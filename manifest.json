@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "QuickTab",
+  "description": "Fast tab switcher for Chrome",
+  "version": "1.0.0",
+  "icons": {
+    "32": "icons/icon_32.png",
+    "36": "icons/icon_36.png",
+    "48": "icons/icon_48.png",
+    "128": "icons/icon_128.png"
+  },
+  "permissions": [
+    "tabs",
+    "storage",
+    "scripting",
+    "activeTab"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "run_at": "document_end"
+    }
+  ],
+  "commands": {
+    "toggle-panel": {
+      "suggested_key": {
+        "default": "Alt+Q",
+        "mac": "Alt+Q"
+      },
+      "description": "Toggle recent tabs panel"
+    }
+  }
+}

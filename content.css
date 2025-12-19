@@ -1,0 +1,106 @@
+/* QuickTab - Tab Switcher Panel */
+
+/* ========== 遮罩层 ========== */
+.tabsnap-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2147483646;
+}
+
+/* ========== 面板 ========== */
+.tabsnap-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(30, 30, 30, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  z-index: 2147483647;
+  padding: 12px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+/* ========== 头部 ========== */
+.tabsnap-header {
+  display: none;
+}
+
+/* ========== 卡片列表 ========== */
+.tabsnap-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.tabsnap-grid::-webkit-scrollbar {
+  width: 4px;
+}
+
+.tabsnap-grid::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+}
+
+/* ========== 卡片 ========== */
+.tabsnap-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  outline: none;
+  border: none;
+  min-width: 300px;
+  max-width: 500px;
+}
+
+.tabsnap-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tabsnap-card:focus {
+  background: rgba(59, 130, 246, 0.3);
+}
+
+/* 当前标签 */
+.tabsnap-card.tabsnap-current {
+  opacity: 0.5;
+}
+
+/* ========== Favicon ========== */
+.tabsnap-favicon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 4px;
+}
+
+/* ========== 标题 ========== */
+.tabsnap-card-title {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+/* ========== 空状态 ========== */
+.tabsnap-empty {
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  padding: 20px;
+  font-size: 13px;
+}
