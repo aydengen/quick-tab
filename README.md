@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="icons/icon_128.png" alt="QuickTab Icon" width="48" height="48" style="vertical-align: middle;">
+  <img src="icons/icon_128.png" alt="QuickTab Icon" width="48" height="48" style="vertical-align: top;">
   QuickTab
 </h1>
 
