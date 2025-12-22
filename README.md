@@ -87,6 +87,15 @@ chrome://extensions/shortcuts
 ## 📝 开发
 
 ```bash
+# 安装依赖
+pnpm install
+
+# 构建到 dist/ 目录
+pnpm build
+
+# 构建并生成 zip 包
+pnpm build:zip
+
 # 修改代码后，在 chrome://extensions/ 点击扩展的刷新按钮即可
 ```
 
@@ -94,6 +103,50 @@ chrome://extensions/shortcuts
 
 - **Service Worker 日志**：在 `chrome://extensions/` 点击「Service Worker」链接
 - **Content Script 日志**：在页面的开发者工具 Console 中查看
+
+## 🚀 自动化部署
+
+本项目使用 GitHub Actions 实现自动化 CI/CD。
+
+### CI 持续集成
+
+每次推送到 `main` 分支或创建 PR 时，会自动：
+- 验证 `manifest.json` 格式
+- 构建并打包扩展
+
+### 发布新版本
+
+```bash
+# 1. 更新版本号 (patch: 1.0.0 → 1.0.1)
+pnpm version:patch   # 或 version:minor / version:major
+
+# 2. 提交更改
+git add .
+git commit -m "chore: bump version to x.x.x"
+
+# 3. 创建 tag 并推送
+git tag v1.0.1
+git push origin main --tags
+```
+
+推送 tag 后，GitHub Actions 会自动：
+1. 构建扩展并生成 zip 包
+2. 创建 GitHub Release 并附加 zip 文件
+
+### Chrome Web Store 自动发布（可选）
+
+如需自动发布到 Chrome Web Store，需要配置以下 Secrets：
+
+| Secret | 说明 |
+|--------|------|
+| `CHROME_EXTENSION_ID` | 扩展 ID |
+| `CHROME_CLIENT_ID` | OAuth Client ID |
+| `CHROME_CLIENT_SECRET` | OAuth Client Secret |
+| `CHROME_REFRESH_TOKEN` | OAuth Refresh Token |
+
+同时在仓库 Variables 中设置 `ENABLE_CHROME_PUBLISH=true` 启用。
+
+获取 Chrome Web Store API 凭据：[官方文档](https://developer.chrome.com/docs/webstore/using-api)
 
 ## 🤝 贡献
 

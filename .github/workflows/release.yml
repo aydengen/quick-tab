@@ -1,0 +1,116 @@
+# GitHub Actions - 自动构建和发布
+#
+# 触发条件:
+#   - 推送 tag (v*)
+#   - 手动触发
+#
+# 功能:
+#   1. 自动构建 zip 包
+#   2. 创建 GitHub Release
+#   3. (可选) 发布到 Chrome Web Store
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号 (如 1.0.1)'
+        required: false
+
+jobs:
+  build:
+    name: 构建和发布
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: 安装依赖
+        run: pnpm install
+      
+      - name: 获取版本号
+        id: version
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION=${GITHUB_REF#refs/tags/v}
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📌 版本: $VERSION"
+      
+      - name: 构建扩展
+        run: pnpm build:zip
+      
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: quick-tab-v${{ steps.version.outputs.version }}
+          path: releases/*.zip
+          retention-days: 30
+      
+      - name: 创建 GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: releases/*.zip
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Chrome Web Store 自动发布 (可选)
+  # 需要先配置 secrets: CHROME_CLIENT_ID, CHROME_CLIENT_SECRET, CHROME_REFRESH_TOKEN
+  publish-chrome:
+    name: 发布到 Chrome Web Store
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/') && vars.ENABLE_CHROME_PUBLISH == 'true'
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+      
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      
+      - name: 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+      
+      - name: 安装依赖
+        run: pnpm install
+      
+      - name: 构建扩展
+        run: pnpm build:zip
+      
+      - name: 发布到 Chrome Web Store
+        uses: mnao305/chrome-extension-upload@v5.0.0
+        with:
+          file-path: releases/quick-tab-v*.zip
+          extension-id: ${{ secrets.CHROME_EXTENSION_ID }}
+          client-id: ${{ secrets.CHROME_CLIENT_ID }}
+          client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
+          refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          publish: true
