@@ -6,8 +6,15 @@
 <p align="center">一个轻量级的 Chrome 标签页切换器，提供快速切换体验。</p>
 
 <p align="center">
+  <a href="https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimheklaj">
+    <img src="https://img.shields.io/chrome-web-store/v/pmagocpnoedekbpchligfnhkimheklaj?label=Chrome%20Web%20Store" alt="Chrome Web Store">
+  </a>
   <img src="https://img.shields.io/badge/Chrome-MV3-green" alt="Chrome">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
+</p>
+
+<p align="center">
+  <img src="icons/chrome_1280_800.png" alt="QuickTab Screenshot" width="640">
 </p>
 
 ## ✨ 特性
@@ -27,6 +34,10 @@
 | `Esc` | 取消并关闭面板 |
 
 ## 📦 安装
+
+### 从 Chrome 应用商店安装（推荐）
+
+直接访问 [Chrome Web Store](https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimheklaj) 点击「添加至 Chrome」即可。
 
 ### 从源码安装
 
@@ -61,22 +72,6 @@ chrome://extensions/shortcuts
 - **Manifest V3** — Chrome 扩展最新标准
 - **原生 JavaScript** — 无框架依赖
 - **chrome.storage.session** — 会话级存储，重启自动清空
-
-## 📁 项目结构
-
-```
-quick-tab/
-├── manifest.json    # 扩展配置
-├── background.js    # Service Worker（事件监听、数据管理）
-├── content.js       # 内容脚本（UI 渲染、交互逻辑）
-├── content.css      # 面板样式
-├── icons/           # 扩展图标
-│   ├── icon_32.png
-│   ├── icon_36.png
-│   ├── icon_48.png
-│   └── icon_128.png
-└── README.md
-```
 
 ## 🔒 权限说明
 
