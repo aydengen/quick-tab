@@ -12,8 +12,9 @@
   // ========== 面板管理 ==========
 
   function showPanel() {
+    // 如果面板已打开，循环选择下一个（支持连续按 Alt+Q 切换）
     if (panelVisible) {
-      hidePanel();
+      cycleSelection(1);
       return;
     }
 
@@ -31,22 +32,6 @@
       const tabs = response?.tabs || [];
       renderPanel(tabs);
     });
-  }
-
-  function hidePanelSimple() {
-    const overlay = document.getElementById(OVERLAY_ID);
-    const panel = document.getElementById(PANEL_ID);
-
-    if (overlay) {
-      overlay.classList.add('tabsnap-fade-out');
-      setTimeout(() => overlay.remove(), 150);
-    }
-    if (panel) {
-      panel.classList.add('tabsnap-fade-out');
-      setTimeout(() => panel.remove(), 150);
-    }
-
-    panelVisible = false;
   }
 
   // ========== 渲染 ==========
@@ -155,32 +140,14 @@
   // ========== 键盘交互 ==========
 
   let altKeyDown = false;
-  let selectedTabId = null;
 
   // 按下键盘
   document.addEventListener('keydown', (e) => {
-    // Alt+Q 唤起面板（未打开时）
-    if (e.altKey && (e.key === 'q' || e.key === 'Q') && !panelVisible) {
-      e.preventDefault();
-      e.stopPropagation();
-      altKeyDown = true;
-      showPanel();
-      return;
-    }
-
     if (!panelVisible) return;
 
     // 记录 Alt 键状态
     if (e.key === 'Alt') {
       altKeyDown = true;
-    }
-
-    // 面板已打开时，按 Q 或 Alt+Q 循环选择
-    if (e.key === 'q' || e.key === 'Q') {
-      e.preventDefault();
-      e.stopPropagation();
-      cycleSelection(e.shiftKey ? -1 : 1);
-      return;
     }
 
     // ESC 关闭
@@ -231,7 +198,6 @@
     const currentIndex = cards.findIndex(c => c === document.activeElement);
     const nextIndex = (currentIndex + direction + cards.length) % cards.length;
     cards[nextIndex]?.focus();
-    selectedTabId = parseInt(cards[nextIndex]?.dataset.tabId);
   }
 
   // 修改 hidePanel 支持切换
@@ -259,7 +225,6 @@
 
     panelVisible = false;
     altKeyDown = false;
-    selectedTabId = null;
   }
 
   // ========== 消息监听 ==========

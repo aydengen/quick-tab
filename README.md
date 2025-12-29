@@ -29,9 +29,13 @@
 | 操作 | 效果 |
 |------|------|
 | `Alt+Q` | 唤起切换面板 |
+| 按住 `Alt`，连续按 `Q` | 循环选择下一个 |
 | `↑` `↓` 或 `Tab` | 循环选择 |
+| 松开 `Alt` | 自动切换到选中项 |
 | `Enter` | 确认切换 |
 | `Esc` | 取消并关闭面板 |
+
+> 💡 快捷键可在 `chrome://extensions/shortcuts` 自定义，连续按快捷键循环切换的功能同样适用于自定义快捷键。
 
 ## 📦 安装
 
@@ -87,14 +91,11 @@ chrome://extensions/shortcuts
 ## 📝 开发
 
 ```bash
-# 安装依赖
-pnpm install
-
 # 构建到 dist/ 目录
-pnpm build
+./scripts/build.sh
 
 # 构建并生成 zip 包
-pnpm build:zip
+./scripts/build.sh --zip
 
 # 修改代码后，在 chrome://extensions/ 点击扩展的刷新按钮即可
 ```
@@ -117,15 +118,14 @@ pnpm build:zip
 ### 发布新版本
 
 ```bash
-# 1. 更新版本号 (patch: 1.0.0 → 1.0.1)
-pnpm version:patch   # 或 version:minor / version:major
+# 1. 更新版本号：直接编辑 manifest.json 的 version 字段
 
 # 2. 提交更改
 git add .
 git commit -m "chore: bump version to x.x.x"
 
 # 3. 创建 tag 并推送
-git tag v1.0.1
+git tag vx.x.x
 git push origin main --tags
 ```
 
@@ -133,9 +133,9 @@ git push origin main --tags
 1. 构建扩展并生成 zip 包
 2. 创建 GitHub Release 并附加 zip 文件
 
-### Chrome Web Store 自动发布（可选）
+### Chrome Web Store 自动发布
 
-如需自动发布到 Chrome Web Store，需要配置以下 Secrets：
+推送 tag 后会自动发布到 Chrome Web Store，需要配置以下 Secrets：
 
 | Secret | 说明 |
 |--------|------|
@@ -143,8 +143,6 @@ git push origin main --tags
 | `CHROME_CLIENT_ID` | OAuth Client ID |
 | `CHROME_CLIENT_SECRET` | OAuth Client Secret |
 | `CHROME_REFRESH_TOKEN` | OAuth Refresh Token |
-
-同时在仓库 Variables 中设置 `ENABLE_CHROME_PUBLISH=true` 启用。
 
 获取 Chrome Web Store API 凭据：[官方文档](https://developer.chrome.com/docs/webstore/using-api)
 
