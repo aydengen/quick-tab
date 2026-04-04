@@ -1,159 +1,54 @@
-<h1 align="center">
-  <img src="icons/icon_128.png" alt="QuickTab Icon" width="48" height="48" style="vertical-align: top;">
-  QuickTab
-</h1>
+# QuickTab
 
-<p align="center">一个轻量级的 Chrome 标签页切换器，提供快速切换体验。</p>
+一个尽量极简的 Chrome 标签页切换扩展。
 
-<p align="center">
-  <a href="https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimheklaj">
-    <img src="https://img.shields.io/chrome-web-store/v/pmagocpnoedekbpchligfnhkimheklaj?label=Chrome%20Web%20Store" alt="Chrome Web Store">
-  </a>
-  <img src="https://img.shields.io/badge/Chrome-MV3-green" alt="Chrome">
-  <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
-</p>
+QuickTab 做的事情只有一件：按 `Alt+Q` 打开最近标签列表，并切换到目标标签页。
 
-<p align="center">
-  <img src="icons/chrome_1280_800.png" alt="QuickTab Screenshot" width="640">
-</p>
+## 使用
 
-## ✨ 特性
+- `Alt+Q`：打开面板
+- 按住 `Alt` 连续按 `Q`：向后循环选择
+- `Tab` / `↑` / `↓` / `←` / `→`：移动选择
+- 松开 `Alt`：切换到当前选中标签
+- `Enter`：切换到当前选中标签
+- `Esc`：关闭面板
 
-- **快速切换** — 按 Alt+Q 快速在最近标签页间切换
-- **轻量无依赖** — 纯原生 JS，无需任何框架
-- **隐私友好** — 数据仅存于内存，关闭浏览器自动清空
-- **开箱即用** — 无需配置，安装即用
+快捷键可在 `chrome://extensions/shortcuts` 自定义。
 
-## 🎯 使用方法
+## 安装
 
-| 操作 | 效果 |
-|------|------|
-| `Alt+Q` | 唤起切换面板 |
-| 按住 `Alt`，连续按 `Q` | 循环选择下一个 |
-| `↑` `↓` 或 `Tab` | 循环选择 |
-| 松开 `Alt` | 自动切换到选中项 |
-| `Enter` | 确认切换 |
-| `Esc` | 取消并关闭面板 |
+### Chrome Web Store
 
-> 💡 快捷键可在 `chrome://extensions/shortcuts` 自定义，连续按快捷键循环切换的功能同样适用于自定义快捷键。
+https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimheklaj
 
-## 📦 安装
+### 从源码加载
 
-### 从 Chrome 应用商店安装（推荐）
+1. 打开 `chrome://extensions/`
+2. 开启「开发者模式」
+3. 点击「加载已解压的扩展程序」
+4. 选择项目根目录
 
-直接访问 [Chrome Web Store](https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimheklaj) 点击「添加至 Chrome」即可。
+## 权限
 
-### 从源码安装
+- `tabs`：读取标签页标题和图标，并切换标签页
+- `storage`：保存最近标签列表（`chrome.storage.session`）
 
-1. 克隆或下载本仓库
+所有数据都只保存在本地会话中，关闭浏览器后自动清空。
+
+## 发布
 
 ```bash
-git clone https://github.com/user/quick-tab.git
+VERSION=$(sed -n 's/.*"version": "\(.*\)".*/\1/p' manifest.json)
+mkdir -p releases
+zip -qr "releases/quick-tab-v${VERSION}.zip" manifest.json background.js content.js content.css icons/icon_32.png icons/icon_36.png icons/icon_48.png icons/icon_128.png
 ```
 
-2. 打开 Chrome 扩展管理页面
+修改代码后，在 `chrome://extensions/` 刷新扩展即可。
 
-```
-chrome://extensions/
-```
+## 结构
 
-3. 开启右上角的「开发者模式」
-
-4. 点击「加载已解压的扩展程序」，选择 `quick-tab` 文件夹
-
-5. 完成！按 `Alt+Q` 开始使用
-
-### 自定义快捷键
-
-如果默认快捷键与其他应用冲突，可以在 Chrome 中修改：
-
-```
-chrome://extensions/shortcuts
-```
-
-## 🏗️ 技术栈
-
-- **Manifest V3** — Chrome 扩展最新标准
-- **原生 JavaScript** — 无框架依赖
-- **chrome.storage.session** — 会话级存储，重启自动清空
-
-## 🔒 权限说明
-
-| 权限 | 用途 |
-|------|------|
-| `tabs` | 获取标签页标题、URL、favicon |
-| `storage` | 存储最近标签列表（会话级） |
-| `scripting` | 注入面板脚本 |
-| `activeTab` | 访问当前标签页 |
-
-本扩展 **不会** 收集或上传任何数据，所有信息仅在本地使用。
-
-## 📝 开发
-
-```bash
-# 构建到 dist/ 目录
-./scripts/build.sh
-
-# 构建并生成 zip 包
-./scripts/build.sh --zip
-
-# 修改代码后，在 chrome://extensions/ 点击扩展的刷新按钮即可
-```
-
-### 调试
-
-- **Service Worker 日志**：在 `chrome://extensions/` 点击「Service Worker」链接
-- **Content Script 日志**：在页面的开发者工具 Console 中查看
-
-## 🚀 自动化部署
-
-本项目使用 GitHub Actions 实现自动化 CI/CD。
-
-### CI 持续集成
-
-每次推送到 `main` 分支或创建 PR 时，会自动：
-- 验证 `manifest.json` 格式
-- 构建并打包扩展
-
-### 发布新版本
-
-```bash
-# 1. 更新版本号：直接编辑 manifest.json 的 version 字段
-
-# 2. 提交更改
-git add .
-git commit -m "chore: bump version to x.x.x"
-
-# 3. 创建 tag 并推送
-git tag vx.x.x
-git push origin main --tags
-```
-
-推送 tag 后，GitHub Actions 会自动：
-1. 构建扩展并生成 zip 包
-2. 创建 GitHub Release 并附加 zip 文件
-
-### Chrome Web Store 自动发布
-
-推送 tag 后会自动发布到 Chrome Web Store，需要配置以下 Secrets：
-
-| Secret | 说明 |
-|--------|------|
-| `CHROME_EXTENSION_ID` | 扩展 ID |
-| `CHROME_CLIENT_ID` | OAuth Client ID |
-| `CHROME_CLIENT_SECRET` | OAuth Client Secret |
-| `CHROME_REFRESH_TOKEN` | OAuth Refresh Token |
-
-获取 Chrome Web Store API 凭据：[官方文档](https://developer.chrome.com/docs/webstore/using-api)
-
-## 🤝 贡献
-
-欢迎提交 Issue 和 Pull Request！
-
-## 📄 License
-
-[MIT](LICENSE)
-
----
-
-Made with ❤️ by Ayden 
+- `manifest.json`：扩展配置
+- `background.js`：最近标签记录和切换逻辑
+- `content.js`：面板渲染和键盘交互
+- `content.css`：面板样式
+- `icons/`：扩展图标

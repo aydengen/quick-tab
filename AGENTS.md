@@ -7,11 +7,10 @@ QuickTab 是一个轻量级 Chrome 标签页切换扩展，使用 Manifest V3 + 
 ## Dev Commands
 
 ```bash
-# 构建扩展到 dist/
-./scripts/build.sh
-
-# 构建并生成发布用 zip 包
-./scripts/build.sh --zip
+# 生成发布用 zip 包
+VERSION=$(sed -n 's/.*"version": "\(.*\)".*/\1/p' manifest.json)
+mkdir -p releases
+zip -qr "releases/quick-tab-v${VERSION}.zip" manifest.json background.js content.js content.css icons/icon_32.png icons/icon_36.png icons/icon_48.png icons/icon_128.png
 
 # 更新版本号：直接编辑 manifest.json 的 version 字段
 ```
@@ -20,7 +19,7 @@ QuickTab 是一个轻量级 Chrome 标签页切换扩展，使用 Manifest V3 + 
 
 1. **Service Worker 日志**: `chrome://extensions/` → 点击扩展的「Service Worker」链接
 2. **Content Script 日志**: 任意页面 → 开发者工具 → Console
-3. **加载扩展**: `chrome://extensions/` → 开启「开发者模式」→「加载已解压的扩展程序」→ 选择项目根目录或 `dist/`
+3. **加载扩展**: `chrome://extensions/` → 开启「开发者模式」→「加载已解压的扩展程序」→ 选择项目根目录
 4. **热更新**: 修改代码后在 `chrome://extensions/` 点击扩展刷新按钮
 
 ## Architecture
@@ -73,15 +72,12 @@ Alt+Q → chrome.commands → background 发消息到 content
 ├── content.js             # Content Script
 ├── content.css            # 面板样式
 ├── icons/                 # 扩展图标
-├── scripts/
-│   └── build.sh           # Shell 构建脚本
-├── dist/                  # 构建输出（勿直接修改）
 └── releases/              # zip 包输出
 ```
 
 ## Important Notes
 
 1. **版本管理**: 直接编辑 `manifest.json` 的 `version` 字段
-2. **构建产物**: `dist/` 目录是构建输出，不要直接修改
+2. **发布打包**: 直接手动执行 `zip` 命令，只包含必要文件
 3. **无测试框架**: 项目暂无自动化测试，需手动在浏览器中验证功能
 4. **Chrome API**: 所有 Chrome Extension API 调用在 background.js 中处理

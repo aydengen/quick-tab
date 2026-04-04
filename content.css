@@ -28,11 +28,6 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
 }
 
-/* ========== 头部 ========== */
-.tabsnap-header {
-  display: none;
-}
-
 /* ========== 卡片列表 ========== */
 .tabsnap-grid {
   display: flex;
