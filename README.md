@@ -35,15 +35,31 @@ https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimhekl
 
 所有数据都只保存在本地会话中，关闭浏览器后自动清空。
 
-## 发布
-
-```bash
-VERSION=$(sed -n 's/.*"version": "\(.*\)".*/\1/p' manifest.json)
-mkdir -p releases
-zip -qr "releases/quick-tab-v${VERSION}.zip" manifest.json background.js content.js content.css icons/icon_32.png icons/icon_36.png icons/icon_48.png icons/icon_128.png
-```
+## 开发
 
 修改代码后，在 `chrome://extensions/` 刷新扩展即可。
+
+## 发布
+
+1. 修改 `manifest.json` 的 `version`。
+2. 提交并推送到 `main`，触发 CI 检查。
+3. 创建并推送同版本 tag，例如：
+
+```bash
+git tag -a v1.0.5 -m "v1.0.5"
+# -a: annotated tag（附注标签） | -m: message（标签说明）
+
+git push origin v1.0.5
+# origin: 远端名 | v1.0.5: 要推送的标签名
+```
+
+4. GitHub Actions 的 `Release` workflow 会自动：
+
+- 生成发布 zip
+- 创建 GitHub Release
+- 上传到 Chrome Web Store
+
+本地不再维护单独的构建脚本，也不需要手动打包作为日常流程。
 
 ## 结构
 

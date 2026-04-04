@@ -7,12 +7,18 @@ QuickTab 是一个轻量级 Chrome 标签页切换扩展，使用 Manifest V3 + 
 ## Dev Commands
 
 ```bash
-# 生成发布用 zip 包
-VERSION=$(sed -n 's/.*"version": "\(.*\)".*/\1/p' manifest.json)
-mkdir -p releases
-zip -qr "releases/quick-tab-v${VERSION}.zip" manifest.json background.js content.js content.css icons/icon_32.png icons/icon_36.png icons/icon_48.png icons/icon_128.png
-
 # 更新版本号：直接编辑 manifest.json 的 version 字段
+
+# 推送代码，触发 CI
+git push origin main
+# origin: 远端名 | main: 主分支
+
+# 创建并推送发布 tag，触发 Release workflow
+git tag -a v1.0.5 -m "v1.0.5"
+# -a: annotated tag（附注标签） | -m: message（标签说明）
+
+git push origin v1.0.5
+# origin: 远端名 | v1.0.5: 要推送的标签名
 ```
 
 ## Debugging
@@ -71,13 +77,14 @@ Alt+Q → chrome.commands → background 发消息到 content
 ├── background.js          # Service Worker
 ├── content.js             # Content Script
 ├── content.css            # 面板样式
-├── icons/                 # 扩展图标
-└── releases/              # zip 包输出
+└── icons/                 # 扩展图标
 ```
 
 ## Important Notes
 
 1. **版本管理**: 直接编辑 `manifest.json` 的 `version` 字段
-2. **发布打包**: 直接手动执行 `zip` 命令，只包含必要文件
-3. **无测试框架**: 项目暂无自动化测试，需手动在浏览器中验证功能
-4. **Chrome API**: 所有 Chrome Extension API 调用在 background.js 中处理
+2. **CI**: 推送到 `main` 会运行 `.github/workflows/ci.yml`，校验 `manifest.json` 并验证 zip 可生成
+3. **发版**: 推送 `v*` tag 会运行 `.github/workflows/release.yml`，自动打包、创建 GitHub Release，并上传到 Chrome Web Store
+4. **无本地构建脚本**: 当前仓库不维护 `build.sh`，默认开发流程是直接加载项目根目录
+5. **无测试框架**: 项目暂无自动化测试，核心验证方式仍是浏览器手动验证
+6. **Chrome API**: 所有 Chrome Extension API 调用在 background.js 中处理
