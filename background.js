@@ -62,6 +62,7 @@ async function recordTabActivation(tabId) {
     tabList.unshift({
       id: tab.id,
       title: tab.title || 'Untitled',
+      url: tab.url || '',
       favIconUrl: tab.favIconUrl || ''
     });
 
@@ -89,6 +90,7 @@ async function updateTabInfo(tabId, changeInfo, tab) {
     const tabInfo = tabList.find((t) => t.id === tabId);
     if (tabInfo) {
       tabInfo.title = tab.title || tabInfo.title;
+      tabInfo.url = tab.url || tabInfo.url;
       tabInfo.favIconUrl = tab.favIconUrl || tabInfo.favIconUrl;
       return tabList;
     }
@@ -137,7 +139,13 @@ chrome.commands.onCommand.addListener(async (command) => {
 // 消息处理
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.action === 'getTabList') {
-    getTabList().then((tabs) => sendResponse({ tabs }));
+    (async () => {
+      const tabs = await getTabList();
+      const settings = await chrome.storage.local.get('showNonInjectableTabs');
+      const showAll = settings.showNonInjectableTabs || false;
+      const filtered = showAll ? tabs : tabs.filter(t => isInjectableUrl(t.url));
+      sendResponse({ tabs: filtered });
+    })();
     return true; // 异步响应
   }
 
@@ -168,6 +176,7 @@ async function initAllTabs() {
         tabList.push({
           id: tab.id,
           title: tab.title || 'Untitled',
+          url: tab.url || '',
           favIconUrl: tab.favIconUrl || ''
         });
       }

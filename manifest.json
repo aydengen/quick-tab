@@ -2,7 +2,13 @@
   "manifest_version": 3,
   "name": "QuickTab",
   "description": "Fast tab switcher for Chrome",
-  "version": "1.0.5",
+  "version": "1.1.0",
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "32": "icons/icon_32.png"
+    }
+  },
   "icons": {
     "32": "icons/icon_32.png",
     "36": "icons/icon_36.png",
