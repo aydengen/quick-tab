@@ -130,8 +130,8 @@ chrome.commands.onCommand.addListener(async (command) => {
       if (tab && isInjectableUrl(tab.url)) {
         await chrome.tabs.sendMessage(tab.id, { action: 'togglePanel' });
       }
-    } catch (error) {
-      console.error('QuickTab: Cannot send message to tab', error);
+    } catch {
+      // Content script not loaded on this page (e.g., freshly installed, not yet refreshed)
     }
   }
 });

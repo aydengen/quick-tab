@@ -1,15 +1,19 @@
 // QuickTab - Popup Settings
 
-const SETTING_KEY = 'showNonInjectableTabs';
+const showNonInjectableCheckbox = document.getElementById('showNonInjectable');
+const stickyModeCheckbox = document.getElementById('stickyMode');
 
-const checkbox = document.getElementById('showNonInjectable');
-
-// Load saved setting
-chrome.storage.local.get(SETTING_KEY, (result) => {
-  checkbox.checked = result[SETTING_KEY] || false;
+// Load saved settings
+chrome.storage.local.get(['showNonInjectableTabs', 'stickyMode'], (result) => {
+  showNonInjectableCheckbox.checked = result.showNonInjectableTabs || false;
+  stickyModeCheckbox.checked = result.stickyMode || false;
 });
 
 // Save on change
-checkbox.addEventListener('change', () => {
-  chrome.storage.local.set({ [SETTING_KEY]: checkbox.checked });
+showNonInjectableCheckbox.addEventListener('change', () => {
+  chrome.storage.local.set({ showNonInjectableTabs: showNonInjectableCheckbox.checked });
+});
+
+stickyModeCheckbox.addEventListener('change', () => {
+  chrome.storage.local.set({ stickyMode: stickyModeCheckbox.checked });
 });

@@ -10,6 +10,17 @@
 
   let panelVisible = false;
   let altKeyDown = false;
+  let stickyMode = false;
+
+  // 加载 sticky mode 设置
+  chrome.storage.local.get('stickyMode', (result) => {
+    stickyMode = result.stickyMode || false;
+  });
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local' && changes.stickyMode) {
+      stickyMode = changes.stickyMode.newValue || false;
+    }
+  });
 
   // ========== 面板管理 ==========
 
@@ -75,6 +86,14 @@
 
     panel.appendChild(grid);
 
+    // 快捷键提示
+    const hints = document.createElement('div');
+    hints.className = 'tabsnap-hints';
+    hints.innerHTML = stickyMode
+      ? '<span><kbd>↑↓</kbd> Navigate</span><span><kbd>Enter</kbd> Switch</span><span><kbd>Esc</kbd> Close</span>'
+      : '<span><kbd>↑↓</kbd> Navigate</span><span><kbd>Enter</kbd> Switch</span><span><kbd>Esc</kbd> Close</span><span><kbd>Alt↑</kbd> Confirm</span>';
+    panel.appendChild(hints);
+
     // 添加到页面
     document.body.appendChild(overlay);
     document.body.appendChild(panel);
@@ -103,12 +122,29 @@
     };
     card.appendChild(favicon);
 
-    // 标题
+    // 文本区域
+    const textWrap = document.createElement('div');
+    textWrap.className = 'tabsnap-card-text';
+
     const title = document.createElement('span');
     title.className = 'tabsnap-card-title';
     title.textContent = tab.title || 'Untitled';
     title.title = tab.title || 'Untitled';
-    card.appendChild(title);
+    textWrap.appendChild(title);
+
+    if (tab.url) {
+      const url = document.createElement('span');
+      url.className = 'tabsnap-card-url';
+      try {
+        const u = new URL(tab.url);
+        url.textContent = u.host + u.pathname.replace(/\/$/, '');
+      } catch {
+        url.textContent = tab.url;
+      }
+      textWrap.appendChild(url);
+    }
+
+    card.appendChild(textWrap);
 
     // 点击事件
     card.addEventListener('click', () => switchToTab(tab.id));
@@ -146,8 +182,8 @@
   document.addEventListener('keydown', (e) => {
     if (!panelVisible) return;
 
-    // 记录 Alt 键状态
-    if (e.key === 'Alt') {
+    // 记录 Alt 键状态（非 sticky 模式）
+    if (!stickyMode && e.key === 'Alt') {
       altKeyDown = true;
     }
 
@@ -170,16 +206,18 @@
     // Tab 或方向键循环选择
     if (e.key === 'Tab' || e.key === 'ArrowRight' || e.key === 'ArrowDown') {
       e.preventDefault();
+      e.stopPropagation();
       cycleSelection(e.shiftKey ? -1 : 1);
     } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
       e.preventDefault();
+      e.stopPropagation();
       cycleSelection(-1);
     }
   }, true);
 
-  // 松开键盘 - 松开 Alt 时自动切换
+  // 松开键盘 - 松开 Alt 时自动切换（仅非 sticky 模式）
   document.addEventListener('keyup', (e) => {
-    if (!panelVisible) return;
+    if (!panelVisible || stickyMode) return;
 
     if (e.key === 'Alt' && altKeyDown) {
       e.preventDefault();
@@ -213,7 +251,7 @@
 
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (message.action === 'togglePanel') {
-      altKeyDown = true; // 来自快捷键，认为 Alt 按下
+      altKeyDown = !stickyMode; // 非 sticky 模式下认为 Alt 按下
       showPanel();
       sendResponse({ success: true });
     }
