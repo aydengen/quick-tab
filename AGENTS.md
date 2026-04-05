@@ -21,6 +21,31 @@ git push origin v1.0.5
 # origin: 远端名 | v1.0.5: 要推送的标签名
 ```
 
+## Release Workflow (Agent)
+
+提交并发版的完整流程：
+
+```bash
+# 1. 升版本号
+#    编辑 manifest.json 的 version 字段（如 1.1.0 → 1.1.1）
+
+# 2. 暂存相关文件（不要用 git add -A）
+git add background.js content.css content.js popup.html popup.js manifest.json
+# 只暂存本次改动涉及的文件
+
+# 3. 提交
+git commit -m "feat: 简要描述"
+
+# 4. 打 tag
+git tag -a v1.1.1 -m "v1.1.1"
+# tag 名和 manifest.json version 保持一致，前缀 v
+
+# 5. 推送代码 + tag
+git push origin main
+git push origin v1.1.1
+# 推送 tag 会自动触发 Release workflow（打包 + 发布 GitHub Release + 上传 Chrome Web Store）
+```
+
 ## Debugging
 
 1. **Service Worker 日志**: `chrome://extensions/` → 点击扩展的「Service Worker」链接
@@ -83,8 +108,7 @@ Alt+Q → chrome.commands → background 发消息到 content
 ## Important Notes
 
 1. **版本管理**: 直接编辑 `manifest.json` 的 `version` 字段
-2. **CI**: 推送到 `main` 会运行 `.github/workflows/ci.yml`，校验 `manifest.json` 并验证 zip 可生成
-3. **发版**: 推送 `v*` tag 会运行 `.github/workflows/release.yml`，自动打包、创建 GitHub Release，并上传到 Chrome Web Store
+2. **发版**: 推送 `v*` tag 会运行 `.github/workflows/release.yml`，自动打包、创建 GitHub Release，并上传到 Chrome Web Store
 4. **无本地构建脚本**: 当前仓库不维护 `build.sh`，默认开发流程是直接加载项目根目录
 5. **无测试框架**: 项目暂无自动化测试，核心验证方式仍是浏览器手动验证
 6. **Chrome API**: 所有 Chrome Extension API 调用在 background.js 中处理
