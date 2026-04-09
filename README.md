@@ -46,11 +46,11 @@ https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimhekl
 3. 创建并推送同版本 tag，例如：
 
 ```bash
-git tag -a v1.0.5 -m "v1.0.5"
+git tag -a v1.1.1 -m "v1.1.1"
 # -a: annotated tag（附注标签） | -m: message（标签说明）
 
-git push origin v1.0.5
-# origin: 远端名 | v1.0.5: 要推送的标签名
+git push origin v1.1.1
+# origin: 远端名 | v1.1.1: 要推送的标签名
 ```
 
 4. GitHub Actions 的 `Release` workflow 会自动：
