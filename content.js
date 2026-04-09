@@ -89,9 +89,10 @@
     // 快捷键提示
     const hints = document.createElement('div');
     hints.className = 'tabsnap-hints';
+    const baseHints = '<span><kbd>↑↓</kbd> Navigate</span><span><kbd>Enter</kbd> Switch</span><span><kbd>Esc</kbd> Close</span>';
     hints.innerHTML = stickyMode
-      ? '<span><kbd>↑↓</kbd> Navigate</span><span><kbd>Enter</kbd> Switch</span><span><kbd>Esc</kbd> Close</span>'
-      : '<span><kbd>↑↓</kbd> Navigate</span><span><kbd>Enter</kbd> Switch</span><span><kbd>Esc</kbd> Close</span><span><kbd>Alt↑</kbd> Confirm</span>';
+      ? baseHints
+      : `${baseHints}<span><kbd>Alt↑</kbd> Confirm</span>`;
     panel.appendChild(hints);
 
     // 添加到页面
