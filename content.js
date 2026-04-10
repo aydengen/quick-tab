@@ -11,6 +11,7 @@
   let panelVisible = false;
   let altKeyDown = false;
   let stickyMode = false;
+  let panelRequestId = 0;
 
   // 加载 sticky mode 设置
   chrome.storage.local.get('stickyMode', (result) => {
@@ -33,12 +34,17 @@
 
     // 立即标记为可见，防止连续按键时重复调用
     panelVisible = true;
+    const requestId = ++panelRequestId;
 
     // 获取标签列表
     chrome.runtime.sendMessage({ action: 'getTabList' }, (response) => {
+      if (requestId !== panelRequestId || !panelVisible) {
+        return;
+      }
+
       if (chrome.runtime.lastError) {
         console.error('QuickTab: Error getting tab list', chrome.runtime.lastError.message);
-        panelVisible = false; // 出错时重置状态
+        panelVisible = false;
         return;
       }
 
@@ -89,7 +95,7 @@
     // 快捷键提示
     const hints = document.createElement('div');
     hints.className = 'tabsnap-hints';
-    const baseHints = '<span><kbd>↑↓</kbd> Navigate</span><span><kbd>Enter</kbd> Switch</span><span><kbd>Esc</kbd> Close</span>';
+    const baseHints = '<span><kbd>J</kbd><kbd>K</kbd><kbd>↑↓</kbd> Navigate</span><span><kbd>Enter</kbd> Switch</span><span><kbd>Esc</kbd> Close</span>';
     hints.innerHTML = stickyMode
       ? baseHints
       : `${baseHints}<span><kbd>Alt↑</kbd> Confirm</span>`;
@@ -182,6 +188,7 @@
   // 按下键盘
   document.addEventListener('keydown', (e) => {
     if (!panelVisible) return;
+    const key = e.key.toLowerCase();
 
     // 记录 Alt 键状态（非 sticky 模式）
     if (!stickyMode && e.key === 'Alt') {
@@ -205,11 +212,11 @@
     }
 
     // Tab 或方向键循环选择
-    if (e.key === 'Tab' || e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    if (e.key === 'Tab' || e.key === 'ArrowRight' || e.key === 'ArrowDown' || key === 'j') {
       e.preventDefault();
       e.stopPropagation();
       cycleSelection(e.shiftKey ? -1 : 1);
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || key === 'k') {
       e.preventDefault();
       e.stopPropagation();
       cycleSelection(-1);
@@ -241,6 +248,7 @@
   }
 
   function hidePanel() {
+    panelRequestId += 1;
     document.getElementById(OVERLAY_ID)?.remove();
     document.getElementById(PANEL_ID)?.remove();
 

@@ -165,6 +165,11 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 // 初始化：记录所有标签页
 async function initAllTabs() {
   try {
+    const existing = await chrome.storage.session.get(STORAGE_KEY);
+    if (Array.isArray(existing[STORAGE_KEY])) {
+      return;
+    }
+
     const allTabs = await chrome.tabs.query({});
     const tabList = [];
 
