@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# No services, credentials, or session state need restoring for this extension.
+# Keep wake-up fast; dependency installation belongs in setup only.
+command -v node >/dev/null
+command -v zip >/dev/null
+command -v agent-browser >/dev/null
+echo 'QuickTab ready. No background services required.'

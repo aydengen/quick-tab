@@ -24,3 +24,6 @@ pnpm-debug.log*
 # 环境变量
 .env
 .env.local
+
+# Amp orb portal metadata
+.amp/portals/*

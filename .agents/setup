@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# QuickTab has no package dependencies or build step. Node is for syntax checks;
+# zip is used by the release workflow. Reuse tools from the orb snapshot.
+SECONDS=0
+echo 'Checking QuickTab tools...'
+packages=()
+command -v node >/dev/null || packages+=(nodejs)
+command -v zip >/dev/null || packages+=(zip)
+if ((${#packages[@]})); then
+  sudo -n apt-get update
+  sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install -y "${packages[@]}"
+fi
+echo "Tools ready (${SECONDS}s)."
+
+# Amp provides agent-browser and its system libraries. Download Chrome only
+# when no cached browser exists; do not update it on every stale snapshot.
+SECONDS=0
+echo 'Checking browser cache...'
+command -v agent-browser >/dev/null
+shopt -s nullglob
+browsers=("$HOME"/.agent-browser/browsers/chrome-*/chrome)
+if ((${#browsers[@]} == 0)); then
+  agent-browser install
+fi
+echo "Browser ready (${SECONDS}s)."
+echo 'QuickTab setup complete. Load this repository as an unpacked Chrome extension.'
