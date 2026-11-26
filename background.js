@@ -94,9 +94,12 @@ async function recordTabActivation(tabId) {
   if (!tab) return;
 
   await withTabList((tabList) => {
-    const rest = tabList.filter((t) => t.id !== tabId);
-    return [toEntry(tab), ...rest].slice(0, MAX_STORED_TABS);
+    const next = [toEntry(tab), ...tabList.filter((t) => t.id !== tabId)];
+    // 掉出最近列表的标签不再保留缩略图
+    next.slice(MAX_STORED_TABS).forEach((t) => deleteThumb(t.id));
+    return next.slice(0, MAX_STORED_TABS);
   });
+  scheduleCapture(tabId);
 }
 
 async function removeTab(tabId) {
@@ -111,6 +114,11 @@ async function updateTabInfo(tabId, changeInfo, tab) {
   const relevant = 'title' in changeInfo || 'url' in changeInfo ||
     'favIconUrl' in changeInfo || changeInfo.status === 'complete';
   if (!relevant) return;
+
+  // 当前标签加载完成或 SPA 跳转后重新截图
+  if (tab.active && (changeInfo.status === 'complete' || 'title' in changeInfo || 'url' in changeInfo)) {
+    scheduleCapture(tabId);
+  }
 
   let shouldRecord = false;
 
@@ -168,6 +176,7 @@ chrome.windows.onFocusChanged.addListener(async (windowId) => {
 });
 
 chrome.tabs.onRemoved.addListener(async (tabId) => {
+  deleteThumb(tabId);
   await removeTab(tabId);
 });
 
@@ -177,6 +186,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 
 // 预渲染等场景下标签 ID 会被替换
 chrome.tabs.onReplaced.addListener(async (addedTabId, removedTabId) => {
+  deleteThumb(removedTabId);
   let tab;
   try {
     tab = await chrome.tabs.get(addedTabId);
@@ -190,6 +200,142 @@ chrome.tabs.onReplaced.addListener(async (addedTabId, removedTabId) => {
     return tabList;
   });
 });
+
+// ========== 缩略图与图标 ==========
+// captureVisibleTab 只能截取窗口当前可见的标签：标签停留片刻后截图缓存，切换时展示
+
+const THUMB_WIDTH = 480;
+const THUMB_HEIGHT = 300;
+const THUMB_PREFIX = 'thumb:';
+// 停留这么久才截图，Alt+Q 或 Ctrl+Tab 连续切换时只截最终停下的标签
+const THUMB_SETTLE_MS = 500;
+// Chrome 限制每秒最多截图 2 次
+const THUMB_MIN_INTERVAL_MS = 550;
+const THUMB_FRESH_MS = 3000;
+// 打开面板时最多等待当前标签截图这么久
+const THUMB_OPEN_BUDGET_MS = 100;
+
+const thumbCache = new Map();
+const thumbTimers = new Map();
+// 面板打开中的标签不截图，避免把面板截进去
+const panelOpenTabs = new Set();
+let captureChain = Promise.resolve(false);
+let lastCaptureAt = 0;
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function withoutHash(url) {
+  return (url || '').split('#')[0];
+}
+
+function bytesToBase64(bytes) {
+  let binary = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  }
+  return btoa(binary);
+}
+
+async function blobToDataUrl(blob) {
+  const bytes = new Uint8Array(await blob.arrayBuffer());
+  return `data:${blob.type};base64,${bytesToBase64(bytes)}`;
+}
+
+// 裁成 16:10 并保留页面顶部，缩小后存为 WebP（约 20–40 KB）
+async function toThumbnail(capturedUrl) {
+  const bitmap = await createImageBitmap(await (await fetch(capturedUrl)).blob());
+  const ratio = THUMB_WIDTH / THUMB_HEIGHT;
+  const sourceWidth = Math.min(bitmap.width, bitmap.height * ratio);
+  const sourceHeight = sourceWidth / ratio;
+  const canvas = new OffscreenCanvas(THUMB_WIDTH, THUMB_HEIGHT);
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(bitmap, (bitmap.width - sourceWidth) / 2, 0, sourceWidth, sourceHeight,
+    0, 0, THUMB_WIDTH, THUMB_HEIGHT);
+  bitmap.close();
+  return blobToDataUrl(await canvas.convertToBlob({ type: 'image/webp', quality: 0.75 }));
+}
+
+async function loadThumbs(tabIds) {
+  const missing = tabIds.filter((id) => !thumbCache.has(id));
+  if (missing.length) {
+    const result = await chrome.storage.session.get(missing.map((id) => THUMB_PREFIX + id));
+    for (const id of missing) thumbCache.set(id, result[THUMB_PREFIX + id] || null);
+  }
+  return tabIds.map((id) => thumbCache.get(id));
+}
+
+function deleteThumb(tabId) {
+  clearTimeout(thumbTimers.get(tabId));
+  thumbTimers.delete(tabId);
+  thumbCache.delete(tabId);
+  panelOpenTabs.delete(tabId);
+  chrome.storage.session.remove(THUMB_PREFIX + tabId).catch(() => {});
+}
+
+async function captureThumb(tabId, { forPanel = false } = {}) {
+  const wait = lastCaptureAt + THUMB_MIN_INTERVAL_MS - Date.now();
+  if (wait > 0) await sleep(wait);
+  if (!forPanel && panelOpenTabs.has(tabId)) return false;
+
+  const tab = await chrome.tabs.get(tabId);
+  if (!tab.active || tab.status !== 'complete' || !isInjectableUrl(tab.url)) return false;
+  const win = await chrome.windows.get(tab.windowId);
+  if (!win.focused || win.state === 'minimized') return false;
+
+  lastCaptureAt = Date.now();
+  const captured = await chrome.tabs.captureVisibleTab(tab.windowId, { format: 'jpeg', quality: 90 });
+  // 截图期间用户可能已经切走
+  const [active] = await chrome.tabs.query({ active: true, windowId: tab.windowId });
+  if (active?.id !== tabId || withoutHash(active.url) !== withoutHash(tab.url)) return false;
+
+  const thumb = { url: tab.url, dataUrl: await toThumbnail(captured), at: Date.now() };
+  thumbCache.set(tabId, thumb);
+  await chrome.storage.session.set({ [THUMB_PREFIX + tabId]: thumb });
+  return true;
+}
+
+function queueCapture(tabId, options) {
+  const run = captureChain
+    .then(() => captureThumb(tabId, options))
+    .catch(() => false); // 受限页面、窗口已关闭等
+  captureChain = run;
+  return run;
+}
+
+function scheduleCapture(tabId) {
+  clearTimeout(thumbTimers.get(tabId));
+  thumbTimers.set(tabId, setTimeout(() => {
+    thumbTimers.delete(tabId);
+    queueCapture(tabId);
+  }, THUMB_SETTLE_MS));
+}
+
+// 用 Chrome 自带的图标缓存（_favicon），后台转成 data URL：不受页面 CSP 影响，chrome:// 页面也有图标
+const faviconCache = new Map();
+function getFavicon(pageUrl) {
+  if (!pageUrl) return Promise.resolve('');
+  let key;
+  try {
+    const url = new URL(pageUrl);
+    key = url.protocol.startsWith('http') ? url.origin : withoutHash(pageUrl);
+  } catch {
+    return Promise.resolve('');
+  }
+  if (!faviconCache.has(key)) {
+    const iconUrl = new URL(chrome.runtime.getURL('/_favicon/'));
+    iconUrl.searchParams.set('pageUrl', pageUrl);
+    iconUrl.searchParams.set('size', '32');
+    faviconCache.set(key, fetch(iconUrl)
+      .then((response) => (response.ok ? response.blob() : null))
+      .then((blob) => (blob ? blobToDataUrl(blob) : ''))
+      .catch(() => {
+        faviconCache.delete(key);
+        return '';
+      }));
+  }
+  return faviconCache.get(key);
+}
 
 // ========== 面板注入 ==========
 
@@ -274,7 +420,28 @@ chrome.commands.onCommand.addListener(async (command, commandTab) => {
   }
 });
 
-async function buildPanelData(senderTab, includeCss) {
+// 打开面板前先截一张当前标签：它就是下次切换时的“上一个标签”
+async function refreshCurrentThumb(tab) {
+  const [thumb] = await loadThumbs([tab.id]);
+  const fresh = thumb && withoutHash(thumb.url) === withoutHash(tab.url) &&
+    Date.now() - thumb.at < THUMB_FRESH_MS;
+  if (fresh || tab.status !== 'complete') return;
+  clearTimeout(thumbTimers.get(tab.id));
+  await Promise.race([queueCapture(tab.id, { forPanel: true }), sleep(THUMB_OPEN_BUDGET_MS)]);
+}
+
+async function withPreviews(entries) {
+  const thumbs = await loadThumbs(entries.map((entry) => entry.id));
+  const favicons = await Promise.all(entries.map((entry) => getFavicon(entry.url)));
+  return entries.map((entry, i) => {
+    const thumb = thumbs[i];
+    const valid = thumb && withoutHash(thumb.url) === withoutHash(entry.url);
+    return { ...entry, thumbnail: valid ? thumb.dataUrl : '', favicon: favicons[i] };
+  });
+}
+
+async function buildPanelData(senderTab, includeCss, capture) {
+  if (senderTab && capture) await refreshCurrentThumb(senderTab).catch(() => {});
   const [tabs, settings, css] = await Promise.all([
     getTabList(),
     chrome.storage.local.get('showNonInjectableTabs'),
@@ -293,15 +460,21 @@ async function buildPanelData(senderTab, includeCss) {
     list.push(entry);
   }
 
-  return { tabs: list, css };
+  if (senderTab) panelOpenTabs.add(senderTab.id);
+  return { tabs: await withPreviews(list), css };
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'getTabList') {
-    buildPanelData(sender.tab, Boolean(message.includeCss))
+    buildPanelData(sender.tab, Boolean(message.includeCss), message.capture !== false)
       .then(sendResponse)
       .catch((error) => sendResponse({ tabs: [], error: error.message }));
     return true; // 异步响应
+  }
+
+  if (message.action === 'panelClosed') {
+    if (sender.tab) panelOpenTabs.delete(sender.tab.id);
+    return;
   }
 
   if (message.action === 'switchToTab') {
