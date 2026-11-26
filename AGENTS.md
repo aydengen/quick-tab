@@ -99,7 +99,7 @@ Alt+Q → chrome.commands → background 发消息到 content（旧页面未注�
 - **不可注入页面**: `chrome://`, `edge://`, `about:`, Chrome Web Store 页面
 - **存储类型**: `chrome.storage.session`（非持久化，隐私优先）
 - **最大标签数**: 面板显示 10 个
-- **权限**: `tabs`、`storage`、`activeTab`、`scripting`
+- **权限**: `tabs`、`storage`、`activeTab`、`scripting`、`favicon`（读 `_favicon` 图标缓存），host `<all_urls>`（`captureVisibleTab` 截缩略图必需；content script 本就匹配所有网站，安装提示不变）
 - **快捷键**: 通过 `chrome.commands` API 处理，用户可在 `chrome://extensions/shortcuts` 自定义，连续按快捷键可循环切换
 
 ## File Structure
