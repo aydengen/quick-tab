@@ -600,7 +600,12 @@ button:disabled {
   margin-top: 8px;
 }
 .showcase {
-  background: radial-gradient(900px 500px at 50% 0%, #28307a 0%, #12153a 45%, #0a0b18 100%);
+  background: radial-gradient(
+    900px 500px at 50% 0%,
+    #28307a 0%,
+    #12153a 45%,
+    #0a0b18 100%
+  );
   color: #fff;
   text-align: center;
   padding: 84px 0 56px;
@@ -1196,7 +1201,17 @@ button:disabled {
 }
 @media (max-width: 480px) {
   .site-header nav {
+    margin-left: auto;
+    margin-right: 20px;
+    gap: 0;
+  }
+  .site-header nav a:not([hreflang]) {
     display: none;
+  }
+  .site-header nav a[hreflang] {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
   }
   .hero h1 {
     font-size: 48px;
