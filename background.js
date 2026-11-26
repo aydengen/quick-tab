@@ -1,5 +1,5 @@
 // QuickTab - Background Service Worker
-// 管理最近标签列表、按需注入面板、处理消息通信
+// 管理最近标签列表和消息通信，必要时补注入面板脚本
 
 const MAX_TABS = 10;
 const MAX_STORED_TABS = 20;
@@ -198,7 +198,8 @@ function getPanelCss() {
   return panelCssPromise;
 }
 
-// 已注入则直接发消息；否则借助快捷键授予的 activeTab 权限按需注入
+// content.js 通过 manifest 注入；安装/更新前已打开的页面没有它，
+// 借助快捷键授予的 activeTab 权限补注入
 async function openPanel(tab) {
   if (!isInjectableUrl(tab.url)) return false;
 

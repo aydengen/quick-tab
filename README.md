@@ -42,9 +42,9 @@ https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimhekl
 
 - `tabs`：读取标签页标题和图标，并切换标签页
 - `storage`：保存最近标签列表（`chrome.storage.session`）和设置
-- `activeTab` + `scripting`：按下快捷键时，才在当前页面注入面板
+- `activeTab` + `scripting`：安装或更新前已打开的页面，按快捷键时补注入面板脚本，无需刷新
 
-QuickTab 不会预先注入任何网站。面板渲染在封闭的 Shadow DOM 中，网页脚本读不到你的其他标签信息；无痕窗口和普通窗口的标签互不显示。
+面板渲染在封闭的 Shadow DOM 中，网页脚本读不到你的其他标签信息；无痕窗口和普通窗口的标签互不显示。
 
 所有数据都只保存在本地会话中，关闭浏览器后自动清空。
 
@@ -78,7 +78,7 @@ git push origin v1.1.1
 
 - `manifest.json`：扩展配置
 - `background.js`：最近标签记录和切换逻辑
-- `content.js`：面板渲染和键盘交互（按需注入）
+- `content.js`：面板渲染和键盘交互
 - `content.css`：面板样式（加载到 Shadow DOM）
 - `popup.html` / `popup.js` / `popup.css`：设置弹窗
 - `scripts/package.sh`：打包和校验

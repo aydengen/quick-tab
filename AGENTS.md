@@ -49,7 +49,7 @@ git push origin v1.1.1
 ## Debugging
 
 1. **Service Worker 日志**: `chrome://extensions/` → 点击扩展的「Service Worker」链接
-2. **Content Script 日志**: 任意页面按一次 Alt+Q 注入后 → 开发者工具 → Console（选择 QuickTab 上下文）
+2. **Content Script 日志**: 任意页面 → 开发者工具 → Console（选择 QuickTab 上下文）
 3. **加载扩展**: `chrome://extensions/` → 开启「开发者模式」→「加载已解压的扩展程序」→ 选择项目根目录
 4. **热更新**: 修改代码后在 `chrome://extensions/` 点击扩展刷新按钮
 
@@ -60,12 +60,12 @@ background.js (Service Worker)
 ├── 管理最近标签列表（存 20 个，面板显示 10 个，MAX_TABS 常量）
 ├── 使用 chrome.storage.session 存储（会话级，浏览器关闭自动清空），内存缓存避免重复读写
 ├── 监听标签激活、窗口焦点、关闭、更新、替换事件
-├── 快捷键触发时用 activeTab + scripting 按需注入 content.js
+├── 页面没有 content.js（安装/更新前已打开）时用 activeTab + scripting 补注入
 ├── 无法注入的页面直接切回上一个标签
 └── 处理消息通信（面板数据按发送方标签标记 current，并区分无痕窗口）
 
 content.js (Content Script)
-├── 由 background 按需注入（无 manifest content_scripts）
+├── 在所有页面注入（run_at: document_end），不注入 CSS 到页面
 ├── 在封闭 Shadow DOM 中渲染 AltTab 风格切换面板（CSS 来自 content.css，由 background 读取后传入）
 ├── 键盘交互：方向键/Tab 循环，Enter 确认，ESC 取消
 ├── 连续按快捷键循环选择（通过 chrome.commands 触发）
@@ -78,7 +78,7 @@ content.css
 
 **数据流**:
 ```
-Alt+Q → chrome.commands → background 发消息到 content（未注入则先注入）
+Alt+Q → chrome.commands → background 发消息到 content（旧页面未注入则补注入）
 → content 请求标签列表 → background 返回存储的标签
 → content 渲染面板 → 用户选择 → content 发切换请求
 → background 执行 chrome.tabs.update
@@ -96,7 +96,7 @@ Alt+Q → chrome.commands → background 发消息到 content（未注入则先�
 - **不可注入页面**: `chrome://`, `edge://`, `about:`, Chrome Web Store 页面
 - **存储类型**: `chrome.storage.session`（非持久化，隐私优先）
 - **最大标签数**: 面板显示 10 个
-- **权限**: `tabs`、`storage`、`activeTab`、`scripting`，不预先注入任何网站
+- **权限**: `tabs`、`storage`、`activeTab`、`scripting`
 - **快捷键**: 通过 `chrome.commands` API 处理，用户可在 `chrome://extensions/shortcuts` 自定义，连续按快捷键可循环切换
 
 ## File Structure

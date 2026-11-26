@@ -1,10 +1,10 @@
 // QuickTab - Content Script
-// 由 background 按需注入，在封闭 Shadow DOM 中渲染 AltTab 风格面板
+// 在封闭 Shadow DOM 中渲染 AltTab 风格面板
 
 (function () {
   'use strict';
 
-  // 扩展重载后可能再次注入，先清理旧实例
+  // background 可能为已打开的旧页面补注入，先清理旧实例
   globalThis.__quicktabCleanup?.();
 
   const HOST_TAG = 'quicktab-root';
@@ -22,11 +22,16 @@
   let stickyMode = false;
   let panelRequestId = 0;
 
-  const settingsReady = chrome.storage.local.get('stickyMode')
-    .then((result) => {
-      stickyMode = Boolean(result.stickyMode);
-    })
-    .catch(() => {});
+  // 首次打开面板时再读取设置，避免每个页面加载都访问存储
+  let settingsReady = null;
+  function loadSettings() {
+    settingsReady ??= chrome.storage.local.get('stickyMode')
+      .then((result) => {
+        stickyMode = Boolean(result.stickyMode);
+      })
+      .catch(() => {});
+    return settingsReady;
+  }
 
   function onStorageChanged(changes, area) {
     if (area === 'local' && changes.stickyMode) {
@@ -51,7 +56,7 @@
 
     Promise.all([
       chrome.runtime.sendMessage({ action: 'getTabList', includeCss: panelCss === null }),
-      settingsReady
+      loadSettings()
     ])
       .then(([response]) => {
         if (requestId !== panelRequestId || !panelVisible) return;
