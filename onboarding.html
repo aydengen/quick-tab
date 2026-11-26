@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QuickTab guide</title>
+  <link rel="icon" href="icons/icon_32.png">
+  <link rel="stylesheet" href="onboarding.css">
+  <script src="onboarding.js" defer></script>
+</head>
+<body>
+  <main class="guide">
+    <header class="brand">
+      <img src="icons/icon_48.png" alt="" width="36" height="36">
+      <span>QuickTab</span>
+      <span class="step" id="step">1 / 3</span>
+    </header>
+
+    <section id="welcome" aria-labelledby="welcome-title">
+      <h1 id="welcome-title">Meet your tab switcher.</h1>
+      <p>Jump between your recent tabs without hunting through the tab bar.</p>
+      <div class="shortcut-box">
+        <span>Your shortcut</span>
+        <kbd data-shortcut>Checking…</kbd>
+      </div>
+      <p data-unbound hidden>No shortcut is assigned. It may already be in use. Assign one in <button type="button" class="text-button" data-settings>Chrome shortcut settings</button>, then return here.</p>
+      <div class="actions">
+        <button type="button" id="start" disabled>Try it now</button>
+        <button type="button" class="text-button" data-skip>Skip practice</button>
+      </div>
+    </section>
+
+    <section id="resume" aria-labelledby="resume-title" hidden>
+      <h1 id="resume-title" tabindex="-1">Try a real tab switch.</h1>
+      <p>Open the practice tab and use your QuickTab shortcut to switch back to this guide.</p>
+      <p data-unbound hidden>No shortcut is assigned. Assign one in <button type="button" class="text-button" data-settings>Chrome shortcut settings</button>, then return here.</p>
+      <div class="actions">
+        <button type="button" id="resume-practice" disabled>Open practice tab</button>
+        <button type="button" class="text-button" data-skip>Skip practice</button>
+      </div>
+    </section>
+
+    <section id="done" aria-labelledby="done-title" hidden>
+      <h1 id="done-title" tabindex="-1">You’re ready to switch.</h1>
+      <p id="done-message" role="status"></p>
+      <div class="settings-note">
+        <p><strong>Prefer a panel that stays open?</strong> Turn on Sticky panel mode in the QuickTab toolbar menu. Move with the arrows and press <kbd>Enter</kbd> to switch or <kbd>Esc</kbd> to cancel.</p>
+        <p>The menu can also show restricted pages and reopen this guide.</p>
+      </div>
+      <div class="actions">
+        <button type="button" id="close">Close guide</button>
+        <button type="button" class="text-button" data-settings>Change shortcut</button>
+      </div>
+    </section>
+    <p id="error" role="alert" hidden>That didn’t work. Please try again.</p>
+  </main>
+</body>
+</html>

@@ -469,10 +469,22 @@
 
   // ========== 消息监听 ==========
 
+  const practiceTab = location.href.startsWith(chrome.runtime.getURL('practice.html') + '?guide=')
+    ? chrome.tabs.getCurrent()
+    : null;
+
   function onMessage(message, _sender, sendResponse) {
     if (message.action === 'togglePanel') {
       showPanel(message.altShortcut !== false);
       sendResponse({ success: true });
+    }
+    if (message.action === 'togglePracticePanel' && practiceTab) {
+      practiceTab.then((tab) => {
+        if (tab?.id !== message.tabId) return;
+        showPanel(message.altShortcut !== false);
+        sendResponse({ success: true });
+      });
+      return true;
     }
   }
 

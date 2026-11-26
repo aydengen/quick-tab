@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QuickTab practice tab</title>
+  <link rel="icon" href="icons/icon_32.png">
+  <link rel="stylesheet" href="onboarding.css">
+  <script src="content.js" defer></script>
+  <script src="onboarding.js" defer></script>
+</head>
+<body data-practice>
+  <main class="guide">
+    <header class="brand">
+      <img src="icons/icon_48.png" alt="" width="36" height="36">
+      <span>QuickTab</span>
+      <span class="step">2 / 3</span>
+    </header>
+    <section>
+      <h1>Switch back with QuickTab.</h1>
+      <p>This is a practice tab. Use QuickTab to switch back to the guide.</p>
+      <div class="shortcut-box">
+        <span>Press your shortcut</span>
+        <kbd data-shortcut>Checking…</kbd>
+      </div>
+      <p id="practice-keys" hidden>QuickTab selects the guide for you. <span id="release-alt" hidden>Hold the shortcut’s Alt / Option key to see the panel, then release it to switch.</span><span id="confirm-enter" hidden>Press <kbd>Enter</kbd> to switch.</span></p>
+      <p data-unbound hidden>No shortcut is assigned. Assign one in <button type="button" class="text-button" data-settings>Chrome shortcut settings</button>, then return to this tab.</p>
+      <p class="note">To skip, return to the guide using the tab bar.</p>
+    </section>
+    <p id="error" role="alert" hidden>That didn’t work. Please try again.</p>
+  </main>
+</body>
+</html>

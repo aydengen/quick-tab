@@ -1,0 +1,170 @@
+:root {
+  color-scheme: light dark;
+  --surface: rgba(255, 255, 255, 0.72);
+  --tile: rgba(255, 255, 255, 0.58);
+  --stroke: rgba(28, 55, 85, 0.15);
+  --text: #182539;
+  --muted: #47576b;
+  --link: #174f9a;
+  --button: #1764ca;
+  --background: #edf2f8;
+  --glow: #c3ddff;
+  --wash: #d8e9ea;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface: rgba(29, 40, 57, 0.75);
+    --tile: rgba(97, 121, 158, 0.17);
+    --stroke: rgba(201, 223, 255, 0.2);
+    --text: #f1f6ff;
+    --muted: #b7c6d9;
+    --link: #a3ccff;
+    --background: #131b27;
+    --glow: #223d67;
+    --wash: #253943;
+  }
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  padding: clamp(16px, 4vw, 40px);
+  background:
+    radial-gradient(ellipse at 18% 12%, var(--glow), transparent 55%),
+    radial-gradient(ellipse at 84% 91%, var(--wash), transparent 48%),
+    var(--background);
+  color: var(--text);
+  font: 16px/1.55 system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.guide {
+  width: min(100%, 620px);
+  padding: clamp(24px, 6vw, 52px);
+  border: 1px solid var(--stroke);
+  border-radius: 30px;
+  background: var(--surface);
+  backdrop-filter: blur(40px) saturate(150%);
+  box-shadow: 0 24px 70px -28px rgba(12, 29, 57, 0.36);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 650;
+}
+
+.step {
+  margin-inline-start: auto;
+  padding: 3px 11px;
+  border: 1px solid var(--stroke);
+  border-radius: 999px;
+  background: var(--tile);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+h1 {
+  margin: 28px 0 10px;
+  font-size: clamp(30px, 6vw, 46px);
+  line-height: 1.09;
+  letter-spacing: -0.05em;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0 0 16px;
+  color: var(--muted);
+}
+
+.shortcut-box, .settings-note {
+  margin: 24px 0 16px;
+  padding: 16px;
+  border: 1px solid var(--stroke);
+  border-radius: 16px;
+  background: var(--tile);
+}
+
+.shortcut-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 650;
+}
+
+kbd {
+  display: inline-block;
+  padding: 2px 8px;
+  border: 1px solid var(--stroke);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--text);
+  font: 600 0.88em/1.4 system-ui, sans-serif;
+}
+
+.settings-note p:last-child, .note, #error {
+  margin-bottom: 0;
+  font-size: 0.9rem;
+}
+
+strong {
+  color: var(--text);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 18px;
+  margin-top: 24px;
+}
+
+button {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 17px;
+  background: var(--button);
+  color: white;
+  font: inherit;
+  font-weight: 630;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  filter: brightness(0.9);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 3px;
+}
+
+.text-button {
+  padding: 0;
+  background: none;
+  color: var(--link);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+#error {
+  margin-top: 12px;
+}
