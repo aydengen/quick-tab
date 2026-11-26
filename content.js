@@ -192,8 +192,7 @@
     grid.className = 'quicktab-grid';
     grid.setAttribute('role', 'listbox');
     grid.setAttribute('aria-label', 'Recent tabs');
-    const columns = Math.max(1, Math.min(tabs.length, 5));
-    grid.style.setProperty('--quicktab-columns', String(columns));
+    grid.style.setProperty('--quicktab-columns', String(Math.max(1, tabs.length)));
 
     if (tabs.length === 0) {
       const empty = document.createElement('div');
@@ -205,22 +204,31 @@
     }
 
     panel.appendChild(grid);
-    panel.appendChild(createHints(tabs.length > columns));
+    panel.appendChild(createHints());
 
     root.replaceChildren(overlay, panel);
     document.documentElement.appendChild(host);
 
+    // 卡片放不下一行时横向滚动，被裁切的一侧渐隐
+    const updateEdges = () => {
+      const max = grid.scrollWidth - grid.clientWidth;
+      grid.classList.toggle('quicktab-fade-start', grid.scrollLeft > 1);
+      grid.classList.toggle('quicktab-fade-end', grid.scrollLeft < max - 1);
+    };
+    grid.addEventListener('scroll', updateEdges, { passive: true });
+
     // 默认选中上一个访问的标签
     const cards = getCards();
     (cards[1] || cards[0])?.focus({ preventScroll: true });
+    updateEdges();
   }
 
-  function createHints(multiRow) {
+  function createHints() {
     const hints = document.createElement('div');
     hints.className = 'quicktab-hints';
 
     const items = [
-      [multiRow ? ['←', '→', '↑', '↓'] : ['←', '→'], 'Select'],
+      [['←', '→'], 'Select'],
       [['↵'], 'Switch'],
       [['esc'], 'Close']
     ];
@@ -302,7 +310,7 @@
     });
     card.addEventListener('focus', () => {
       card.setAttribute('aria-selected', 'true');
-      card.scrollIntoView({ block: 'nearest' });
+      card.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     });
     card.addEventListener('blur', () => card.setAttribute('aria-selected', 'false'));
 
@@ -346,23 +354,6 @@
     const currentIndex = cards.indexOf(root.activeElement);
     const nextIndex = (currentIndex + direction + cards.length) % cards.length;
     cards[nextIndex].focus({ preventScroll: true });
-  }
-
-  // 多行时上下键按行移动；只有一行时等同左右
-  function moveRow(direction) {
-    const cards = getCards();
-    const columns = Number(root.querySelector('.quicktab-grid')?.style.getPropertyValue('--quicktab-columns')) || 1;
-    if (cards.length <= columns) {
-      cycleSelection(direction);
-      return;
-    }
-    const index = cards.indexOf(root.activeElement);
-    if (index === -1) return;
-    const next = index + direction * columns;
-    // 首行向上、末行向下不动；下一行不满时落到最后一张
-    const lastRow = Math.floor((cards.length - 1) / columns);
-    if (next < 0 || Math.floor(index / columns) === lastRow && direction > 0) return;
-    cards[Math.min(cards.length - 1, next)].focus({ preventScroll: true });
   }
 
   function hidePanel() {
@@ -414,15 +405,12 @@
     if (e.key === 'Tab') {
       e.preventDefault();
       cycleSelection(e.shiftKey ? -1 : 1);
-    } else if (e.key === 'ArrowRight' || key === 'j') {
+    } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || key === 'j') {
       e.preventDefault();
       cycleSelection(1);
-    } else if (e.key === 'ArrowLeft' || key === 'k') {
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || key === 'k') {
       e.preventDefault();
       cycleSelection(-1);
-    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-      e.preventDefault();
-      moveRow(e.key === 'ArrowDown' ? 1 : -1);
     }
   }
 

@@ -25,7 +25,6 @@
     0 18px 48px -8px rgba(0, 0, 0, 0.22),
     0 48px 120px -24px rgba(0, 0, 0, 0.28);
 
-  --qt-card-width: clamp(148px, calc((100vw - 120px) / 5), 220px);
   --qt-panel-radius: 22px;
   --qt-panel-padding: 10px;
   --qt-card-padding: 6px;
@@ -113,16 +112,40 @@
 
 /* ========== 卡片网格 ========== */
 .quicktab-grid {
+  /* 单行：卡片随窗口宽度等比缩小，窄到下限后横向滚动 */
+  --qt-gap: 4px;
+  --qt-fit-width: calc(
+    (100vw - 32px - 2 * var(--qt-panel-padding) - (var(--quicktab-columns) - 1) * var(--qt-gap))
+      / var(--quicktab-columns)
+  );
   display: grid;
-  grid-template-columns: repeat(var(--quicktab-columns, 5), var(--qt-card-width));
-  gap: 4px;
-  overflow-y: auto;
+  grid-auto-flow: column;
+  grid-auto-columns: clamp(128px, var(--qt-fit-width), 232px);
+  gap: var(--qt-gap);
+  overflow-x: auto;
+  overflow-y: hidden;
   overscroll-behavior: contain;
+  scroll-padding-inline: 28px;
   scrollbar-width: none;
 }
 
 .quicktab-grid::-webkit-scrollbar {
   display: none;
+}
+
+.quicktab-fade-start {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 28px);
+  mask-image: linear-gradient(to right, transparent, #000 28px);
+}
+
+.quicktab-fade-end {
+  -webkit-mask-image: linear-gradient(to left, transparent, #000 28px);
+  mask-image: linear-gradient(to left, transparent, #000 28px);
+}
+
+.quicktab-fade-start.quicktab-fade-end {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent);
 }
 
 /* ========== 卡片 ========== */
@@ -261,7 +284,8 @@
 .quicktab-hints {
   display: flex;
   justify-content: center;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 4px 16px;
   padding: 10px 8px 2px;
   color: var(--qt-text-secondary);
   font-size: 11.5px;
