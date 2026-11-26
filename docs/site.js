@@ -112,8 +112,9 @@
       event.preventDefault();
       press("q", true);
       if (event.repeat) return;
-      if (!open) show(true);
-      else select(selected + (event.shiftKey ? -1 : 1));
+      if (!open) return show(true);
+      fromKeyboard = true;
+      select(selected + (event.shiftKey ? -1 : 1));
       return;
     }
     if (!open || !fromKeyboard) return;
