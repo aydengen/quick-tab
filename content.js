@@ -19,6 +19,7 @@
   // 面板渲染前就松开了 Alt：数据返回后直接切换
   let confirmPending = false;
   let panelOpenReported = false;
+  let pointerFocus = false;
   let stickyMode = false;
   let altShortcutOpen = true;
   let panelRequestId = 0;
@@ -306,11 +307,15 @@
     card.addEventListener('click', () => switchToTab(tab.id));
     // 只响应真实的鼠标移动：面板弹出时光标恰好停在某张卡片上不改变选中项
     card.addEventListener('mousemove', () => {
-      if (root.activeElement !== card) card.focus({ preventScroll: true });
+      if (root.activeElement === card) return;
+      // 鼠标选中不滚动，否则卡片会从指针下移走，点击落空
+      pointerFocus = true;
+      card.focus({ preventScroll: true });
+      pointerFocus = false;
     });
     card.addEventListener('focus', () => {
       card.setAttribute('aria-selected', 'true');
-      card.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      if (!pointerFocus) card.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     });
     card.addEventListener('blur', () => card.setAttribute('aria-selected', 'false'));
 
