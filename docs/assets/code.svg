@@ -1,0 +1,99 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="960"
+  height="600"
+  viewBox="0 0 960 600"
+>
+  <rect width="960" height="600" fill="#fff" />
+  <rect width="960" height="56" fill="#f5f7f9" />
+  <circle cx="31" cy="28" r="14" fill="#262d37" />
+  <g font-family="sans-serif" font-size="11" fill="#444c57">
+    <text x="57" y="32" font-weight="600">aydengen　 /　 quick-tab</text>
+    <text x="31" y="85">
+      ⌘ Code　　 ◉ Issues　　 ⤴ Pull requests　　 ▷ Actions　　 ◇ Security
+    </text>
+  </g>
+  <path d="M20 102H99" stroke="#e9986c" stroke-width="3" />
+  <path d="M0 104H960" stroke="#e0e5ea" />
+  <g font-family="sans-serif">
+    <text x="52" y="149" font-size="17" fill="#3571c0">quick-tab</text>
+    <rect
+      x="140"
+      y="135"
+      width="41"
+      height="17"
+      rx="9"
+      fill="#fff"
+      stroke="#d7dde4"
+    />
+    <text x="150" y="147" font-size="8" fill="#6d7887">Public</text>
+  </g>
+  <rect
+    x="52"
+    y="177"
+    width="585"
+    height="230"
+    rx="5"
+    fill="#fff"
+    stroke="#d9e0e6"
+  />
+  <path d="M52 212H637" stroke="#d9e0e6" />
+  <rect x="53" y="178" width="583" height="33" rx="4" fill="#f5f7f9" />
+  <g font-family="sans-serif" font-size="10" fill="#627185">
+    <text x="68" y="199">●　aydengen　　Make switching feel natural.</text>
+    <text x="69" y="239">▧　icons</text>
+    <text x="69" y="269">▤　background.js</text>
+    <text x="69" y="299">▤　content.js</text>
+    <text x="69" y="329">▤　content.css</text>
+    <text x="69" y="359">▤　manifest.json</text>
+    <text x="69" y="389">▤　README.md</text>
+    <text x="403" y="239">Update extension icons</text>
+    <text x="403" y="269">Keep things lightweight</text>
+    <text x="403" y="299">A shortcut to your last tab</text>
+    <text x="403" y="329">A little less visual noise</text>
+    <text x="403" y="359">Ready to go</text>
+    <text x="403" y="389">Getting started</text>
+  </g>
+  <g stroke="#edf0f4">
+    <path d="M53 250H636M53 280H636M53 310H636M53 340H636M53 370H636" />
+  </g>
+  <rect
+    x="52"
+    y="426"
+    width="585"
+    height="174"
+    rx="5"
+    fill="#fff"
+    stroke="#d9e0e6"
+  />
+  <g font-family="sans-serif">
+    <text x="72" y="449" font-size="9" fill="#697585">☷　README</text>
+    <text x="85" y="498" font-size="29" fill="#303a46" font-weight="700">
+      QuickTab
+    </text>
+    <text x="85" y="532" font-size="12" fill="#717e8c">
+      Fast tab switching. One simple shortcut.
+    </text>
+    <rect x="85" y="552" width="345" height="25" rx="4" fill="#f3f5f8" />
+    <text x="98" y="569" font-size="10" fill="#60728a">
+      Alt + Q　→　Find your flow.
+    </text>
+    <text x="675" y="195" font-size="14" fill="#303a46" font-weight="600">
+      About
+    </text>
+    <text x="675" y="225" font-size="11" fill="#717e8c">
+      A tiny shortcut for a calmer browser.
+    </text>
+    <text x="675" y="257" font-size="10" fill="#4080c6">
+      chrome-extension　 productivity
+    </text>
+    <text x="675" y="296" font-size="10" fill="#717e8c">☷　Readme</text>
+    <text x="675" y="323" font-size="10" fill="#717e8c">⚖　MIT license</text>
+    <text x="675" y="383" font-size="13" fill="#303a46" font-weight="600">
+      Languages
+    </text>
+  </g>
+  <rect x="675" y="402" width="229" height="7" rx="3.5" fill="#f1d961" />
+  <rect x="814" y="402" width="58" height="7" fill="#7354bd" />
+  <path d="M872 402H901Q904 402 904 405.5T901 409H872" fill="#d07966" />
+</svg>

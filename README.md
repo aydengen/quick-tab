@@ -4,6 +4,20 @@
 
 QuickTab 做的事情只有一件：按 `Alt+Q` 打开最近标签列表，并切换到目标标签页。
 
+## 官网
+
+官网源码位于 `docs/`：中文介绍、可交互的标签切换演示、安装入口和常见问题。纯静态 HTML / CSS / JavaScript，无需依赖或构建；网页演示不读取真实标签页，也不加载第三方资源。
+
+本地预览：在仓库根目录运行 `python3 -m http.server 8000 --directory docs`，然后打开 `http://localhost:8000`。
+
+### GitHub Pages 部署
+
+1. 在 [仓库的 Pages 设置](https://github.com/aydengen/quick-tab/settings/pages)中，将 **Build and deployment → Source** 设为 **GitHub Actions**（首次需要仓库管理员设置）。
+2. 合并官网 PR 到 `main`。`.github/workflows/pages.yml` 会检查官网资源并仅发布 `docs/`；也可在 Actions 中手动运行 **Website** workflow。
+3. 首次部署成功后的地址为 `https://aydengen.github.io/quick-tab/`。PR 只做检查，不会发布；合并前或首次部署前，该地址不保证可用。
+
+官网演示展示新版缩略图界面；应用商店版本可能尚未包含全部新功能。网站与扩展发布流程独立，不需要创建版本 tag，也不会改变扩展代码或权限。
+
 ## 使用
 
 - `Alt+Q`：打开面板

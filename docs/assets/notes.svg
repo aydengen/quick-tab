@@ -1,0 +1,76 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="960"
+  height="600"
+  viewBox="0 0 960 600"
+>
+  <rect width="960" height="600" fill="#fff" />
+  <rect width="180" height="600" fill="#f4f4f1" />
+  <rect
+    x="22"
+    y="26"
+    width="24"
+    height="24"
+    rx="5"
+    fill="#fff"
+    stroke="#dededb"
+  />
+  <text x="28" y="44" font-family="Georgia,serif" font-size="19" fill="#373832">
+    N
+  </text>
+  <text
+    x="57"
+    y="43"
+    font-family="sans-serif"
+    font-size="12"
+    font-weight="600"
+    fill="#4c4d48"
+  >
+    My space
+  </text>
+  <g fill="#8b8b83" font-family="sans-serif" font-size="11">
+    <text x="25" y="89">⌕　Search anything</text>
+    <text x="25" y="123">⌂　Home</text>
+    <text x="25" y="157">◷　Recently visited</text>
+    <text x="25" y="214" font-size="9">PRIVATE</text>
+  </g>
+  <rect x="12" y="232" width="156" height="30" rx="4" fill="#e7e7e2" />
+  <g fill="#62625a" font-family="sans-serif" font-size="10">
+    <text x="25" y="251">☷　Friday notes</text>
+    <text x="25" y="285">☷　Reading list</text>
+    <text x="25" y="319">☷　Little things</text>
+    <text x="25" y="353">＋　Add a page</text>
+  </g>
+  <text x="220" y="36" font-family="sans-serif" font-size="9" fill="#8e8e87">
+    My space　 /　 Friday notes
+  </text>
+  <rect x="180" y="57" width="780" height="124" fill="#e9eddc" />
+  <path d="M180 151 Q330 67 480 145 T780 124 T960 124V181H180" fill="#d7dfc4" />
+  <path
+    d="M180 168 Q370 114 510 163 T790 147 T960 152V181H180"
+    fill="#c0cdb0"
+  />
+  <circle cx="786" cy="106" r="24" fill="#f5f3d5" />
+  <text x="269" y="219" font-size="35">☕</text>
+  <g font-family="sans-serif">
+    <text x="270" y="271" font-size="29" font-weight="700" fill="#363b31">
+      Friday, a little slower.
+    </text>
+    <text x="271" y="300" font-size="11" fill="#96998d">
+      A few notes on making room for the things that matter.
+    </text>
+    <rect x="270" y="324" width="505" height="50" rx="4" fill="#f4f5ee" />
+    <text x="286" y="353" font-size="11" fill="#717961">
+      ↳　Less noise. More of what you love.
+    </text>
+    <text x="270" y="412" font-size="16" font-weight="600" fill="#434b39">
+      A small plan for today
+    </text>
+    <g font-size="11" fill="#777d70">
+      <text x="272" y="444">☑　Make something useful</text>
+      <text x="272" y="472">☐　Leave a little room for curiosity</text>
+      <text x="272" y="500">☐　Go for a walk, without a destination</text>
+    </g>
+  </g>
+  <rect x="270" y="532" width="505" height="1" fill="#e9ebe3" />
+</svg>
