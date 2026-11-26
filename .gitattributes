@@ -7,3 +7,4 @@ scripts export-ignore
 AGENTS.md export-ignore
 README.md export-ignore
 icons/icon.svg export-ignore
+PRIVACY.md export-ignore
