@@ -163,7 +163,7 @@
       [['Enter'], 'Switch'],
       [['Esc'], 'Close']
     ];
-    if (!stickyMode) {
+    if (!stickyMode && altShortcutOpen) {
       items.push([[`${ALT_LABEL}↑`], 'Confirm']);
     }
 
