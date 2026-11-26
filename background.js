@@ -273,7 +273,7 @@ function deleteThumb(tabId) {
   chrome.storage.session.remove(THUMB_PREFIX + tabId).catch(() => {});
 }
 
-async function captureThumb(tabId, { forPanel = false } = {}) {
+async function captureThumb(tabId, { forPanel = false, deadline = Infinity } = {}) {
   const wait = lastCaptureAt + THUMB_MIN_INTERVAL_MS - Date.now();
   if (wait > 0) await sleep(wait);
   if (!forPanel && panelOpenTabs.has(tabId)) return false;
@@ -283,6 +283,8 @@ async function captureThumb(tabId, { forPanel = false } = {}) {
   const win = await chrome.windows.get(tab.windowId);
   if (!win.focused || win.state === 'minimized') return false;
 
+  // 打开面板前的截图排队超时后，面板可能已经显示，不能再截
+  if (forPanel && Date.now() > deadline) return false;
   lastCaptureAt = Date.now();
   const captured = await chrome.tabs.captureVisibleTab(tab.windowId, { format: 'jpeg', quality: 90 });
   // 截图期间用户可能已经切走
@@ -427,7 +429,8 @@ async function refreshCurrentThumb(tab) {
     Date.now() - thumb.at < THUMB_FRESH_MS;
   if (fresh || tab.status !== 'complete') return;
   clearTimeout(thumbTimers.get(tab.id));
-  await Promise.race([queueCapture(tab.id, { forPanel: true }), sleep(THUMB_OPEN_BUDGET_MS)]);
+  const deadline = Date.now() + THUMB_OPEN_BUDGET_MS;
+  await Promise.race([queueCapture(tab.id, { forPanel: true, deadline }), sleep(THUMB_OPEN_BUDGET_MS)]);
 }
 
 async function withPreviews(entries) {
