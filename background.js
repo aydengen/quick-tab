@@ -139,8 +139,14 @@ async function updateTabInfo(tabId, changeInfo, tab) {
     return tabList;
   });
 
+  // 只记录用户正在看的标签，后台窗口里的标题变化不算访问
   if (shouldRecord) {
-    await recordTabActivation(tabId);
+    try {
+      const win = await chrome.windows.get(tab.windowId);
+      if (win.focused) await recordTabActivation(tabId);
+    } catch {
+      // 窗口已关闭
+    }
   }
 }
 
