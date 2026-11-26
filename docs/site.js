@@ -91,9 +91,6 @@
   cards.forEach((card, index) => {
     card.addEventListener("click", () => confirm(index));
     card.addEventListener("focus", () => select(index));
-    card.addEventListener("pointerenter", (event) => {
-      if (event.pointerType === "mouse") select(index);
-    });
   });
 
   stage.addEventListener("keydown", (event) => {
