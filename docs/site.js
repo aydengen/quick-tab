@@ -1,26 +1,22 @@
 (() => {
   "use strict";
 
-  // This is a self-contained simulation, not an extension API integration.
+  // Self-contained simulation that reacts to the real Alt+Q shortcut; it never reads real tabs.
   const en = document.documentElement.lang.startsWith("en");
   const text = en
     ? {
         titles: ["Friday side project", "Moodboard", "aydengen / quick-tab", "Deep focus"],
         alt: (title) => `Simulated tab: ${title}`,
-        again: "Try again →",
-        restart: "Start over →",
-        switched: (title) => `Switched to “${title}”. With the extension, releasing Alt does this.`,
-        cancelled: "Cancelled. You stayed on the same page.",
-        hint: "Use ← → or Q to choose, Enter to confirm, Esc to cancel, or click a card",
+        opened: "Switcher open. Keep pressing Q, then release Alt.",
+        switched: (title) => `Switched to “${title}”`,
+        cancelled: "Cancelled",
       }
     : {
         titles: ["周五，做点喜欢的事", "下一点灵感", "aydengen / quick-tab", "Deep focus"],
         alt: (title) => `模拟标签页：${title}`,
-        again: "再试一次 →",
-        restart: "重新开始 →",
-        switched: (title) => `已切换到「${title}」。安装后，松开 Alt 就能完成这一步`,
-        cancelled: "已取消，仍留在原来的页面",
-        hint: "用 ← → 或 Q 选择，Enter 确认，Esc 取消；也可以直接点击卡片",
+        opened: "面板已打开，继续按 Q 选择，松开 Alt 切换",
+        switched: (title) => `已切换到「${title}」`,
+        cancelled: "已取消",
       };
   const addresses = [
     "notes.example / my-space",
@@ -32,25 +28,29 @@
   const tabs = [...document.querySelectorAll("[data-tab] .tab-preview img")].map(
     (img, i) => ({ title: text.titles[i], address: addresses[i], image: img.getAttribute("src") })
   );
-  const stage = document.querySelector("#demo-stage");
   const switcher = document.querySelector("#switcher");
   const cards = [...document.querySelectorAll("[data-tab]")];
-  const start = document.querySelector("#demo-start");
   const status = document.querySelector("#demo-status");
   const page = document.querySelector("#active-page");
   const shade = document.querySelector("#demo-shade");
   const success = document.querySelector("#demo-success");
+  const keycaps = {
+    alt: document.querySelector('[data-key="alt"]'),
+    q: document.querySelector('[data-key="q"]'),
+  };
+  // Without a keyboard, keep the switcher visible so the cards can be tapped.
+  const touchOnly = matchMedia("(hover: none)").matches;
   let current = 0;
   let selected = 1;
-  let open = true;
+  let open = false;
+  let successTimer;
 
-  function select(index, focus = false) {
+  function select(index) {
     selected = (index + tabs.length) % tabs.length;
     cards.forEach((card, i) => {
       card.classList.toggle("is-selected", i === selected);
       card.setAttribute("aria-pressed", String(i === selected));
     });
-    if (focus) cards[selected].focus();
   }
 
   function updateBrowser() {
@@ -65,63 +65,90 @@
     document.querySelector("#demo-address").textContent = tabs[current].address;
   }
 
-  function closePanel(confirmed) {
+  function show() {
+    open = true;
+    clearTimeout(successTimer);
+    switcher.hidden = false;
+    shade.hidden = false;
+    success.hidden = true;
+    select(current + 1);
+    status.textContent = text.opened;
+  }
+
+  function hide(confirmed) {
     open = false;
     switcher.hidden = true;
     shade.hidden = true;
     success.hidden = !confirmed;
-    start.setAttribute("aria-expanded", "false");
-    start.textContent = text.again;
     status.textContent = confirmed ? text.switched(tabs[current].title) : text.cancelled;
-    start.focus();
+    clearTimeout(successTimer);
+    successTimer = setTimeout(() => {
+      success.hidden = true;
+      if (touchOnly) show();
+    }, 1400);
   }
 
   function confirm(index) {
     current = index;
     updateBrowser();
-    closePanel(true);
+    hide(true);
   }
 
-  start.addEventListener("click", () => {
-    open = true;
-    switcher.hidden = false;
-    shade.hidden = false;
-    success.hidden = true;
-    start.setAttribute("aria-expanded", "true");
-    status.textContent = text.hint;
-    start.textContent = text.restart;
-    select(current + 1, true);
+  function press(key, down) {
+    keycaps[key]?.classList.toggle("is-pressed", down);
+  }
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Alt") {
+      press("alt", true);
+      if (open) event.preventDefault();
+      return;
+    }
+    // event.code, because Option+Q types "œ" on a Mac.
+    if (event.altKey && event.code === "KeyQ" && !event.ctrlKey && !event.metaKey) {
+      event.preventDefault();
+      press("q", true);
+      if (!open) show();
+      else select(selected + (event.shiftKey ? -1 : 1));
+      return;
+    }
+    if (!open) return;
+    const columns = getComputedStyle(switcher).gridTemplateColumns.split(" ").length;
+    const moves = {
+      ArrowLeft: -1,
+      ArrowRight: 1,
+      ArrowUp: selected >= columns ? -columns : 0,
+      ArrowDown: selected + columns < tabs.length ? columns : 0,
+    };
+    if (event.key in moves) select(selected + moves[event.key]);
+    else if (event.key === "Enter") confirm(selected);
+    else if (event.key === "Escape") hide(false);
+    else return;
+    event.preventDefault();
+  });
+
+  window.addEventListener("keyup", (event) => {
+    if (event.code === "KeyQ") press("q", false);
+    if (event.key !== "Alt") return;
+    press("alt", false);
+    if (open) {
+      event.preventDefault();
+      confirm(selected);
+    }
+  });
+
+  window.addEventListener("blur", () => {
+    press("alt", false);
+    press("q", false);
+    if (open && !touchOnly) hide(false);
   });
 
   cards.forEach((card, index) => {
     card.addEventListener("click", () => confirm(index));
+    card.addEventListener("mouseenter", () => select(index));
     card.addEventListener("focus", () => select(index));
   });
 
-  stage.addEventListener("keydown", (event) => {
-    if (!open || event.ctrlKey || event.metaKey || event.altKey) return;
-    const key = event.key.toLowerCase();
-    if (
-      ["arrowright", "arrowleft", "arrowup", "arrowdown", "q"].includes(key)
-    ) {
-      event.preventDefault();
-      const columns =
-        getComputedStyle(switcher).gridTemplateColumns.split(" ").length;
-      let next = selected;
-      if (key === "arrowleft") next -= 1;
-      else if (key === "arrowup") {
-        if (selected >= columns) next -= columns;
-      } else if (key === "arrowdown") {
-        if (selected + columns < tabs.length) next += columns;
-      } else next += 1;
-      select(next, true);
-    } else if (key === "escape") {
-      event.preventDefault();
-      closePanel(false);
-    }
-    // Enter/Space and Tab retain their native button/focus behavior.
-  });
-
-  document.querySelector("#demo-controls").hidden = false;
   updateBrowser();
+  if (touchOnly) show();
 })();

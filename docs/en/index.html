@@ -54,10 +54,6 @@
     <main id="main">
       <section class="hero wrap" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow">
-            <span class="status-dot" aria-hidden="true"></span>
-            Less hunting for tabs
-          </p>
           <h1 id="hero-title">
             Switch tabs,<br />keep your <span class="accent"
               >focus<span class="underline" aria-hidden="true"></span
@@ -65,9 +61,7 @@
           </h1>
         </div>
         <div class="hero-aside">
-          <p>
-            The page you just left is one shortcut away.<br />It works like switching apps, only for tabs.
-          </p>
+          <p>Get back to the page you just left.</p>
           <a
             class="button button-primary"
             href="https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimheklaj"
@@ -87,10 +81,7 @@
               <path d="M12 8h8.6M8.5 14 4.2 6.6M15.5 14l-4.3 7.4" /></svg
             >Add to Chrome, free <span aria-hidden="true">↗</span></a
           >
-          <p class="hero-note">
-            No sign-up <span>·</span> Free and open source <span>·</span> Mac / Windows /
-            Linux
-          </p>
+          <p class="hero-note">Free and open source <span>·</span> No sign-up</p>
         </div>
       </section>
 
@@ -99,16 +90,7 @@
         class="experience wrap"
         aria-labelledby="experience-title"
       >
-        <div class="demo-heading">
-          <h2 id="experience-title">Your recent tabs, one key away</h2>
-          <span class="demo-label"
-            >Interactive demo <span aria-hidden="true">↙</span></span
-          >
-        </div>
         <div class="demo-canvas">
-          <div class="canvas-note" aria-hidden="true">
-            LESS SEARCHING. MORE DOING.
-          </div>
           <div class="browser">
             <div class="browser-bar" aria-hidden="true">
               <div class="traffic-lights"><i></i><i></i><i></i></div>
@@ -143,10 +125,11 @@
                 width="960"
                 height="600"
               />
-              <div class="demo-shade" id="demo-shade"></div>
+              <div class="demo-shade" id="demo-shade" hidden></div>
               <div
                 class="switcher"
                 id="switcher"
+                hidden
                 role="group"
                 aria-label="Simulated tab switcher. Click a card to switch."
               >
@@ -244,38 +227,19 @@
                 </button>
               </div>
               <div class="demo-success" id="demo-success" hidden>
-                <span aria-hidden="true">✓</span> Switched. Carry on.
+                <span aria-hidden="true">✓</span> Switched
               </div>
             </div>
           </div>
           <div class="shortcut-display" aria-hidden="true">
-            <kbd>alt <span>⌥</span></kbd
-            ><span class="key-plus">+</span><kbd>Q</kbd
-            ><span class="shortcut-caption">Hold, pick, let go</span>
+            <kbd data-key="alt">alt <span>⌥</span></kbd
+            ><span class="key-plus">+</span><kbd data-key="q">Q</kbd
+            ><span class="shortcut-caption">Hold Alt, press Q</span>
           </div>
         </div>
-        <div class="demo-controls" id="demo-controls" hidden>
-          <p id="demo-status" role="status" aria-live="polite">
-            Click a card, or try it with the keyboard
-          </p>
-          <button
-            type="button"
-            class="text-button"
-            id="demo-start"
-            aria-controls="switcher"
-            aria-expanded="true"
-          >
-            Try with keyboard <span aria-hidden="true">→</span>
-          </button>
-        </div>
-        <p class="demo-disclaimer">
-          This is a simulation and does not read your tabs. After installing, press <kbd>Alt</kbd> +
-          <kbd>Q</kbd> to open it, or <kbd>⌥</kbd> + <kbd>Q</kbd>
-        </p>
+        <p id="demo-status" class="sr-only" role="status" aria-live="polite"></p>
         <noscript
-          ><p class="no-script">
-            The demo above needs JavaScript. You can also just install the extension.
-          </p></noscript
+          ><p class="no-script">Turn on JavaScript to try the demo.</p></noscript
         >
       </section>
 
@@ -283,24 +247,18 @@
         <article>
           <span class="feature-icon" aria-hidden="true">↔</span>
           <h3>Back to the last page in one tap</h3>
-          <p>
-            Tabs are ordered by when you last used them, so there is no scanning the tab bar. Tap Alt + Q once to jump back to the previous tab.
-          </p>
+          <p>Ordered by recent use. Tap Alt+Q to go back one tab.</p>
         </article>
         <article>
           <span class="feature-icon" aria-hidden="true">▧</span>
           <h3>Recognize pages by sight</h3>
-          <p>
-            Each card shows a thumbnail of the page, so you are not guessing from truncated titles. With more tabs, the cards wrap onto extra rows.
-          </p>
+          <p>Spot pages by thumbnail, not by truncated titles.</p>
           
         </article>
         <article>
           <span class="feature-icon" aria-hidden="true">⌁</span>
           <h3>Small, and your data stays local</h3>
-          <p>
-            No account and no analytics. Tab history and thumbnails stay in the browser session and are never uploaded.
-          </p>
+          <p>No account, no tracking. Your data stays on your device.</p>
         </article>
       </section>
 
@@ -322,10 +280,8 @@
         <div class="wrap">
           <div class="section-heading">
             <div>
-              <p class="eyebrow">From install to habit</p>
               <h2>Nothing to learn. Try it once.</h2>
             </div>
-            <p>Your hands stay on the keyboard,<br />and your attention stays on your work.</p>
           </div>
           <div class="steps">
             <article class="step">
@@ -339,9 +295,7 @@
                 /><span>+ Add extension</span>
               </div>
               <h3>Install QuickTab</h3>
-              <p>
-                Click “Add to Chrome” in the Chrome Web Store and confirm. No account and no setup.
-              </p>
+              <p>Add it from the Chrome Web Store. No sign-in.</p>
             </article>
             <article class="step">
               <span class="step-number">02 /</span>
@@ -350,9 +304,7 @@
                 ><span>+</span><kbd>Q</kbd>
               </div>
               <h3>Hold Alt, press Q</h3>
-              <p>
-                Your recent tabs appear on any regular web page. Press Q again or use the arrow keys to choose one.
-              </p>
+              <p>Recent tabs appear as cards. Press Q again to move on.</p>
             </article>
             <article class="step">
               <span class="step-number">03 /</span>
@@ -361,20 +313,15 @@
                 ><span class="release-check">✓</span>
               </div>
               <h3>Let go of Alt</h3>
-              <p>
-                Releasing Alt switches to the selected tab. You can also press Enter to confirm, or Esc to stay where you are.
-              </p>
+              <p>Release to switch, or press Esc to cancel.</p>
             </article>
           </div>
-          <p class="tip">
-            <span>Tip</span>Rather not hold Alt? Turn on “Sticky panel mode” in the extension settings and confirm with Enter.
-          </p>
+          <p class="tip">Rather not hold Alt? Turn on Sticky mode in settings and confirm with Enter.</p>
         </div>
       </section>
 
       <section id="questions" class="faq wrap" aria-labelledby="faq-title">
         <div class="faq-heading">
-          <p class="eyebrow">Good to know</p>
           <h2 id="faq-title">Common questions</h2>
           <a
             href="https://github.com/aydengen/quick-tab/issues"
@@ -436,7 +383,6 @@
 
       <section class="closing wrap" aria-labelledby="closing-title">
         <div>
-          <p class="eyebrow">Ready when you are</p>
           <h2 id="closing-title">Spend less time<br />finding tabs.</h2>
         </div>
         <div>
@@ -447,7 +393,6 @@
             rel="noopener noreferrer"
             >Add to Chrome, free <span aria-hidden="true">↗</span></a
           >
-          <p>One shortcut. That is the whole thing.</p>
         </div>
       </section>
     </main>
@@ -461,7 +406,6 @@
           alt=""
         />QuickTab<span class="brand-dot">.</span></a
       >
-      <p>Does one thing: switching tabs.</p>
       <div>
         <a
           href="https://github.com/aydengen/quick-tab"
