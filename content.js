@@ -225,6 +225,8 @@
     const count = getCards().length || 1;
     const measure = (columns) => {
       grid.style.setProperty('--quicktab-columns', String(columns));
+      // ↑↓ 提示可能让底栏换行，测量时要和最终显示一致
+      panel.classList.toggle('quicktab-multirow', columns < count);
       return Math.min(
         1,
         (window.innerWidth - 2 * PANEL_MARGIN) / panel.offsetWidth,
