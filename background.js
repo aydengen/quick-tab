@@ -208,9 +208,9 @@ function getPanelCss() {
 async function shortcutUsesAlt() {
   const commands = await chrome.commands.getAll();
   const shortcut = commands.find((c) => c.name === 'toggle-panel')?.shortcut || '';
-  // 按 + 拆分比较，避免匹配到 Umschalttaste（德语 Shift）等含 alt 的按键名
+  // 按键名会本地化（如祖鲁语 I-Alt）；要求 alt 位于键名末尾，避免匹配德语 Shift 的 Umschalttaste
   return shortcut.includes('⌥') ||
-    shortcut.split('+').some((key) => key.trim().toLowerCase() === 'alt');
+    shortcut.split('+').some((key) => /(^|[^a-z])alt$/i.test(key.trim()));
 }
 
 // content.js 通过 manifest 注入；安装/更新前已打开的页面没有它，
