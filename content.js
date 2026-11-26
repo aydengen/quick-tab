@@ -10,6 +10,7 @@
   const QUICK_TAP_WINDOW_MS = 1000;
   // 面板到窗口边缘的最小距离
   const PANEL_MARGIN = 16;
+  const MAX_ROWS = 3;
     const IS_MAC = /mac|iphone|ipad/i.test(navigator.userAgentData?.platform || navigator.platform || '');
   const ALT_LABEL = IS_MAC ? '⌥' : 'Alt';
 
@@ -216,28 +217,34 @@
     (cards[1] || cards[0])?.focus({ preventScroll: true });
   }
 
-  // 卡片尺寸固定：一行放不下就换成两行，两行还放不下再整体等比缩小
+  // 卡片尺寸固定：一行放不下就逐步换成两行、三行，三行还放不下再整体等比缩小
   function layoutPanel() {
     const panel = root?.querySelector('.quicktab-panel');
     const grid = panel?.querySelector('.quicktab-grid');
     if (!grid) return;
     const count = getCards().length || 1;
-    const styles = getComputedStyle(panel);
-    const card = parseFloat(styles.getPropertyValue('--qt-card-width'));
-    const gap = parseFloat(styles.getPropertyValue('--qt-gap'));
-    const chrome = 2 * parseFloat(styles.paddingLeft) + 2 * PANEL_MARGIN;
-    const fit = Math.max(1, Math.floor((window.innerWidth - chrome + gap) / (card + gap)));
-    const columns = count <= fit ? count : Math.ceil(count / 2);
-    grid.style.setProperty('--quicktab-columns', String(columns));
-    panel.classList.toggle('quicktab-multirow', columns < count);
+    const measure = (columns) => {
+      grid.style.setProperty('--quicktab-columns', String(columns));
+      return Math.min(
+        1,
+        (window.innerWidth - 2 * PANEL_MARGIN) / panel.offsetWidth,
+        (window.innerHeight - 2 * PANEL_MARGIN) / panel.offsetHeight
+      );
+    };
 
     panel.style.setProperty('--qt-scale', '1');
-    const scale = Math.min(
-      1,
-      (window.innerWidth - 2 * PANEL_MARGIN) / panel.offsetWidth,
-      (window.innerHeight - 2 * PANEL_MARGIN) / panel.offsetHeight
-    );
-    panel.style.setProperty('--qt-scale', String(scale));
+    let best = { columns: count, scale: 0 };
+    for (let rows = 1; rows <= MAX_ROWS; rows += 1) {
+      const columns = Math.ceil(count / rows);
+      if (rows > 1 && columns === best.columns) continue;
+      const scale = measure(columns);
+      // 行数少的优先，只有明显更大时才多换一行
+      if (scale > best.scale + 0.001) best = { columns, scale };
+      if (scale >= 1) break;
+    }
+    grid.style.setProperty('--quicktab-columns', String(best.columns));
+    panel.classList.toggle('quicktab-multirow', best.columns < count);
+    panel.style.setProperty('--qt-scale', String(best.scale));
   }
 
   function createHints() {
@@ -371,7 +378,7 @@
     cards[nextIndex].focus({ preventScroll: true });
   }
 
-  // 两行时上下键按行移动；只有一行时等同左右
+  // 多行时上下键按行移动；只有一行时等同左右
   function moveRow(direction) {
     const cards = getCards();
     const columns = Number(root.querySelector('.quicktab-grid')?.style.getPropertyValue('--quicktab-columns')) || 1;
