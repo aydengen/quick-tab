@@ -40,6 +40,11 @@ document.querySelectorAll('[data-settings]').forEach((button) => {
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) refreshControls();
 });
+if (practicePage) {
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local' && changes.stickyMode) refreshControls();
+  });
+}
 refreshControls();
 
 if (!practicePage) {
