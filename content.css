@@ -1,163 +1,270 @@
-/* QuickTab - Tab Switcher Panel */
+/* QuickTab - 标签切换面板（加载到封闭 Shadow DOM 中，与宿主页面样式隔离） */
+
+:host {
+  color-scheme: light dark;
+}
+
+.quicktab-overlay,
+.quicktab-panel {
+  --qt-accent: #0a7cff;
+  --qt-panel-bg: rgba(246, 246, 248, 0.78);
+  --qt-panel-stroke: rgba(0, 0, 0, 0.1);
+  --qt-panel-highlight: rgba(255, 255, 255, 0.7);
+  --qt-text: rgba(0, 0, 0, 0.88);
+  --qt-text-secondary: rgba(0, 0, 0, 0.56);
+  --qt-card-selected: rgba(10, 124, 255, 0.12);
+  --qt-card-hover: rgba(0, 0, 0, 0.04);
+  --qt-preview-bg: rgba(0, 0, 0, 0.05);
+  --qt-preview-stroke: rgba(0, 0, 0, 0.08);
+  --qt-tile-bg: #ffffff;
+  --qt-overlay: rgba(0, 0, 0, 0.12);
+  --qt-shadow:
+    0 0 0 0.5px rgba(0, 0, 0, 0.12),
+    0 2px 6px rgba(0, 0, 0, 0.06),
+    0 18px 48px -8px rgba(0, 0, 0, 0.22),
+    0 48px 120px -24px rgba(0, 0, 0, 0.28);
+
+  --qt-card-width: 208px;
+  --qt-gap: 4px;
+  --qt-scale: 1;
+  --qt-panel-radius: 22px;
+  --qt-panel-padding: 10px;
+  --qt-card-padding: 6px;
+  --qt-card-radius: calc(var(--qt-panel-radius) - var(--qt-panel-padding));
+  --qt-preview-radius: calc(var(--qt-card-radius) - var(--qt-card-padding));
+}
+
+@media (prefers-color-scheme: dark) {
+  .quicktab-overlay,
+  .quicktab-panel {
+    --qt-accent: #3b99fc;
+    --qt-panel-bg: rgba(36, 36, 40, 0.74);
+    --qt-panel-stroke: rgba(255, 255, 255, 0.12);
+    --qt-panel-highlight: rgba(255, 255, 255, 0.08);
+    --qt-text: rgba(255, 255, 255, 0.92);
+    --qt-text-secondary: rgba(255, 255, 255, 0.6);
+    --qt-card-selected: rgba(59, 153, 252, 0.22);
+    --qt-card-hover: rgba(255, 255, 255, 0.05);
+    --qt-preview-bg: rgba(255, 255, 255, 0.06);
+    --qt-preview-stroke: rgba(255, 255, 255, 0.1);
+    --qt-tile-bg: rgba(255, 255, 255, 0.12);
+    --qt-overlay: rgba(0, 0, 0, 0.3);
+    --qt-shadow:
+      0 0 0 0.5px rgba(0, 0, 0, 0.6),
+      0 2px 6px rgba(0, 0, 0, 0.2),
+      0 18px 48px -8px rgba(0, 0, 0, 0.45),
+      0 48px 120px -24px rgba(0, 0, 0, 0.55);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .quicktab-favicon.quicktab-icon-dark {
+    box-sizing: border-box;
+    padding: 1.5px;
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  .quicktab-tile-icon.quicktab-icon-dark {
+    background: rgba(255, 255, 255, 0.9);
+  }
+}
 
 /* ========== 遮罩层 ========== */
-.tabsnap-overlay {
+.quicktab-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 2147483646;
+  inset: 0;
+  background: var(--qt-overlay);
+  /* 先短暂延迟再出现：快速切换时不会闪一下面板 */
+  animation: quicktab-fade 160ms ease-out 70ms both;
 }
 
 /* ========== 面板 ========== */
-.tabsnap-panel {
+.quicktab-panel {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(30, 30, 30, 0.72);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  z-index: 2147483647;
-  padding: 12px;
-  max-width: 90vw;
-  max-height: 80vh;
-  overflow: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-}
-
-/* ========== 卡片列表 ========== */
-.tabsnap-grid {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  overflow-y: auto;
+  padding: var(--qt-panel-padding);
+  border-radius: var(--qt-panel-radius);
+  background: var(--qt-panel-bg);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  box-shadow: var(--qt-shadow), inset 0 0.5px 0 var(--qt-panel-highlight);
+  color: var(--qt-text);
+  font: 13px/1.3 system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  letter-spacing: -0.005em;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  cursor: default;
+  /* 三行仍放不下时由 layoutPanel 设置 --qt-scale 整体缩小 */
+  transform: translate(-50%, -50%) scale(var(--qt-scale));
+  animation: quicktab-pop 180ms cubic-bezier(0.2, 0.9, 0.3, 1.15) 70ms both;
 }
 
-.tabsnap-grid::-webkit-scrollbar {
-  width: 4px;
+@keyframes quicktab-fade {
+  from { opacity: 0; }
 }
 
-.tabsnap-grid::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 2px;
+@keyframes quicktab-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(calc(var(--qt-scale) * 0.96));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .quicktab-overlay,
+  .quicktab-panel {
+    animation-duration: 1ms;
+  }
+}
+
+/* ========== 卡片网格 ========== */
+.quicktab-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--quicktab-columns, 1), var(--qt-card-width));
+  gap: var(--qt-gap);
 }
 
 /* ========== 卡片 ========== */
-.tabsnap-card {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  background: transparent;
-  border-radius: 0;
-  cursor: pointer;
-  outline: none;
-  border-left: 2px solid transparent;
-  min-width: 300px;
-  max-width: 500px;
-  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
-}
-
-.tabsnap-card:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.tabsnap-card:focus {
-  background: rgba(59, 130, 246, 0.2);
-  border-left-color: rgba(59, 130, 246, 0.8);
-  box-shadow: inset 0 0 0 1px rgba(59, 130, 246, 0.15);
-}
-
-/* 当前标签 - 右侧小标签 */
-.tabsnap-card.tabsnap-current::after {
-  content: 'Current';
-  flex-shrink: 0;
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.4);
-  background: rgba(255, 255, 255, 0.08);
-  padding: 2px 6px;
-  border-radius: 3px;
-}
-
-/* ========== Favicon ========== */
-.tabsnap-favicon {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-  border-radius: 4px;
-}
-
-/* ========== 文本区域 ========== */
-.tabsnap-card-text {
+.quicktab-card {
   display: flex;
   flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+  padding: var(--qt-card-padding);
+  border-radius: var(--qt-card-radius);
+  outline: none;
+  transition: background-color 120ms ease;
+}
+
+.quicktab-card:hover {
+  background: var(--qt-card-hover);
+}
+
+.quicktab-card:focus {
+  background: var(--qt-card-selected);
+}
+
+.quicktab-preview {
+  position: relative;
+  aspect-ratio: 16 / 10;
   overflow: hidden;
-  flex: 1;
-  gap: 1px;
+  border-radius: var(--qt-preview-radius);
+  background: var(--qt-preview-bg);
 }
 
-.tabsnap-card-title {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 13px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+/* 描边画在图片上方，截图边缘与背景同色时也有清晰轮廓 */
+.quicktab-preview::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 0.5px var(--qt-preview-stroke);
+  pointer-events: none;
 }
 
-.tabsnap-card-url {
-  color: rgba(255, 255, 255, 0.35);
-  font-size: 11px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.quicktab-card:focus .quicktab-preview::after {
+  box-shadow: inset 0 0 0 2px var(--qt-accent);
 }
 
-/* ========== 快捷键提示 ========== */
-.tabsnap-hints {
-  display: flex;
-  gap: 6px;
-  justify-content: center;
-  padding: 8px 12px 4px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  margin-top: 6px;
-  color: rgba(255, 255, 255, 0.45);
-  font-size: 11px;
+.quicktab-shot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  opacity: 0;
+  transition: opacity 120ms ease;
 }
 
-.tabsnap-hints span {
+.quicktab-shot.quicktab-loaded {
+  opacity: 1;
+}
+
+.quicktab-tile {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.quicktab-tile-icon {
+  box-sizing: border-box;
+  width: 48px;
+  height: 48px;
+  padding: 10px;
+  border-radius: 12px;
+  background: var(--qt-tile-bg);
+  box-shadow: 0 0 0 0.5px var(--qt-preview-stroke), 0 2px 8px rgba(0, 0, 0, 0.08);
+  color: var(--qt-text-secondary);
+  image-rendering: auto;
+}
+
+.quicktab-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 14px;
+  letter-spacing: 0.01em;
+}
+
+/* ========== 标题 ========== */
+.quicktab-meta {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 7px;
+  min-width: 0;
+  padding: 0 2px 1px;
 }
 
-.tabsnap-hints span + span::before {
-  content: '·';
-  margin-right: 2px;
-  color: rgba(255, 255, 255, 0.25);
+.quicktab-favicon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  color: var(--qt-text-secondary);
 }
 
-.tabsnap-hints kbd {
-  display: inline-block;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 4px;
-  padding: 1px 5px;
-  font-family: inherit;
-  font-size: 10px;
-  line-height: 1.4;
-  color: rgba(255, 255, 255, 0.6);
+.quicktab-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.quicktab-title,
+.quicktab-url {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quicktab-title {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+.quicktab-url {
+  color: var(--qt-text-secondary);
+  font-size: 11px;
+  line-height: 14px;
 }
 
 /* ========== 空状态 ========== */
-.tabsnap-empty {
-  color: rgba(255, 255, 255, 0.5);
+.quicktab-empty {
+  grid-column: 1 / -1;
+  padding: 28px 40px;
+  color: var(--qt-text-secondary);
   text-align: center;
-  padding: 20px;
-  font-size: 13px;
 }

@@ -1,31 +1,52 @@
 // QuickTab - Content Script
-// 渲染 AltTab 风格面板
+// 在封闭 Shadow DOM 中渲染 AltTab 风格面板
 
 (function () {
   'use strict';
 
-  const PANEL_ID = 'tabsnap-panel';
-  const OVERLAY_ID = 'tabsnap-overlay';
-  const FALLBACK_FAVICON = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">%F0%9F%8C%90</text></svg>';
+  // background 可能为已打开的旧页面补注入，先清理旧实例
+  globalThis.__quicktabCleanup?.();
 
+  const QUICK_TAP_WINDOW_MS = 1000;
+  // 面板到窗口边缘的最小距离
+  const PANEL_MARGIN = 16;
+  const MAX_ROWS = 3;
+
+  let host = null;
+  let root = null;
+  let panelCss = null;
   let panelVisible = false;
   let altKeyDown = false;
+  // 面板渲染前就松开了 Alt：数据返回后直接切换
+  let confirmPending = false;
+  let panelOpenReported = false;
   let stickyMode = false;
+  let altShortcutOpen = true;
   let panelRequestId = 0;
+  // 页面实际观察到的 Alt 状态：true / false / null（未知，如刚注入或失焦后）
+  let altHeld = null;
+  let lastAltUpAt = 0;
 
-  // 加载 sticky mode 设置
-  chrome.storage.local.get('stickyMode', (result) => {
-    stickyMode = result.stickyMode || false;
-  });
-  chrome.storage.onChanged.addListener((changes, area) => {
+  // 首次打开面板时再读取设置，避免每个页面加载都访问存储
+  let settingsReady = null;
+  function loadSettings() {
+    settingsReady ??= chrome.storage.local.get('stickyMode')
+      .then((result) => {
+        stickyMode = Boolean(result.stickyMode);
+      })
+      .catch(() => {});
+    return settingsReady;
+  }
+
+  function onStorageChanged(changes, area) {
     if (area === 'local' && changes.stickyMode) {
-      stickyMode = changes.stickyMode.newValue || false;
+      stickyMode = Boolean(changes.stickyMode.newValue);
     }
-  });
+  }
 
   // ========== 面板管理 ==========
 
-  function showPanel() {
+  function showPanel(altShortcut) {
     // 如果面板已打开，循环选择下一个（支持连续按 Alt+Q 切换）
     if (panelVisible) {
       cycleSelection(1);
@@ -34,146 +55,294 @@
 
     // 立即标记为可见，防止连续按键时重复调用
     panelVisible = true;
+    // 快捷键不含 Alt 时没有“松开确认”，面板保持打开
+    altShortcutOpen = altShortcut;
+    altKeyDown = altShortcut;
+    // 快捷键消息到达前 Alt 刚刚松开（快速轻按）
+    confirmPending = altShortcut && altHeld === false &&
+      performance.now() - lastAltUpAt < QUICK_TAP_WINDOW_MS;
     const requestId = ++panelRequestId;
+    panelOpenReported = true;
 
-    // 获取标签列表
-    chrome.runtime.sendMessage({ action: 'getTabList' }, (response) => {
-      if (requestId !== panelRequestId || !panelVisible) {
-        return;
-      }
+    Promise.all([
+      // 快速轻按不会显示面板，不必等当前标签截图
+      chrome.runtime.sendMessage({
+        action: 'getTabList',
+        includeCss: panelCss === null,
+        capture: !confirmPending
+      }),
+      loadSettings()
+    ])
+      .then(([response]) => {
+        if (requestId !== panelRequestId || !panelVisible) return;
 
-      if (chrome.runtime.lastError) {
-        console.error('QuickTab: Error getting tab list', chrome.runtime.lastError.message);
-        panelVisible = false;
-        return;
-      }
+        if (response?.css) panelCss = response.css;
+        const tabs = response?.tabs || [];
 
-      const tabs = response?.tabs || [];
-      renderPanel(tabs);
-    });
+        if (stickyMode || !altShortcut) {
+          altKeyDown = false;
+          confirmPending = false;
+        }
+
+        if (confirmPending) {
+          const target = tabs[1];
+          hidePanel();
+          if (target) switchToTab(target.id);
+          return;
+        }
+
+        renderPanel(tabs);
+      })
+      .catch((error) => {
+        console.error('QuickTab: Error getting tab list', error);
+        hidePanel();
+      });
+  }
+
+  function ensureHost() {
+    if (host) return;
+
+    // 用 div 而非自定义元素：页面可抢先注册同名自定义元素并通过 ElementInternals 读取 closed shadow root
+    host = document.createElement('div');
+    // 防止宿主页面 CSS 影响面板容器
+    const hostStyles = {
+      all: 'initial',
+      position: 'fixed',
+      inset: '0',
+      display: 'block',
+      'z-index': '2147483647'
+    };
+    for (const [property, value] of Object.entries(hostStyles)) {
+      host.style.setProperty(property, value, 'important');
+    }
+
+    // closed 模式：页面脚本无法读取面板中的标签标题和 URL
+    root = host.attachShadow({ mode: 'closed' });
+    const sheet = new CSSStyleSheet();
+    sheet.replaceSync(panelCss || '');
+    root.adoptedStyleSheets = [sheet];
   }
 
   // ========== 渲染 ==========
 
+  // 图片都由 background 转成 data URL，这里解码后画进 canvas：不经过 <img> 加载，不受页面 CSP 限制
+  function decodeImage(dataUrl) {
+    const [header, base64] = dataUrl.split(',');
+    const type = /^data:([^;]+)/.exec(header)?.[1] || 'image/png';
+    const binary = atob(base64 || '');
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return createImageBitmap(new Blob([bytes], { type }));
+  }
+
+  function createImage(dataUrl, className) {
+    const canvas = document.createElement('canvas');
+    canvas.className = className;
+    canvas.setAttribute('aria-hidden', 'true');
+    decodeImage(dataUrl)
+      .then((bitmap) => {
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(bitmap, 0, 0);
+        bitmap.close();
+        canvas.classList.toggle('quicktab-icon-dark', isDarkIcon(ctx, canvas.width, canvas.height));
+        canvas.classList.add('quicktab-loaded');
+      })
+      .catch(() => canvas.remove());
+    return canvas;
+  }
+
+  // 黑色图标（如 GitHub）在深色面板上看不清，深色模式下给它垫一层浅色底
+  function isDarkIcon(ctx, width, height) {
+    if (width * height > 256 * 256) return false;
+    const { data } = ctx.getImageData(0, 0, width, height);
+    let opaque = 0;
+    let luminance = 0;
+    for (let i = 0; i < data.length; i += 4) {
+      if (data[i + 3] < 128) continue;
+      opaque += 1;
+      luminance += 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
+    }
+    return opaque > 0 && luminance / opaque < 70;
+  }
+
+  function createGlobe(className) {
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', '0 0 16 16');
+    svg.setAttribute('class', className);
+    svg.setAttribute('aria-hidden', 'true');
+    const path = document.createElementNS(ns, 'path');
+    path.setAttribute('d', 'M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13Zm0 0c1.7 1.6 2.6 3.9 2.6 6.5S9.7 12.9 8 14.5M8 1.5C6.3 3.1 5.4 5.4 5.4 8s.9 4.9 2.6 6.5M1.8 6h12.4M1.8 10h12.4');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', 'currentColor');
+    path.setAttribute('stroke-width', '1.1');
+    svg.appendChild(path);
+    return svg;
+  }
+
+  function createIcon(tab, className) {
+    return tab.favicon ? createImage(tab.favicon, className) : createGlobe(className);
+  }
+
+  function displayUrl(rawUrl) {
+    try {
+      const url = new URL(rawUrl);
+      return url.protocol.startsWith('http') ? url.host.replace(/^www\./, '') : rawUrl.replace(/\/$/, '');
+    } catch {
+      return rawUrl;
+    }
+  }
+
   function renderPanel(tabs) {
-    // 移除已存在的面板
-    document.getElementById(OVERLAY_ID)?.remove();
-    document.getElementById(PANEL_ID)?.remove();
+    ensureHost();
 
-    // 创建遮罩
     const overlay = document.createElement('div');
-    overlay.id = OVERLAY_ID;
-    overlay.className = 'tabsnap-overlay';
-    overlay.addEventListener('click', () => hidePanel(false));
+    overlay.className = 'quicktab-overlay';
+    overlay.addEventListener('click', () => hidePanel());
 
-    // 创建面板
     const panel = document.createElement('div');
-    panel.id = PANEL_ID;
-    panel.className = 'tabsnap-panel';
+    panel.className = 'quicktab-panel';
 
-    // 卡片容器
     const grid = document.createElement('div');
-    grid.className = 'tabsnap-grid';
+    grid.className = 'quicktab-grid';
+    grid.setAttribute('role', 'listbox');
+    grid.setAttribute('aria-label', 'Recent tabs');
 
     if (tabs.length === 0) {
       const empty = document.createElement('div');
-      empty.className = 'tabsnap-empty';
-      empty.textContent = 'No recent tabs yet. Switch between tabs to populate this list.';
+      empty.className = 'quicktab-empty';
+      empty.textContent = 'No recent tabs yet';
       grid.appendChild(empty);
     } else {
-      tabs.forEach((tab, index) => {
-        const card = createTabCard(tab);
-        if (index === 0) {
-          card.classList.add('tabsnap-current');
-        }
-        grid.appendChild(card);
-      });
+      tabs.forEach((tab) => grid.appendChild(createTabCard(tab)));
     }
 
     panel.appendChild(grid);
 
-    // 快捷键提示
-    const hints = document.createElement('div');
-    hints.className = 'tabsnap-hints';
-    const baseHints = '<span><kbd>J</kbd><kbd>K</kbd><kbd>↑↓</kbd> Navigate</span><span><kbd>Enter</kbd> Switch</span><span><kbd>Esc</kbd> Close</span>';
-    hints.innerHTML = stickyMode
-      ? baseHints
-      : `${baseHints}<span><kbd>Alt↑</kbd> Confirm</span>`;
-    panel.appendChild(hints);
+    root.replaceChildren(overlay, panel);
+    document.documentElement.appendChild(host);
+    layoutPanel();
 
-    // 添加到页面
-    document.body.appendChild(overlay);
-    document.body.appendChild(panel);
+    // 默认选中上一个访问的标签
+    const cards = getCards();
+    (cards[1] || cards[0])?.focus({ preventScroll: true });
+  }
 
-    // 自动聚焦第二个卡片（上一个访问的标签）
-    const cards = panel.querySelectorAll('.tabsnap-card');
-    const focusTarget = cards[1] || cards[0]; // 优先第二个，否则第一个
-    if (focusTarget) {
-      focusTarget.focus();
+  // 卡片尺寸固定：一行放不下就逐步换成两行、三行，三行还放不下再整体等比缩小
+  function layoutPanel() {
+    const panel = root?.querySelector('.quicktab-panel');
+    const grid = panel?.querySelector('.quicktab-grid');
+    if (!grid) return;
+    const count = getCards().length || 1;
+    const measure = (columns) => {
+      grid.style.setProperty('--quicktab-columns', String(columns));
+      return Math.min(
+        1,
+        (window.innerWidth - 2 * PANEL_MARGIN) / panel.offsetWidth,
+        (window.innerHeight - 2 * PANEL_MARGIN) / panel.offsetHeight
+      );
+    };
+
+    panel.style.setProperty('--qt-scale', '1');
+    let best = { columns: count, scale: 0 };
+    for (let rows = 1; rows <= MAX_ROWS; rows += 1) {
+      const columns = Math.ceil(count / rows);
+      if (rows > 1 && columns === best.columns) continue;
+      const scale = measure(columns);
+      // 行数少的优先，只有明显更大时才多换一行
+      if (scale > best.scale + 0.001) best = { columns, scale };
+      if (scale >= 1) break;
     }
+    grid.style.setProperty('--quicktab-columns', String(best.columns));
+    panel.style.setProperty('--qt-scale', String(best.scale));
   }
 
   function createTabCard(tab) {
+    const title = tab.title || 'Untitled';
+    const url = tab.url ? displayUrl(tab.url) : '';
+
     const card = document.createElement('div');
-    card.className = 'tabsnap-card';
-    card.tabIndex = 0;
+    card.className = 'quicktab-card';
+    card.tabIndex = -1;
     card.dataset.tabId = tab.id;
+    card.title = tab.url ? `${title}\n${tab.url}` : title;
+    card.setAttribute('role', 'option');
+    card.setAttribute('aria-selected', 'false');
+    card.setAttribute('aria-label', url ? `${title}, ${url}` : title);
+    if (tab.current) card.classList.add('quicktab-current');
 
-    // Favicon
-    const favicon = document.createElement('img');
-    favicon.className = 'tabsnap-favicon';
-    favicon.src = tab.favIconUrl || FALLBACK_FAVICON;
-    favicon.alt = '';
-    favicon.onerror = () => {
-      favicon.src = FALLBACK_FAVICON;
-    };
-    card.appendChild(favicon);
-
-    // 文本区域
-    const textWrap = document.createElement('div');
-    textWrap.className = 'tabsnap-card-text';
-
-    const title = document.createElement('span');
-    title.className = 'tabsnap-card-title';
-    title.textContent = tab.title || 'Untitled';
-    title.title = tab.title || 'Untitled';
-    textWrap.appendChild(title);
-
-    if (tab.url) {
-      const url = document.createElement('span');
-      url.className = 'tabsnap-card-url';
-      try {
-        const u = new URL(tab.url);
-        url.textContent = u.host + u.pathname.replace(/\/$/, '');
-      } catch {
-        url.textContent = tab.url;
-      }
-      textWrap.appendChild(url);
+    const preview = document.createElement('div');
+    preview.className = 'quicktab-preview';
+    if (tab.thumbnail) {
+      preview.appendChild(createImage(tab.thumbnail, 'quicktab-shot'));
+    } else {
+      // 还没截过图的标签（受限页面、扩展启动后未打开过）显示大图标
+      const tile = document.createElement('div');
+      tile.className = 'quicktab-tile';
+      tile.appendChild(createIcon(tab, 'quicktab-tile-icon'));
+      preview.appendChild(tile);
     }
+    if (tab.current) {
+      const badge = document.createElement('span');
+      badge.className = 'quicktab-badge';
+      badge.textContent = 'Current';
+      preview.appendChild(badge);
+    }
+    card.appendChild(preview);
 
-    card.appendChild(textWrap);
+    const meta = document.createElement('div');
+    meta.className = 'quicktab-meta';
+    meta.appendChild(createIcon(tab, 'quicktab-favicon'));
 
-    // 点击事件
+    const text = document.createElement('div');
+    text.className = 'quicktab-text';
+    const titleEl = document.createElement('div');
+    titleEl.className = 'quicktab-title';
+    titleEl.textContent = title;
+    text.appendChild(titleEl);
+    if (url) {
+      const urlEl = document.createElement('div');
+      urlEl.className = 'quicktab-url';
+      urlEl.textContent = url;
+      text.appendChild(urlEl);
+    }
+    meta.appendChild(text);
+    card.appendChild(meta);
+
     card.addEventListener('click', () => switchToTab(tab.id));
+    // 只响应真实的鼠标移动：面板弹出时光标恰好停在某张卡片上不改变选中项
+    card.addEventListener('mousemove', () => {
+      if (root.activeElement !== card) card.focus({ preventScroll: true });
+    });
+    card.addEventListener('focus', () => card.setAttribute('aria-selected', 'true'));
+    card.addEventListener('blur', () => card.setAttribute('aria-selected', 'false'));
 
     return card;
   }
 
   // ========== 交互 ==========
 
+  function getCards() {
+    return root ? Array.from(root.querySelectorAll('.quicktab-card')) : [];
+  }
+
   function switchToTab(tabId) {
     hidePanel();
 
-    chrome.runtime.sendMessage({ action: 'switchToTab', tabId }, (response) => {
-      if (chrome.runtime.lastError || !response?.success) {
-        console.error('QuickTab: Failed to switch tab', chrome.runtime.lastError?.message || response?.error);
-      }
-    });
+    chrome.runtime.sendMessage({ action: 'switchToTab', tabId })
+      .then((response) => {
+        if (!response?.success) {
+          console.error('QuickTab: Failed to switch tab', response?.error);
+        }
+      })
+      .catch((error) => console.error('QuickTab: Failed to switch tab', error));
   }
 
   function activateFocusedTab() {
-    const focusedCard = document.querySelector(`#${PANEL_ID} .tabsnap-card:focus`);
-    const tabId = Number.parseInt(focusedCard?.dataset.tabId || '', 10);
+    const focusedCard = root?.activeElement;
+    const tabId = Number.parseInt(focusedCard?.dataset?.tabId || '', 10);
 
     if (Number.isInteger(tabId) && tabId > 0) {
       switchToTab(tabId);
@@ -183,86 +352,151 @@
     hidePanel();
   }
 
-  // ========== 键盘交互 ==========
-
-  // 按下键盘
-  document.addEventListener('keydown', (e) => {
-    if (!panelVisible) return;
-    const key = e.key.toLowerCase();
-
-    // 记录 Alt 键状态（非 sticky 模式）
-    if (!stickyMode && e.key === 'Alt') {
-      altKeyDown = true;
-    }
-
-    // ESC 关闭
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      e.stopPropagation();
-      hidePanel();
-      return;
-    }
-
-    // Enter 确认切换
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      e.stopPropagation();
-      activateFocusedTab();
-      return;
-    }
-
-    // Tab 或方向键循环选择
-    if (e.key === 'Tab' || e.key === 'ArrowRight' || e.key === 'ArrowDown' || key === 'j') {
-      e.preventDefault();
-      e.stopPropagation();
-      cycleSelection(e.shiftKey ? -1 : 1);
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || key === 'k') {
-      e.preventDefault();
-      e.stopPropagation();
-      cycleSelection(-1);
-    }
-  }, true);
-
-  // 松开键盘 - 松开 Alt 时自动切换（仅非 sticky 模式）
-  document.addEventListener('keyup', (e) => {
-    if (!panelVisible || stickyMode) return;
-
-    if (e.key === 'Alt' && altKeyDown) {
-      e.preventDefault();
-      altKeyDown = false;
-      activateFocusedTab();
-    }
-  }, true);
-
-  // 循环选择
   function cycleSelection(direction) {
-    const panel = document.getElementById(PANEL_ID);
-    if (!panel) return;
-
-    const cards = Array.from(panel.querySelectorAll('.tabsnap-card'));
+    const cards = getCards();
     if (cards.length === 0) return;
 
-    const currentIndex = cards.findIndex(c => c === document.activeElement);
+    const currentIndex = cards.indexOf(root.activeElement);
     const nextIndex = (currentIndex + direction + cards.length) % cards.length;
-    cards[nextIndex]?.focus();
+    cards[nextIndex].focus({ preventScroll: true });
+  }
+
+  // 多行时上下键按行移动；只有一行时等同左右
+  function moveRow(direction) {
+    const cards = getCards();
+    const columns = Number(root.querySelector('.quicktab-grid')?.style.getPropertyValue('--quicktab-columns')) || 1;
+    if (cards.length <= columns) {
+      cycleSelection(direction);
+      return;
+    }
+    const index = cards.indexOf(root.activeElement);
+    if (index === -1) return;
+    const next = index + direction * columns;
+    // 首行向上、末行向下不动；下一行不满时落到最后一张
+    const lastRow = Math.floor((cards.length - 1) / columns);
+    if (next < 0 || Math.floor(index / columns) === lastRow && direction > 0) return;
+    cards[Math.min(cards.length - 1, next)].focus({ preventScroll: true });
   }
 
   function hidePanel() {
     panelRequestId += 1;
-    document.getElementById(OVERLAY_ID)?.remove();
-    document.getElementById(PANEL_ID)?.remove();
+    // 快速轻按时面板没渲染过，也要通知 background 恢复截图
+    if (panelOpenReported) {
+      panelOpenReported = false;
+      chrome.runtime.sendMessage({ action: 'panelClosed' }).catch(() => {});
+    }
+    root?.replaceChildren();
+    host?.remove();
 
     panelVisible = false;
     altKeyDown = false;
+    confirmPending = false;
+  }
+
+  // ========== 键盘交互 ==========
+
+  function trackAlt(e) {
+    altHeld = e.key === 'Alt' ? e.type === 'keydown' : e.altKey;
+    if (e.key === 'Alt' && e.type === 'keyup') lastAltUpAt = performance.now();
+  }
+
+  function onKeyDown(e) {
+    trackAlt(e);
+    if (!panelVisible) return;
+    // 面板打开期间不让按键漏到页面快捷键
+    e.stopImmediatePropagation();
+
+    const key = e.key.toLowerCase();
+
+    if (!stickyMode && altShortcutOpen && e.key === 'Alt') {
+      altKeyDown = true;
+    }
+
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      hidePanel();
+      return;
+    }
+
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      activateFocusedTab();
+      return;
+    }
+
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      cycleSelection(e.shiftKey ? -1 : 1);
+    } else if (e.key === 'ArrowRight' || key === 'j') {
+      e.preventDefault();
+      cycleSelection(1);
+    } else if (e.key === 'ArrowLeft' || key === 'k') {
+      e.preventDefault();
+      cycleSelection(-1);
+    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      moveRow(e.key === 'ArrowDown' ? 1 : -1);
+    }
+  }
+
+  // 松开 Alt 时自动切换（仅非 sticky 模式）
+  function onKeyUp(e) {
+    trackAlt(e);
+    if (!panelVisible) return;
+    e.stopImmediatePropagation();
+    if (stickyMode || e.key !== 'Alt' || !altKeyDown) return;
+
+    e.preventDefault();
+    altKeyDown = false;
+    if (root?.childElementCount) {
+      activateFocusedTab();
+    } else {
+      confirmPending = true;
+    }
+  }
+
+  // 焦点离开页面（地址栏、其他窗口）时收不到 Alt 松开事件，直接关闭
+  function onBlur() {
+    altHeld = null;
+    if (panelVisible) hidePanel();
+  }
+
+  function onVisibilityChange() {
+    if (!document.hidden) return;
+    altHeld = null;
+    if (panelVisible) hidePanel();
   }
 
   // ========== 消息监听 ==========
 
-  chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  function onMessage(message, _sender, sendResponse) {
     if (message.action === 'togglePanel') {
-      altKeyDown = !stickyMode; // 非 sticky 模式下认为 Alt 按下
-      showPanel();
+      showPanel(message.altShortcut !== false);
       sendResponse({ success: true });
     }
+  }
+
+  window.addEventListener('keydown', onKeyDown, true);
+  window.addEventListener('keyup', onKeyUp, true);
+  window.addEventListener('blur', onBlur);
+  window.addEventListener('resize', () => {
+    if (panelVisible) layoutPanel();
   });
+  document.addEventListener('visibilitychange', onVisibilityChange);
+  chrome.storage.onChanged.addListener(onStorageChanged);
+  chrome.runtime.onMessage.addListener(onMessage);
+
+  globalThis.__quicktabCleanup = () => {
+    hidePanel();
+    window.removeEventListener('keydown', onKeyDown, true);
+    window.removeEventListener('keyup', onKeyUp, true);
+    window.removeEventListener('blur', onBlur);
+    document.removeEventListener('visibilitychange', onVisibilityChange);
+    try {
+      chrome.storage.onChanged.removeListener(onStorageChanged);
+      chrome.runtime.onMessage.removeListener(onMessage);
+    } catch {
+      // 旧实例的扩展上下文已失效
+    }
+  };
 })();

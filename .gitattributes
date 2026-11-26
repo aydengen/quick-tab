@@ -1,0 +1,9 @@
+# 不打进扩展发布包（scripts/package.sh 使用 git archive）
+.agents export-ignore
+.github export-ignore
+.gitattributes export-ignore
+.gitignore export-ignore
+scripts export-ignore
+AGENTS.md export-ignore
+README.md export-ignore
+icons/icon.svg export-ignore
