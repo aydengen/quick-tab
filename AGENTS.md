@@ -30,7 +30,7 @@ git push origin v1.0.5
 #    编辑 manifest.json 的 version 字段（如 1.1.0 → 1.1.1）
 
 # 2. 暂存相关文件（不要用 git add -A）
-git add background.js content.css content.js popup.html popup.js manifest.json
+git add background.js content.css content.js popup.html popup.js popup.css manifest.json
 # 只暂存本次改动涉及的文件
 
 # 3. 提交
@@ -49,7 +49,7 @@ git push origin v1.1.1
 ## Debugging
 
 1. **Service Worker 日志**: `chrome://extensions/` → 点击扩展的「Service Worker」链接
-2. **Content Script 日志**: 任意页面 → 开发者工具 → Console
+2. **Content Script 日志**: 任意页面按一次 Alt+Q 注入后 → 开发者工具 → Console（选择 QuickTab 上下文）
 3. **加载扩展**: `chrome://extensions/` → 开启「开发者模式」→「加载已解压的扩展程序」→ 选择项目根目录
 4. **热更新**: 修改代码后在 `chrome://extensions/` 点击扩展刷新按钮
 
@@ -57,25 +57,28 @@ git push origin v1.1.1
 
 ```
 background.js (Service Worker)
-├── 管理最近标签列表（最多 10 个，MAX_TABS 常量）
-├── 使用 chrome.storage.session 存储（会话级，浏览器关闭自动清空）
-├── 监听标签激活、关闭、更新事件
-└── 处理快捷键命令和消息通信
+├── 管理最近标签列表（存 20 个，面板显示 10 个，MAX_TABS 常量）
+├── 使用 chrome.storage.session 存储（会话级，浏览器关闭自动清空），内存缓存避免重复读写
+├── 监听标签激活、窗口焦点、关闭、更新、替换事件
+├── 快捷键触发时用 activeTab + scripting 按需注入 content.js
+├── 无法注入的页面直接切回上一个标签
+└── 处理消息通信（面板数据按发送方标签标记 current，并区分无痕窗口）
 
 content.js (Content Script)
-├── 在所有页面注入（run_at: document_end）
-├── 渲染 AltTab 风格切换面板
+├── 由 background 按需注入（无 manifest content_scripts）
+├── 在封闭 Shadow DOM 中渲染 AltTab 风格切换面板（CSS 来自 content.css，由 background 读取后传入）
 ├── 键盘交互：方向键/Tab 循环，Enter 确认，ESC 取消
 ├── 连续按快捷键循环选择（通过 chrome.commands 触发）
-└── 支持松开 Alt 键自动切换
+├── 支持松开 Alt 键自动切换（面板渲染前松开则直接切到上一个标签）
+└── 窗口失焦或页面隐藏时关闭面板
 
 content.css
-└── 面板样式，淡入淡出动画
+└── 面板样式（Shadow DOM 内部，类名前缀 quicktab-）
 ```
 
 **数据流**:
 ```
-Alt+Q → chrome.commands → background 发消息到 content
+Alt+Q → chrome.commands → background 发消息到 content（未注入则先注入）
 → content 请求标签列表 → background 返回存储的标签
 → content 渲染面板 → 用户选择 → content 发切换请求
 → background 执行 chrome.tabs.update
@@ -86,13 +89,14 @@ Alt+Q → chrome.commands → background 发消息到 content
 - **零依赖**: 项目无任何 npm 依赖，纯原生实现
 - **原生 JS**: 使用标准 DOM API 和 Chrome Extension API
 - **模块化**: background.js 和 content.js 各司其职，通过 chrome.runtime 消息通信
-- **CSS 隔离**: 所有样式使用 `#quicktab-` 前缀防止污染宿主页面
+- **CSS 隔离**: 面板渲染在封闭 Shadow DOM 中，类名使用 `quicktab-` 前缀
 
 ## Key Constraints
 
 - **不可注入页面**: `chrome://`, `edge://`, `about:`, Chrome Web Store 页面
 - **存储类型**: `chrome.storage.session`（非持久化，隐私优先）
-- **最大标签数**: 10 个
+- **最大标签数**: 面板显示 10 个
+- **权限**: `tabs`、`storage`、`activeTab`、`scripting`，不预先注入任何网站
 - **快捷键**: 通过 `chrome.commands` API 处理，用户可在 `chrome://extensions/shortcuts` 自定义，连续按快捷键可循环切换
 
 ## File Structure
@@ -102,6 +106,8 @@ Alt+Q → chrome.commands → background 发消息到 content
 ├── background.js          # Service Worker
 ├── content.js             # Content Script
 ├── content.css            # 面板样式
+├── popup.html/js/css      # 设置弹窗
+├── scripts/package.sh     # 打包 + 校验引用文件（CI / Release 使用）
 └── icons/                 # 扩展图标
 ```
 
@@ -109,6 +115,7 @@ Alt+Q → chrome.commands → background 发消息到 content
 
 1. **版本管理**: 直接编辑 `manifest.json` 的 `version` 字段
 2. **发版**: 推送 `v*` tag 会运行 `.github/workflows/release.yml`，自动打包、创建 GitHub Release，并上传到 Chrome Web Store
-4. **无本地构建脚本**: 当前仓库不维护 `build.sh`，默认开发流程是直接加载项目根目录
+3. **CI**: 推送 main / PR 运行 `.github/workflows/ci.yml`（语法检查 + 打包校验）
+4. **打包**: `scripts/package.sh` 用 `git archive` 打包已提交文件，开发文件在 `.gitattributes` 中 `export-ignore`；日常开发仍直接加载项目根目录
 5. **无测试框架**: 项目暂无自动化测试，核心验证方式仍是浏览器手动验证
 6. **Chrome API**: 所有 Chrome Extension API 调用在 background.js 中处理

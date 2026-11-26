@@ -8,12 +8,22 @@ QuickTab 做的事情只有一件：按 `Alt+Q` 打开最近标签列表，并�
 
 - `Alt+Q`：打开面板
 - 按住 `Alt` 连续按 `Q`：向后循环选择
-- `Tab` / `↑` / `↓` / `←` / `→`：移动选择
-- 松开 `Alt`：切换到当前选中标签
+- `Tab` / `↑` / `↓` / `←` / `→` / `J` / `K`：移动选择
+- 松开 `Alt`（Mac 上是 `⌥`）：切换到当前选中标签
+- 快速按一下 `Alt+Q`：直接切回上一个标签
 - `Enter`：切换到当前选中标签
 - `Esc`：关闭面板
 
+在新标签页、`chrome://` 页面、PDF 等无法显示面板的页面上，`Alt+Q` 会直接切回上一个标签。
+
 快捷键可在 `chrome://extensions/shortcuts` 自定义。
+
+## 设置
+
+点击工具栏中的 QuickTab 图标：
+
+- **Sticky panel mode**：面板保持打开，不需要一直按住 `Alt`，用 `Enter` 确认
+- **Show non-switchable tabs**：在列表中显示 `chrome://`、Web Store 等受限页面
 
 ## 安装
 
@@ -31,7 +41,10 @@ https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimhekl
 ## 权限
 
 - `tabs`：读取标签页标题和图标，并切换标签页
-- `storage`：保存最近标签列表（`chrome.storage.session`）
+- `storage`：保存最近标签列表（`chrome.storage.session`）和设置
+- `activeTab` + `scripting`：按下快捷键时，才在当前页面注入面板
+
+QuickTab 不会预先注入任何网站。面板渲染在封闭的 Shadow DOM 中，网页脚本读不到你的其他标签信息；无痕窗口和普通窗口的标签互不显示。
 
 所有数据都只保存在本地会话中，关闭浏览器后自动清空。
 
@@ -55,16 +68,18 @@ git push origin v1.1.1
 
 4. GitHub Actions 的 `Release` workflow 会自动：
 
-- 生成发布 zip
+- 用 `scripts/package.sh` 生成发布 zip（并校验引用的文件都已打包）
 - 创建 GitHub Release
 - 上传到 Chrome Web Store
 
-本地不再维护单独的构建脚本，也不需要手动打包作为日常流程。
+推送到 `main` 或提交 PR 时，`CI` workflow 会做语法检查和打包校验。本地可以运行 `scripts/package.sh` 检查打包结果（基于已提交的文件）。
 
 ## 结构
 
 - `manifest.json`：扩展配置
 - `background.js`：最近标签记录和切换逻辑
-- `content.js`：面板渲染和键盘交互
-- `content.css`：面板样式
+- `content.js`：面板渲染和键盘交互（按需注入）
+- `content.css`：面板样式（加载到 Shadow DOM）
+- `popup.html` / `popup.js` / `popup.css`：设置弹窗
+- `scripts/package.sh`：打包和校验
 - `icons/`：扩展图标
