@@ -8,8 +8,7 @@
   globalThis.__quicktabCleanup?.();
 
   const QUICK_TAP_WINDOW_MS = 1000;
-  const FALLBACK_FAVICON = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">%F0%9F%8C%90</text></svg>';
-  const IS_MAC = /mac|iphone|ipad/i.test(navigator.userAgentData?.platform || navigator.platform || '');
+    const IS_MAC = /mac|iphone|ipad/i.test(navigator.userAgentData?.platform || navigator.platform || '');
   const ALT_LABEL = IS_MAC ? '⌥' : 'Alt';
 
   let host = null;
@@ -63,7 +62,12 @@
     const requestId = ++panelRequestId;
 
     Promise.all([
-      chrome.runtime.sendMessage({ action: 'getTabList', includeCss: panelCss === null }),
+      // 快速轻按不会显示面板，不必等当前标签截图
+      chrome.runtime.sendMessage({
+        action: 'getTabList',
+        includeCss: panelCss === null,
+        capture: !confirmPending
+      }),
       loadSettings()
     ])
       .then(([response]) => {
@@ -118,6 +122,60 @@
 
   // ========== 渲染 ==========
 
+  // 图片都由 background 转成 data URL，这里解码后画进 canvas：不经过 <img> 加载，不受页面 CSP 限制
+  function decodeImage(dataUrl) {
+    const [header, base64] = dataUrl.split(',');
+    const type = /^data:([^;]+)/.exec(header)?.[1] || 'image/png';
+    const binary = atob(base64 || '');
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return createImageBitmap(new Blob([bytes], { type }));
+  }
+
+  function createImage(dataUrl, className) {
+    const canvas = document.createElement('canvas');
+    canvas.className = className;
+    canvas.setAttribute('aria-hidden', 'true');
+    decodeImage(dataUrl)
+      .then((bitmap) => {
+        canvas.width = bitmap.width;
+        canvas.height = bitmap.height;
+        canvas.getContext('2d').drawImage(bitmap, 0, 0);
+        bitmap.close();
+        canvas.classList.add('quicktab-loaded');
+      })
+      .catch(() => canvas.remove());
+    return canvas;
+  }
+
+  function createGlobe(className) {
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', '0 0 16 16');
+    svg.setAttribute('class', className);
+    svg.setAttribute('aria-hidden', 'true');
+    const path = document.createElementNS(ns, 'path');
+    path.setAttribute('d', 'M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13Zm0 0c1.7 1.6 2.6 3.9 2.6 6.5S9.7 12.9 8 14.5M8 1.5C6.3 3.1 5.4 5.4 5.4 8s.9 4.9 2.6 6.5M1.8 6h12.4M1.8 10h12.4');
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', 'currentColor');
+    path.setAttribute('stroke-width', '1.1');
+    svg.appendChild(path);
+    return svg;
+  }
+
+  function createIcon(tab, className) {
+    return tab.favicon ? createImage(tab.favicon, className) : createGlobe(className);
+  }
+
+  function displayUrl(rawUrl) {
+    try {
+      const url = new URL(rawUrl);
+      return url.protocol.startsWith('http') ? url.host.replace(/^www\./, '') : rawUrl.replace(/\/$/, '');
+    } catch {
+      return rawUrl;
+    }
+  }
+
   function renderPanel(tabs) {
     ensureHost();
 
@@ -132,11 +190,12 @@
     grid.className = 'quicktab-grid';
     grid.setAttribute('role', 'listbox');
     grid.setAttribute('aria-label', 'Recent tabs');
+    grid.style.setProperty('--quicktab-columns', String(Math.max(1, Math.min(tabs.length, 5))));
 
     if (tabs.length === 0) {
       const empty = document.createElement('div');
       empty.className = 'quicktab-empty';
-      empty.textContent = 'No recent tabs yet. Switch between tabs to populate this list.';
+      empty.textContent = 'No recent tabs yet';
       grid.appendChild(empty);
     } else {
       tabs.forEach((tab) => grid.appendChild(createTabCard(tab)));
@@ -148,10 +207,9 @@
     root.replaceChildren(overlay, panel);
     document.documentElement.appendChild(host);
 
-    // 自动聚焦第二个卡片（上一个访问的标签）
+    // 默认选中上一个访问的标签
     const cards = getCards();
-    const focusTarget = cards[1] || cards[0];
-    focusTarget?.focus();
+    (cards[1] || cards[0])?.focus({ preventScroll: true });
   }
 
   function createHints() {
@@ -159,73 +217,90 @@
     hints.className = 'quicktab-hints';
 
     const items = [
-      [['J', 'K', '↑↓'], 'Navigate'],
-      [['Enter'], 'Switch'],
-      [['Esc'], 'Close']
+      [['←', '→'], 'Select'],
+      [['↵'], 'Switch'],
+      [['esc'], 'Close']
     ];
     if (!stickyMode && altShortcutOpen) {
-      items.push([[`${ALT_LABEL}↑`], 'Confirm']);
+      items.unshift([[`Release ${ALT_LABEL}`], 'Switch']);
+      items.splice(2, 1);
     }
 
     for (const [keys, label] of items) {
       const item = document.createElement('span');
+      item.className = 'quicktab-hint';
       for (const key of keys) {
         const kbd = document.createElement('kbd');
         kbd.textContent = key;
         item.appendChild(kbd);
       }
-      item.append(` ${label}`);
+      item.append(label);
       hints.appendChild(item);
     }
     return hints;
   }
 
   function createTabCard(tab) {
+    const title = tab.title || 'Untitled';
+    const url = tab.url ? displayUrl(tab.url) : '';
+
     const card = document.createElement('div');
     card.className = 'quicktab-card';
-    card.tabIndex = 0;
+    card.tabIndex = -1;
     card.dataset.tabId = tab.id;
+    card.title = tab.url ? `${title}\n${tab.url}` : title;
     card.setAttribute('role', 'option');
     card.setAttribute('aria-selected', 'false');
+    card.setAttribute('aria-label', url ? `${title}, ${url}` : title);
+    if (tab.current) card.classList.add('quicktab-current');
+
+    const preview = document.createElement('div');
+    preview.className = 'quicktab-preview';
+    if (tab.thumbnail) {
+      preview.appendChild(createImage(tab.thumbnail, 'quicktab-shot'));
+    } else {
+      // 还没截过图的标签（受限页面、扩展启动后未打开过）显示大图标
+      const tile = document.createElement('div');
+      tile.className = 'quicktab-tile';
+      tile.appendChild(createIcon(tab, 'quicktab-tile-icon'));
+      preview.appendChild(tile);
+    }
     if (tab.current) {
-      card.classList.add('quicktab-current');
+      const badge = document.createElement('span');
+      badge.className = 'quicktab-badge';
+      badge.textContent = 'Current';
+      preview.appendChild(badge);
     }
+    card.appendChild(preview);
 
-    const favicon = document.createElement('img');
-    favicon.className = 'quicktab-favicon';
-    favicon.alt = '';
-    favicon.onerror = () => {
-      favicon.onerror = null;
-      favicon.src = FALLBACK_FAVICON;
-    };
-    favicon.src = tab.favIconUrl || FALLBACK_FAVICON;
-    card.appendChild(favicon);
+    const meta = document.createElement('div');
+    meta.className = 'quicktab-meta';
+    meta.appendChild(createIcon(tab, 'quicktab-favicon'));
 
-    const textWrap = document.createElement('div');
-    textWrap.className = 'quicktab-card-text';
-
-    const title = document.createElement('span');
-    title.className = 'quicktab-card-title';
-    title.textContent = tab.title || 'Untitled';
-    title.title = tab.title || 'Untitled';
-    textWrap.appendChild(title);
-
-    if (tab.url) {
-      const url = document.createElement('span');
-      url.className = 'quicktab-card-url';
-      try {
-        const u = new URL(tab.url);
-        url.textContent = u.host + u.pathname.replace(/\/$/, '');
-      } catch {
-        url.textContent = tab.url;
-      }
-      textWrap.appendChild(url);
+    const text = document.createElement('div');
+    text.className = 'quicktab-text';
+    const titleEl = document.createElement('div');
+    titleEl.className = 'quicktab-title';
+    titleEl.textContent = title;
+    text.appendChild(titleEl);
+    if (url) {
+      const urlEl = document.createElement('div');
+      urlEl.className = 'quicktab-url';
+      urlEl.textContent = url;
+      text.appendChild(urlEl);
     }
-
-    card.appendChild(textWrap);
+    meta.appendChild(text);
+    card.appendChild(meta);
 
     card.addEventListener('click', () => switchToTab(tab.id));
-    card.addEventListener('focus', () => card.setAttribute('aria-selected', 'true'));
+    // 只响应真实的鼠标移动：面板弹出时光标恰好停在某张卡片上不改变选中项
+    card.addEventListener('mousemove', () => {
+      if (root.activeElement !== card) card.focus({ preventScroll: true });
+    });
+    card.addEventListener('focus', () => {
+      card.setAttribute('aria-selected', 'true');
+      card.scrollIntoView({ block: 'nearest' });
+    });
     card.addEventListener('blur', () => card.setAttribute('aria-selected', 'false'));
 
     return card;
@@ -267,11 +342,27 @@
 
     const currentIndex = cards.indexOf(root.activeElement);
     const nextIndex = (currentIndex + direction + cards.length) % cards.length;
-    cards[nextIndex].focus();
+    cards[nextIndex].focus({ preventScroll: true });
+  }
+
+  // 多行时上下键按行移动；只有一行时等同左右
+  function moveRow(direction) {
+    const cards = getCards();
+    const columns = Number(root.querySelector('.quicktab-grid')?.style.getPropertyValue('--quicktab-columns')) || 1;
+    if (cards.length <= columns) {
+      cycleSelection(direction);
+      return;
+    }
+    const index = cards.indexOf(root.activeElement);
+    const next = index + direction * columns;
+    cards[Math.max(0, Math.min(cards.length - 1, next))].focus({ preventScroll: true });
   }
 
   function hidePanel() {
     panelRequestId += 1;
+    if (host?.isConnected) {
+      chrome.runtime.sendMessage({ action: 'panelClosed' }).catch(() => {});
+    }
     root?.replaceChildren();
     host?.remove();
 
@@ -311,12 +402,18 @@
       return;
     }
 
-    if (e.key === 'Tab' || e.key === 'ArrowRight' || e.key === 'ArrowDown' || key === 'j') {
+    if (e.key === 'Tab') {
       e.preventDefault();
       cycleSelection(e.shiftKey ? -1 : 1);
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || key === 'k') {
+    } else if (e.key === 'ArrowRight' || key === 'j') {
+      e.preventDefault();
+      cycleSelection(1);
+    } else if (e.key === 'ArrowLeft' || key === 'k') {
       e.preventDefault();
       cycleSelection(-1);
+    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      moveRow(e.key === 'ArrowDown' ? 1 : -1);
     }
   }
 
