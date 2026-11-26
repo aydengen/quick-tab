@@ -108,6 +108,7 @@
     if (event.altKey && event.keyCode === 81 && !event.ctrlKey && !event.metaKey) {
       event.preventDefault();
       press("q", true);
+      if (event.repeat) return;
       if (!open) show();
       else select(selected + (event.shiftKey ? -1 : 1));
       return;
