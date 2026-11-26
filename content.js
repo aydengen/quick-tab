@@ -7,7 +7,7 @@
   // background 可能为已打开的旧页面补注入，先清理旧实例
   globalThis.__quicktabCleanup?.();
 
-  const HOST_TAG = 'quicktab-root';
+  const QUICK_TAP_WINDOW_MS = 1000;
   const FALLBACK_FAVICON = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">%F0%9F%8C%90</text></svg>';
   const IS_MAC = /mac|iphone|ipad/i.test(navigator.userAgentData?.platform || navigator.platform || '');
   const ALT_LABEL = IS_MAC ? '⌥' : 'Alt';
@@ -23,6 +23,7 @@
   let panelRequestId = 0;
   // 页面实际观察到的 Alt 状态：true / false / null（未知，如刚注入或失焦后）
   let altHeld = null;
+  let lastAltUpAt = 0;
 
   // 首次打开面板时再读取设置，避免每个页面加载都访问存储
   let settingsReady = null;
@@ -53,8 +54,8 @@
     // 立即标记为可见，防止连续按键时重复调用
     panelVisible = true;
     altKeyDown = true;
-    // 快捷键消息到达前 Alt 已松开（快速轻按）
-    confirmPending = altHeld === false;
+    // 快捷键消息到达前 Alt 刚刚松开（快速轻按）；不含 Alt 的自定义快捷键不受影响
+    confirmPending = altHeld === false && performance.now() - lastAltUpAt < QUICK_TAP_WINDOW_MS;
     const requestId = ++panelRequestId;
 
     Promise.all([
@@ -90,7 +91,8 @@
   function ensureHost() {
     if (host) return;
 
-    host = document.createElement(HOST_TAG);
+    // 用 div 而非自定义元素：页面可抢先注册同名自定义元素并通过 ElementInternals 读取 closed shadow root
+    host = document.createElement('div');
     // 防止宿主页面 CSS 影响面板容器
     const hostStyles = {
       all: 'initial',
@@ -278,6 +280,7 @@
 
   function trackAlt(e) {
     altHeld = e.key === 'Alt' ? e.type === 'keydown' : e.altKey;
+    if (e.key === 'Alt' && e.type === 'keyup') lastAltUpAt = performance.now();
   }
 
   function onKeyDown(e) {
