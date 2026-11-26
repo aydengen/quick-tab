@@ -20,6 +20,7 @@
   // 面板渲染前就松开了 Alt：数据返回后直接切换
   let confirmPending = false;
   let stickyMode = false;
+  let altShortcutOpen = true;
   let panelRequestId = 0;
   // 页面实际观察到的 Alt 状态：true / false / null（未知，如刚注入或失焦后）
   let altHeld = null;
@@ -44,7 +45,7 @@
 
   // ========== 面板管理 ==========
 
-  function showPanel() {
+  function showPanel(altShortcut) {
     // 如果面板已打开，循环选择下一个（支持连续按 Alt+Q 切换）
     if (panelVisible) {
       cycleSelection(1);
@@ -53,9 +54,12 @@
 
     // 立即标记为可见，防止连续按键时重复调用
     panelVisible = true;
-    altKeyDown = true;
-    // 快捷键消息到达前 Alt 刚刚松开（快速轻按）；不含 Alt 的自定义快捷键不受影响
-    confirmPending = altHeld === false && performance.now() - lastAltUpAt < QUICK_TAP_WINDOW_MS;
+    // 快捷键不含 Alt 时没有“松开确认”，面板保持打开
+    altShortcutOpen = altShortcut;
+    altKeyDown = altShortcut;
+    // 快捷键消息到达前 Alt 刚刚松开（快速轻按）
+    confirmPending = altShortcut && altHeld === false &&
+      performance.now() - lastAltUpAt < QUICK_TAP_WINDOW_MS;
     const requestId = ++panelRequestId;
 
     Promise.all([
@@ -68,7 +72,7 @@
         if (response?.css) panelCss = response.css;
         const tabs = response?.tabs || [];
 
-        if (stickyMode) {
+        if (stickyMode || !altShortcut) {
           altKeyDown = false;
           confirmPending = false;
         }
@@ -291,7 +295,7 @@
 
     const key = e.key.toLowerCase();
 
-    if (!stickyMode && e.key === 'Alt') {
+    if (!stickyMode && altShortcutOpen && e.key === 'Alt') {
       altKeyDown = true;
     }
 
@@ -348,7 +352,7 @@
 
   function onMessage(message, _sender, sendResponse) {
     if (message.action === 'togglePanel') {
-      showPanel();
+      showPanel(message.altShortcut !== false);
       sendResponse({ success: true });
     }
   }

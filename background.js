@@ -204,13 +204,21 @@ function getPanelCss() {
   return panelCssPromise;
 }
 
+// 用户可在 chrome://extensions/shortcuts 改成不含 Alt 的快捷键，此时没有“松开 Alt 确认”
+async function shortcutUsesAlt() {
+  const commands = await chrome.commands.getAll();
+  const shortcut = commands.find((c) => c.name === 'toggle-panel')?.shortcut || '';
+  return /alt|⌥/i.test(shortcut);
+}
+
 // content.js 通过 manifest 注入；安装/更新前已打开的页面没有它，
 // 借助快捷键授予的 activeTab 权限补注入
 async function openPanel(tab) {
   if (!isInjectableUrl(tab.url)) return false;
 
+  const message = { action: 'togglePanel', altShortcut: await shortcutUsesAlt() };
   try {
-    await chrome.tabs.sendMessage(tab.id, { action: 'togglePanel' });
+    await chrome.tabs.sendMessage(tab.id, message);
     return true;
   } catch {
     // 尚未注入
@@ -218,7 +226,7 @@ async function openPanel(tab) {
 
   try {
     await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['content.js'] });
-    await chrome.tabs.sendMessage(tab.id, { action: 'togglePanel' });
+    await chrome.tabs.sendMessage(tab.id, message);
     return true;
   } catch {
     // PDF、本地文件等无法注入的页面
