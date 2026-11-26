@@ -356,8 +356,12 @@
       return;
     }
     const index = cards.indexOf(root.activeElement);
+    if (index === -1) return;
     const next = index + direction * columns;
-    cards[Math.max(0, Math.min(cards.length - 1, next))].focus({ preventScroll: true });
+    // 首行向上、末行向下不动；下一行不满时落到最后一张
+    const lastRow = Math.floor((cards.length - 1) / columns);
+    if (next < 0 || Math.floor(index / columns) === lastRow && direction > 0) return;
+    cards[Math.min(cards.length - 1, next)].focus({ preventScroll: true });
   }
 
   function hidePanel() {
