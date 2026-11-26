@@ -62,11 +62,14 @@ background.js (Service Worker)
 ├── 监听标签激活、窗口焦点、关闭、更新、替换事件
 ├── 页面没有 content.js（安装/更新前已打开）时用 activeTab + scripting 补注入
 ├── 无法注入的页面直接切回上一个标签
+├── 缩略图：标签停留 THUMB_SETTLE_MS 后 captureVisibleTab，裁成 480×300 WebP 存入 session（thumb:<tabId>）；打开面板时先补截当前标签
+├── 图标：通过 _favicon 读取并转 data URL（不受页面 CSP 影响）
 └── 处理消息通信（面板数据按发送方标签标记 current，并区分无痕窗口）
 
 content.js (Content Script)
 ├── 在所有页面注入（run_at: document_end），不注入 CSS 到页面
-├── 在封闭 Shadow DOM 中渲染 AltTab 风格切换面板（CSS 来自 content.css，由 background 读取后传入）
+├── 在封闭 Shadow DOM 中渲染 AltTab 风格缩略图网格（CSS 来自 content.css，由 background 读取后传入）
+├── 缩略图和图标解码后画进 canvas，不用 <img> 加载，避开页面 CSP
 ├── 键盘交互：方向键/Tab 循环，Enter 确认，ESC 取消
 ├── 连续按快捷键循环选择（通过 chrome.commands 触发）
 ├── 支持松开 Alt 键自动切换（面板渲染前松开则直接切到上一个标签）
