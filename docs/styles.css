@@ -861,6 +861,43 @@ button:disabled {
   margin: 17px 0 0;
   text-align: center;
 }
+.legal {
+  max-width: 760px;
+  padding-top: 56px;
+  padding-bottom: 96px;
+}
+.legal h1 {
+  font-size: 40px;
+  letter-spacing: -0.03em;
+  margin: 0 0 8px;
+}
+.legal-updated {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0 0 36px;
+}
+.legal h2 {
+  font-size: 18px;
+  margin: 36px 0 12px;
+}
+.legal p,
+.legal li {
+  font-size: 15px;
+  line-height: 1.85;
+  color: #3d4450;
+}
+.legal ul {
+  padding-left: 1.2em;
+}
+.legal a {
+  color: var(--blue);
+}
+.legal code {
+  font-size: 0.9em;
+  background: #eceef2;
+  border-radius: 4px;
+  padding: 1px 5px;
+}
 .site-footer {
   display: flex;
   align-items: center;

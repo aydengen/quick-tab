@@ -55,7 +55,7 @@ jobs:
                       assert target.is_relative_to(root), f'Path leaves website: {value}'
                       assert target.is_file(), f'Missing website asset: {value}'
 
-          for page in ('index.html', 'en/index.html'):
+          for page in ('index.html', 'en/index.html', 'privacy.html', 'en/privacy.html'):
               CheckLinks(page).feed((root / page).read_text())
           print('All local website links and assets exist.')
           PY

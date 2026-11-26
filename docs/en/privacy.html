@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f7f8fa" />
+    <title>QuickTab Privacy Policy</title>
+    <link rel="alternate" hreflang="zh-CN" href="https://aydengen.github.io/quick-tab/privacy.html" />
+    <link rel="alternate" hreflang="en" href="https://aydengen.github.io/quick-tab/en/privacy.html" />
+    <link rel="icon" type="image/png" href="../assets/icon.png" />
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body>
+    <header class="site-header wrap">
+      <a class="brand" href="./"
+        ><img src="../assets/icon.png" width="34" height="34" alt="" />QuickTab<span class="brand-dot">.</span></a
+      >
+      <nav>
+        <a href="./">← Back to home</a>
+        <a href="../privacy.html" hreflang="zh-CN" lang="zh-CN">中文</a>
+      </nav>
+      <a class="header-github" href="https://github.com/aydengen/quick-tab" target="_blank" rel="noopener noreferrer"
+        >GitHub <span aria-hidden="true">↗</span></a
+      >
+    </header>
+    <main id="main" class="legal wrap">
+      <h1>Privacy Policy</h1>
+      <p class="legal-updated">Last updated: 2026-11-26</p>
+        <p>QuickTab is a tab switcher extension for Chrome. It does not collect, sell, or transmit any user data.</p>
+        <h2>What the extension handles on your computer</h2>
+        <ul>
+        <li>Titles, URLs, and icons of recently used tabs, to list them in the switcher.</li>
+        <li>A thumbnail of the visible tab, captured with <code>chrome.tabs.captureVisibleTab</code>, to show on the switcher cards.</li>
+        <li>Your extension settings (for example, Sticky mode).</li>
+        </ul>
+        <h2>Where it is stored</h2>
+        <ul>
+        <li>The recent-tab list and thumbnails are kept in <code>chrome.storage.session</code>, in memory on your computer only, and are cleared when you close the browser.</li>
+        <li>Settings are kept in <code>chrome.storage.local</code>, on your computer only.</li>
+        <li>Incognito and regular windows never show each other&#x27;s tabs.</li>
+        </ul>
+        <h2>Nothing leaves your computer</h2>
+        <p>QuickTab has no server, uses no analytics or tracking, loads no remote code, and shares no data with third parties. The switcher panel runs in a closed Shadow DOM, so web pages cannot read information about your other tabs.</p>
+        <h2>Why each permission is needed</h2>
+        <ul>
+        <li><code>tabs</code>: read tab titles, URLs, and icons, and switch to the tab you choose.</li>
+        <li><code>storage</code>: keep the recent-tab list, thumbnails, and settings locally.</li>
+        <li><code>activeTab</code>, <code>scripting</code>: inject the panel script when you press the shortcut on a page that was open before the extension was installed or updated.</li>
+        <li><code>favicon</code>: read site icons from Chrome&#x27;s favicon cache.</li>
+        <li>Access to all sites (<code>&lt;all_urls&gt;</code>): show the switcher panel on web pages and capture the visible tab as a thumbnail.</li>
+        </ul>
+        <h2>Contact</h2>
+        <p>Questions? Open an issue at <a href="https://github.com/aydengen/quick-tab/issues">https://github.com/aydengen/quick-tab/issues</a>.</p>
+    </main>
+  </body>
+</html>
