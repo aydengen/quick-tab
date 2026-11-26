@@ -11,8 +11,6 @@
   // 面板到窗口边缘的最小距离
   const PANEL_MARGIN = 16;
   const MAX_ROWS = 3;
-    const IS_MAC = /mac|iphone|ipad/i.test(navigator.userAgentData?.platform || navigator.platform || '');
-  const ALT_LABEL = IS_MAC ? '⌥' : 'Alt';
 
   let host = null;
   let root = null;
@@ -206,7 +204,6 @@
     }
 
     panel.appendChild(grid);
-    panel.appendChild(createHints());
 
     root.replaceChildren(overlay, panel);
     document.documentElement.appendChild(host);
@@ -225,8 +222,6 @@
     const count = getCards().length || 1;
     const measure = (columns) => {
       grid.style.setProperty('--quicktab-columns', String(columns));
-      // ↑↓ 提示可能让底栏换行，测量时要和最终显示一致
-      panel.classList.toggle('quicktab-multirow', columns < count);
       return Math.min(
         1,
         (window.innerWidth - 2 * PANEL_MARGIN) / panel.offsetWidth,
@@ -245,37 +240,7 @@
       if (scale >= 1) break;
     }
     grid.style.setProperty('--quicktab-columns', String(best.columns));
-    panel.classList.toggle('quicktab-multirow', best.columns < count);
     panel.style.setProperty('--qt-scale', String(best.scale));
-  }
-
-  function createHints() {
-    const hints = document.createElement('div');
-    hints.className = 'quicktab-hints';
-
-    const items = [
-      [['←', '→', '↑', '↓'], 'Select'],
-      [['↵'], 'Switch'],
-      [['esc'], 'Close']
-    ];
-    if (!stickyMode && altShortcutOpen) {
-      items.unshift([[`Release ${ALT_LABEL}`], 'Switch']);
-      items.splice(2, 1);
-    }
-
-    for (const [keys, label] of items) {
-      const item = document.createElement('span');
-      item.className = 'quicktab-hint';
-      for (const key of keys) {
-        const kbd = document.createElement('kbd');
-        kbd.textContent = key;
-        if (key === '↑' || key === '↓') kbd.className = 'quicktab-key-rows';
-        item.appendChild(kbd);
-      }
-      item.append(label);
-      hints.appendChild(item);
-    }
-    return hints;
   }
 
   function createTabCard(tab) {

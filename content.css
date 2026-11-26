@@ -17,7 +17,6 @@
   --qt-preview-bg: rgba(0, 0, 0, 0.05);
   --qt-preview-stroke: rgba(0, 0, 0, 0.08);
   --qt-tile-bg: #ffffff;
-  --qt-kbd-bg: rgba(0, 0, 0, 0.06);
   --qt-overlay: rgba(0, 0, 0, 0.12);
   --qt-shadow:
     0 0 0 0.5px rgba(0, 0, 0, 0.12),
@@ -49,7 +48,6 @@
     --qt-preview-bg: rgba(255, 255, 255, 0.06);
     --qt-preview-stroke: rgba(255, 255, 255, 0.1);
     --qt-tile-bg: rgba(255, 255, 255, 0.12);
-    --qt-kbd-bg: rgba(255, 255, 255, 0.1);
     --qt-overlay: rgba(0, 0, 0, 0.3);
     --qt-shadow:
       0 0 0 0.5px rgba(0, 0, 0, 0.6),
@@ -249,45 +247,6 @@
   color: var(--qt-text-secondary);
   font-size: 11px;
   line-height: 14px;
-}
-
-/* ========== 快捷键提示 ========== */
-.quicktab-hints {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 4px 16px;
-  padding: 10px 8px 2px;
-  color: var(--qt-text-secondary);
-  font-size: 11.5px;
-  line-height: 16px;
-}
-
-.quicktab-hint {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.quicktab-hint kbd {
-  display: inline-block;
-  min-width: 16px;
-  padding: 0 4px;
-  border-radius: 4px;
-  background: var(--qt-kbd-bg);
-  font: inherit;
-  font-size: 11px;
-  line-height: 17px;
-  color: var(--qt-text);
-  text-align: center;
-}
-
-.quicktab-panel:not(.quicktab-multirow) .quicktab-key-rows {
-  display: none;
-}
-
-.quicktab-hint kbd + kbd {
-  margin-left: -2px;
 }
 
 /* ========== 空状态 ========== */
