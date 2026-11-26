@@ -1,0 +1,129 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="960"
+  height="600"
+  viewBox="0 0 960 600"
+>
+  <defs>
+    <linearGradient id="bg" x2=".3" y2="1">
+      <stop stop-color="#496958" />
+      <stop offset="1" stop-color="#1a2a25" />
+    </linearGradient>
+    <linearGradient id="cover" x2="1" y2="1">
+      <stop stop-color="#d5dbb5" />
+      <stop offset="1" stop-color="#788a69" />
+    </linearGradient>
+  </defs>
+  <rect width="960" height="600" fill="#17211d" />
+  <rect x="165" width="795" height="600" fill="url(#bg)" />
+  <g font-family="sans-serif" fill="#9baa9d" font-size="11">
+    <text x="24" y="48" fill="#e1e8dd" font-size="20" font-weight="700">
+      ♫ sound
+    </text>
+    <text x="25" y="100">⌂　Home</text>
+    <text x="25" y="134">⌕　Search</text>
+    <text x="25" y="168">▤　Your library</text>
+    <text x="25" y="233" font-size="9">YOUR PLAYLISTS</text>
+    <text x="25" y="272" fill="#e5eddf">Deep focus</text>
+    <text x="25" y="305">A slow morning</text>
+    <text x="25" y="338">On the way home</text>
+    <text x="25" y="371">Rainy days</text>
+  </g>
+  <rect x="205" y="79" width="176" height="176" fill="url(#cover)" />
+  <circle
+    cx="293"
+    cy="160"
+    r="54"
+    fill="none"
+    stroke="#e1e7cb"
+    stroke-width="1"
+  />
+  <circle
+    cx="293"
+    cy="160"
+    r="41"
+    fill="none"
+    stroke="#e1e7cb"
+    stroke-width="1"
+  />
+  <circle
+    cx="293"
+    cy="160"
+    r="28"
+    fill="none"
+    stroke="#e1e7cb"
+    stroke-width="1"
+  />
+  <circle
+    cx="293"
+    cy="160"
+    r="15"
+    fill="none"
+    stroke="#e1e7cb"
+    stroke-width="1"
+  />
+  <text
+    x="240"
+    y="236"
+    fill="#e4e9d1"
+    font-family="sans-serif"
+    font-size="8"
+    letter-spacing="4"
+  >
+    FIND YOUR FLOW
+  </text>
+  <g font-family="sans-serif">
+    <text x="407" y="124" font-size="9" fill="#c0cebd" letter-spacing="2">
+      PLAYLIST
+    </text>
+    <text x="404" y="186" font-size="55" fill="#fff" font-weight="700">
+      Deep focus
+    </text>
+    <text x="408" y="218" font-size="11" fill="#acbca7">
+      A little space to get lost in what you love.
+    </text>
+    <text x="408" y="246" font-size="10" fill="#8fa58b">
+      Made for quiet minds　·　24 songs, about 2 hr
+    </text>
+  </g>
+  <circle cx="230" cy="305" r="23" fill="#b7d39e" />
+  <path d="M225 295L241 305 225 315Z" fill="#243c2b" />
+  <path
+    d="M275 300Q275 289 283 295Q290 288 293 297Q298 304 283 315Q270 306 275 300Z"
+    fill="none"
+    stroke="#9aaf93"
+    stroke-width="2"
+  />
+  <g font-family="sans-serif" font-size="10" fill="#b0bfa9">
+    <text x="216" y="367">#</text>
+    <text x="250" y="367">TITLE</text>
+    <text x="603" y="367">ALBUM</text>
+    <text x="882" y="367">◷</text>
+  </g>
+  <path d="M205 381H917" stroke="#8ca180" stroke-opacity=".2" />
+  <g font-family="sans-serif" font-size="11" fill="#d3dfcd">
+    <text x="217" y="414">1</text>
+    <text x="250" y="414">First light</text>
+    <text x="603" y="414" fill="#96aa8e">Somewhere quiet</text>
+    <text x="881" y="414">4:32</text>
+    <text x="217" y="457" fill="#bbd59e">♫</text>
+    <text x="250" y="457" fill="#bbd59e">A place to begin</text>
+    <text x="603" y="457" fill="#96aa8e">Small hours</text>
+    <text x="881" y="457">3:57</text>
+    <text x="217" y="500">3</text>
+    <text x="250" y="500">Still water</text>
+    <text x="603" y="500" fill="#96aa8e">Soft edges</text>
+    <text x="881" y="500">5:18</text>
+  </g>
+  <rect y="542" width="960" height="58" fill="#18231e" />
+  <rect x="20" y="551" width="38" height="38" fill="url(#cover)" />
+  <text x="70" y="569" font-family="sans-serif" font-size="10" fill="#d8e3d2">
+    A place to begin
+  </text>
+  <text x="70" y="584" font-family="sans-serif" font-size="8" fill="#80947a">
+    Small hours
+  </text>
+  <g stroke="#c4d3bc" stroke-width="3"><path d="M470 554V567M478 554V567" /></g>
+  <rect x="330" y="583" width="280" height="3" rx="1.5" fill="#4b5f44" />
+  <rect x="330" y="583" width="105" height="3" rx="1.5" fill="#b6cd9e" />
+</svg>

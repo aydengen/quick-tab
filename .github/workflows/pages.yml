@@ -1,0 +1,83 @@
+name: Website
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - ".github/workflows/pages.yml"
+  pull_request:
+    paths:
+      - "docs/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Check website
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Check JavaScript syntax
+        run: node --check docs/site.js
+      - name: Check local links and assets
+        # Check project-relative paths, including GitHub Pages' /quick-tab/ prefix.
+        run: |
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          from urllib.parse import unquote, urlsplit
+
+          root = Path('docs').resolve()
+          class CheckLinks(HTMLParser):
+              def __init__(self, page):
+                  super().__init__()
+                  self.base = (root / page).parent
+
+              def handle_starttag(self, tag, attrs):
+                  for key, value in attrs:
+                      if key not in ('href', 'src') or not value:
+                          continue
+                      url = urlsplit(value)
+                      if url.scheme or url.netloc or not url.path:
+                          continue
+                      assert not url.path.startswith('/'), f'Root-relative URL: {value}'
+                      target = (self.base / unquote(url.path)).resolve()
+                      if url.path.endswith('/'):
+                          target = target / 'index.html'
+                      assert target.is_relative_to(root), f'Path leaves website: {value}'
+                      assert target.is_file(), f'Missing website asset: {value}'
+
+          for page in ('index.html', 'en/index.html'):
+              CheckLinks(page).feed((root / page).read_text())
+          print('All local website links and assets exist.')
+          PY
+
+  deploy:
+    name: Deploy to GitHub Pages
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: docs
+      - name: Deploy website
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f7f8fa" />
+    <meta
+      name="description"
+      content="QuickTab is a small, open-source tab switcher for Chrome. Hold Alt + Q, pick a recent tab, let go."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="QuickTab — Switch tabs without losing your train of thought" />
+    <meta
+      property="og:description"
+      content="Switch Chrome tabs the way you switch apps. One shortcut takes you back to the page you were just on. Free, open source, no sign-up."
+    />
+    <meta property="og:image" content="https://aydengen.github.io/quick-tab/assets/og-en.png" />
+    <meta property="og:url" content="https://aydengen.github.io/quick-tab/en/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="alternate" hreflang="en" href="https://aydengen.github.io/quick-tab/" />
+    <link rel="alternate" hreflang="en" href="https://aydengen.github.io/quick-tab/en/" />
+    <link rel="alternate" hreflang="x-default" href="https://aydengen.github.io/quick-tab/" />
+    <title>QuickTab — Switch tabs without losing your train of thought</title>
+    <link rel="icon" type="image/png" href="../assets/icon.png" />
+    <link rel="stylesheet" href="../styles.css" />
+    <script src="../site.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header wrap">
+      <a class="brand" href="./" aria-label="QuickTab home"
+        ><img
+          src="../assets/icon.png"
+          width="34"
+          height="34"
+          alt=""
+        />QuickTab<span class="brand-dot">.</span></a
+      >
+      <nav aria-label="Main navigation">
+        <a href="#experience">Try it</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#questions">FAQ</a>
+        <a href="../" hreflang="zh-CN" lang="zh-CN">中文</a>
+      </nav>
+      <a
+        class="header-github"
+        href="https://github.com/aydengen/quick-tab"
+        target="_blank"
+        rel="noopener noreferrer"
+        >GitHub <span aria-hidden="true">↗</span></a
+      >
+    </header>
+
+    <main id="main">
+      <section class="hero wrap" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">
+            <span class="status-dot" aria-hidden="true"></span>
+            Less hunting for tabs
+          </p>
+          <h1 id="hero-title">
+            Switch tabs,<br />keep your <span class="accent"
+              >focus<span class="underline" aria-hidden="true"></span
+            ></span>
+          </h1>
+        </div>
+        <div class="hero-aside">
+          <p>
+            The page you just left is one shortcut away.<br />It works like switching apps, only for tabs.
+          </p>
+          <a
+            class="button button-primary"
+            href="https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimheklaj"
+            target="_blank"
+            rel="noopener noreferrer"
+            ><svg
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="9.5" />
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 8h8.6M8.5 14 4.2 6.6M15.5 14l-4.3 7.4" /></svg
+            >Add to Chrome, free <span aria-hidden="true">↗</span></a
+          >
+          <p class="hero-note">
+            No sign-up <span>·</span> Free and open source <span>·</span> Mac / Windows /
+            Linux
+          </p>
+        </div>
+      </section>
+
+      <section
+        id="experience"
+        class="experience wrap"
+        aria-labelledby="experience-title"
+      >
+        <div class="demo-heading">
+          <h2 id="experience-title">Your recent tabs, one key away</h2>
+          <span class="demo-label"
+            >Interactive demo <span aria-hidden="true">↙</span></span
+          >
+        </div>
+        <div class="demo-canvas">
+          <div class="canvas-note" aria-hidden="true">
+            LESS SEARCHING. MORE DOING.
+          </div>
+          <div class="browser">
+            <div class="browser-bar" aria-hidden="true">
+              <div class="traffic-lights"><i></i><i></i><i></i></div>
+              <div class="browser-tab" data-browser-tab="0">
+                <span class="favicon f-notes">N</span
+                ><span>Friday side project</span>
+              </div>
+              <div class="browser-tab" data-browser-tab="1">
+                <span class="favicon f-design">F</span><span>Moodboard</span>
+              </div>
+              <div class="browser-tab" data-browser-tab="2">
+                <span class="favicon f-code">G</span><span>quick-tab</span>
+              </div>
+              <div class="browser-tab" data-browser-tab="3">
+                <span class="favicon f-music">♫</span><span>Deep focus</span>
+              </div>
+              <span class="new-tab">+</span>
+            </div>
+            <div class="browser-address" aria-hidden="true">
+              <span>← &nbsp; → &nbsp; ↻</span
+              ><span class="address-field"
+                ><span class="lock">⌑</span>
+                <span id="demo-address">notes.example / my-space</span></span
+              ><span>⋮</span>
+            </div>
+            <div class="browser-viewport" id="demo-stage">
+              <img
+                class="active-page"
+                id="active-page"
+                src="../assets/notes.svg"
+                alt="Simulated tab: Friday side project"
+                width="960"
+                height="600"
+              />
+              <div class="demo-shade" id="demo-shade"></div>
+              <div
+                class="switcher"
+                id="switcher"
+                role="group"
+                aria-label="Simulated tab switcher. Click a card to switch."
+              >
+                <button
+                  type="button"
+                  class="tab-card"
+                  data-tab="0"
+                  aria-pressed="false"
+                >
+                  <span class="tab-preview"
+                    ><img
+                      src="../assets/notes.svg"
+                      alt=""
+                      width="320"
+                      height="200"
+                    /><span class="current-badge" data-current="0"
+                      >Current</span
+                    ></span
+                  ><span class="tab-meta"
+                    ><span class="favicon f-notes" aria-hidden="true">N</span
+                    ><span
+                      ><span class="tab-title">Friday side project</span
+                      ><span class="tab-url">notes.example</span></span
+                    ></span
+                  >
+                </button>
+                <button
+                  type="button"
+                  class="tab-card is-selected"
+                  data-tab="1"
+                  aria-pressed="true"
+                >
+                  <span class="tab-preview"
+                    ><img
+                      src="../assets/design.svg"
+                      alt=""
+                      width="320"
+                      height="200"
+                    /><span class="current-badge" data-current="1" hidden
+                      >Current</span
+                    ></span
+                  ><span class="tab-meta"
+                    ><span class="favicon f-design" aria-hidden="true">F</span
+                    ><span
+                      ><span class="tab-title">Moodboard</span
+                      ><span class="tab-url">design.example</span></span
+                    ></span
+                  >
+                </button>
+                <button
+                  type="button"
+                  class="tab-card"
+                  data-tab="2"
+                  aria-pressed="false"
+                >
+                  <span class="tab-preview"
+                    ><img
+                      src="../assets/code.svg"
+                      alt=""
+                      width="320"
+                      height="200"
+                    /><span class="current-badge" data-current="2" hidden
+                      >Current</span
+                    ></span
+                  ><span class="tab-meta"
+                    ><span class="favicon f-code" aria-hidden="true">G</span
+                    ><span
+                      ><span class="tab-title">aydengen / quick-tab</span
+                      ><span class="tab-url">github.com</span></span
+                    ></span
+                  >
+                </button>
+                <button
+                  type="button"
+                  class="tab-card"
+                  data-tab="3"
+                  aria-pressed="false"
+                >
+                  <span class="tab-preview"
+                    ><img
+                      src="../assets/music.svg"
+                      alt=""
+                      width="320"
+                      height="200"
+                    /><span class="current-badge" data-current="3" hidden
+                      >Current</span
+                    ></span
+                  ><span class="tab-meta"
+                    ><span class="favicon f-music" aria-hidden="true">♫</span
+                    ><span
+                      ><span class="tab-title">Deep focus</span
+                      ><span class="tab-url">music.example</span></span
+                    ></span
+                  >
+                </button>
+              </div>
+              <div class="demo-success" id="demo-success" hidden>
+                <span aria-hidden="true">✓</span> Switched. Carry on.
+              </div>
+            </div>
+          </div>
+          <div class="shortcut-display" aria-hidden="true">
+            <kbd>alt <span>⌥</span></kbd
+            ><span class="key-plus">+</span><kbd>Q</kbd
+            ><span class="shortcut-caption">Hold, pick, let go</span>
+          </div>
+        </div>
+        <div class="demo-controls" id="demo-controls" hidden>
+          <p id="demo-status" role="status" aria-live="polite">
+            Click a card, or try it with the keyboard
+          </p>
+          <button
+            type="button"
+            class="text-button"
+            id="demo-start"
+            aria-controls="switcher"
+            aria-expanded="true"
+          >
+            Try with keyboard <span aria-hidden="true">→</span>
+          </button>
+        </div>
+        <p class="demo-disclaimer">
+          This is a simulation and does not read your tabs. After installing, press <kbd>Alt</kbd> +
+          <kbd>Q</kbd> to open it, or <kbd>⌥</kbd> + <kbd>Q</kbd>
+        </p>
+        <noscript
+          ><p class="no-script">
+            The demo above needs JavaScript. You can also just install the extension.
+          </p></noscript
+        >
+      </section>
+
+      <section class="features wrap" aria-label="Why QuickTab">
+        <article>
+          <span class="feature-icon" aria-hidden="true">↔</span>
+          <h3>Back to the last page in one tap</h3>
+          <p>
+            Tabs are ordered by when you last used them, so there is no scanning the tab bar. Tap Alt + Q once to jump back to the previous tab.
+          </p>
+        </article>
+        <article>
+          <span class="feature-icon" aria-hidden="true">▧</span>
+          <h3>Recognize pages by sight</h3>
+          <p>
+            Each card shows a thumbnail of the page, so you are not guessing from truncated titles. With more tabs, the cards wrap onto extra rows.
+          </p>
+          
+        </article>
+        <article>
+          <span class="feature-icon" aria-hidden="true">⌁</span>
+          <h3>Small, and your data stays local</h3>
+          <p>
+            No account and no analytics. Tab history and thumbnails stay in the browser session and are never uploaded.
+          </p>
+        </article>
+      </section>
+
+      <section class="showcase" aria-labelledby="showcase-title">
+        <div class="wrap">
+          <h2 id="showcase-title">See the page before you switch</h2>
+          <p>Recent tabs appear as live thumbnails, so you never read a cut-off title again.</p>
+          <img
+            src="../assets/showcase.png"
+            width="1800"
+            height="1080"
+            alt="QuickTab panel showing thumbnails of 8 recent tabs in two rows"
+            loading="lazy"
+          />
+        </div>
+      </section>
+
+      <section id="how-it-works" class="how-section">
+        <div class="wrap">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">From install to habit</p>
+              <h2>Nothing to learn. Try it once.</h2>
+            </div>
+            <p>Your hands stay on the keyboard,<br />and your attention stays on your work.</p>
+          </div>
+          <div class="steps">
+            <article class="step">
+              <span class="step-number">01 /</span>
+              <div class="step-visual install-visual" aria-hidden="true">
+                <img
+                  src="../assets/icon.png"
+                  width="58"
+                  height="58"
+                  alt=""
+                /><span>+ Add extension</span>
+              </div>
+              <h3>Install QuickTab</h3>
+              <p>
+                Click “Add to Chrome” in the Chrome Web Store and confirm. No account and no setup.
+              </p>
+            </article>
+            <article class="step">
+              <span class="step-number">02 /</span>
+              <div class="step-visual keys-visual" aria-hidden="true">
+                <kbd>Alt <small>⌥</small></kbd
+                ><span>+</span><kbd>Q</kbd>
+              </div>
+              <h3>Hold Alt, press Q</h3>
+              <p>
+                Your recent tabs appear on any regular web page. Press Q again or use the arrow keys to choose one.
+              </p>
+            </article>
+            <article class="step">
+              <span class="step-number">03 /</span>
+              <div class="step-visual release-visual" aria-hidden="true">
+                <span class="release-key">↵</span
+                ><span class="release-check">✓</span>
+              </div>
+              <h3>Let go of Alt</h3>
+              <p>
+                Releasing Alt switches to the selected tab. You can also press Enter to confirm, or Esc to stay where you are.
+              </p>
+            </article>
+          </div>
+          <p class="tip">
+            <span>Tip</span>Rather not hold Alt? Turn on “Sticky panel mode” in the extension settings and confirm with Enter.
+          </p>
+        </div>
+      </section>
+
+      <section id="questions" class="faq wrap" aria-labelledby="faq-title">
+        <div class="faq-heading">
+          <p class="eyebrow">Good to know</p>
+          <h2 id="faq-title">Common questions</h2>
+          <a
+            href="https://github.com/aydengen/quick-tab/issues"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Something else? Ask on GitHub <span aria-hidden="true">↗</span></a
+          >
+        </div>
+        <div class="faq-list">
+          <details>
+            <summary>
+              The shortcut does nothing. What now?<span aria-hidden="true">+</span>
+            </summary>
+            <div>
+              <p>
+                First try it on a regular web page such as GitHub. If nothing happens, open
+                <code>chrome://extensions/shortcuts</code>, find QuickTab, and give it a shortcut that no other extension or system feature is using.
+              </p>
+              <p>
+                On a Mac, Alt is the Option (⌥) key. If a page that was open before installing does not respond, reload it and try again.
+              </p>
+            </div>
+          </details>
+          <details>
+            <summary>
+              Why doesn’t the panel show on some pages?<span aria-hidden="true">+</span>
+            </summary>
+            <div>
+              <p>
+                Chrome does not let extensions draw on the New Tab page,<code>chrome://</code> pages, the Chrome Web Store, or some PDFs. On those pages the shortcut switches straight back to the previous tab.
+              </p>
+            </div>
+          </details>
+          <details>
+            <summary>
+              Why does it need tab and site permissions?<span aria-hidden="true">+</span>
+            </summary>
+            <div>
+              <p>
+                Tab access is used to show titles and icons and to switch tabs. Site access is used to capture the visible page as a thumbnail. There is no server receiving any of this, and the source code is public.
+              </p>
+              <p>
+                Recent tabs and thumbnails are kept in local session storage and cleared when you quit Chrome. Your shortcut and settings are kept.
+              </p>
+            </div>
+          </details>
+          <details>
+            <summary>
+              Is it free? Which browsers work?<span aria-hidden="true">+</span>
+            </summary>
+            <div>
+              <p>
+                Yes, it is free under the MIT license. QuickTab is built for desktop Chrome on Mac, Windows, and Linux. Other Chromium browsers may work but have not been tested. Mobile browsers cannot install it.
+              </p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section class="closing wrap" aria-labelledby="closing-title">
+        <div>
+          <p class="eyebrow">Ready when you are</p>
+          <h2 id="closing-title">Spend less time<br />finding tabs.</h2>
+        </div>
+        <div>
+          <a
+            class="button button-primary"
+            href="https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimheklaj"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Add to Chrome, free <span aria-hidden="true">↗</span></a
+          >
+          <p>One shortcut. That is the whole thing.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer wrap">
+      <a class="brand" href="./"
+        ><img
+          src="../assets/icon.png"
+          width="26"
+          height="26"
+          alt=""
+        />QuickTab<span class="brand-dot">.</span></a
+      >
+      <p>Does one thing: switching tabs.</p>
+      <div>
+        <a
+          href="https://github.com/aydengen/quick-tab"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Source code ↗</a
+        ><a
+          href="https://github.com/aydengen/quick-tab/blob/main/LICENSE"
+          target="_blank"
+          rel="noopener noreferrer"
+          >MIT License</a
+        >
+      </div>
+    </footer>
+  </body>
+</html>

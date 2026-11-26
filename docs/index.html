@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f7f8fa" />
+    <meta
+      name="description"
+      content="QuickTab 是一个轻量、开源的 Chrome 标签页切换扩展。按住 Alt + Q，找到最近的页面，松手即达。"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="QuickTab — 切换标签，不切断思路" />
+    <meta
+      property="og:description"
+      content="让 Chrome 标签切换像切换应用一样自然。一个快捷键，回到刚才的页面。免费、开源、无需注册。"
+    />
+    <meta property="og:image" content="https://aydengen.github.io/quick-tab/assets/og-zh.png" />
+    <meta property="og:url" content="https://aydengen.github.io/quick-tab/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="alternate" hreflang="zh-CN" href="https://aydengen.github.io/quick-tab/" />
+    <link rel="alternate" hreflang="en" href="https://aydengen.github.io/quick-tab/en/" />
+    <link rel="alternate" hreflang="x-default" href="https://aydengen.github.io/quick-tab/" />
+    <title>QuickTab — 切换标签，不切断思路</title>
+    <link rel="icon" type="image/png" href="./assets/icon.png" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./site.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到主要内容</a>
+    <header class="site-header wrap">
+      <a class="brand" href="#" aria-label="QuickTab 首页"
+        ><img
+          src="./assets/icon.png"
+          width="34"
+          height="34"
+          alt=""
+        />QuickTab<span class="brand-dot">.</span></a
+      >
+      <nav aria-label="主导航">
+        <a href="#experience">体验一下</a>
+        <a href="#how-it-works">如何使用</a>
+        <a href="#questions">常见问题</a>
+        <a href="./en/" hreflang="en" lang="en">English</a>
+      </nav>
+      <a
+        class="header-github"
+        href="https://github.com/aydengen/quick-tab"
+        target="_blank"
+        rel="noopener noreferrer"
+        >GitHub <span aria-hidden="true">↗</span></a
+      >
+    </header>
+
+    <main id="main">
+      <section class="hero wrap" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">
+            <span class="status-dot" aria-hidden="true"></span>
+            少一点寻找，多一点专注
+          </p>
+          <h1 id="hero-title">
+            切换标签，<br />不切断<span class="accent"
+              >思路<span class="underline" aria-hidden="true"></span
+            ></span>
+          </h1>
+        </div>
+        <div class="hero-aside">
+          <p>
+            刚才的页面，不必再找一遍。<br />让标签切换，像切换应用一样自然。
+          </p>
+          <a
+            class="button button-primary"
+            href="https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimheklaj"
+            target="_blank"
+            rel="noopener noreferrer"
+            ><svg
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="9.5" />
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 8h8.6M8.5 14 4.2 6.6M15.5 14l-4.3 7.4" /></svg
+            >免费添加到 Chrome <span aria-hidden="true">↗</span></a
+          >
+          <p class="hero-note">
+            无需注册 <span>·</span> 开源免费 <span>·</span> Mac / Windows /
+            Linux
+          </p>
+        </div>
+      </section>
+
+      <section
+        id="experience"
+        class="experience wrap"
+        aria-labelledby="experience-title"
+      >
+        <div class="demo-heading">
+          <h2 id="experience-title">你的标签，触手可及</h2>
+          <span class="demo-label"
+            >交互演示 <span aria-hidden="true">↙</span></span
+          >
+        </div>
+        <div class="demo-canvas">
+          <div class="canvas-note" aria-hidden="true">
+            LESS SEARCHING. MORE DOING.
+          </div>
+          <div class="browser">
+            <div class="browser-bar" aria-hidden="true">
+              <div class="traffic-lights"><i></i><i></i><i></i></div>
+              <div class="browser-tab" data-browser-tab="0">
+                <span class="favicon f-notes">N</span
+                ><span>周五，做点喜欢的事</span>
+              </div>
+              <div class="browser-tab" data-browser-tab="1">
+                <span class="favicon f-design">F</span><span>下一点灵感</span>
+              </div>
+              <div class="browser-tab" data-browser-tab="2">
+                <span class="favicon f-code">G</span><span>quick-tab</span>
+              </div>
+              <div class="browser-tab" data-browser-tab="3">
+                <span class="favicon f-music">♫</span><span>Deep focus</span>
+              </div>
+              <span class="new-tab">+</span>
+            </div>
+            <div class="browser-address" aria-hidden="true">
+              <span>← &nbsp; → &nbsp; ↻</span
+              ><span class="address-field"
+                ><span class="lock">⌑</span>
+                <span id="demo-address">notes.example / my-space</span></span
+              ><span>⋮</span>
+            </div>
+            <div class="browser-viewport" id="demo-stage">
+              <img
+                class="active-page"
+                id="active-page"
+                src="./assets/notes.svg"
+                alt="模拟标签页：周五，做点喜欢的事"
+                width="960"
+                height="600"
+              />
+              <div class="demo-shade" id="demo-shade"></div>
+              <div
+                class="switcher"
+                id="switcher"
+                role="group"
+                aria-label="模拟标签切换器，点击卡片切换页面"
+              >
+                <button
+                  type="button"
+                  class="tab-card"
+                  data-tab="0"
+                  aria-pressed="false"
+                >
+                  <span class="tab-preview"
+                    ><img
+                      src="./assets/notes.svg"
+                      alt=""
+                      width="320"
+                      height="200"
+                    /><span class="current-badge" data-current="0"
+                      >当前页面</span
+                    ></span
+                  ><span class="tab-meta"
+                    ><span class="favicon f-notes" aria-hidden="true">N</span
+                    ><span
+                      ><span class="tab-title">周五，做点喜欢的事</span
+                      ><span class="tab-url">notes.example</span></span
+                    ></span
+                  >
+                </button>
+                <button
+                  type="button"
+                  class="tab-card is-selected"
+                  data-tab="1"
+                  aria-pressed="true"
+                >
+                  <span class="tab-preview"
+                    ><img
+                      src="./assets/design.svg"
+                      alt=""
+                      width="320"
+                      height="200"
+                    /><span class="current-badge" data-current="1" hidden
+                      >当前页面</span
+                    ></span
+                  ><span class="tab-meta"
+                    ><span class="favicon f-design" aria-hidden="true">F</span
+                    ><span
+                      ><span class="tab-title">下一点灵感</span
+                      ><span class="tab-url">design.example</span></span
+                    ></span
+                  >
+                </button>
+                <button
+                  type="button"
+                  class="tab-card"
+                  data-tab="2"
+                  aria-pressed="false"
+                >
+                  <span class="tab-preview"
+                    ><img
+                      src="./assets/code.svg"
+                      alt=""
+                      width="320"
+                      height="200"
+                    /><span class="current-badge" data-current="2" hidden
+                      >当前页面</span
+                    ></span
+                  ><span class="tab-meta"
+                    ><span class="favicon f-code" aria-hidden="true">G</span
+                    ><span
+                      ><span class="tab-title">aydengen / quick-tab</span
+                      ><span class="tab-url">github.com</span></span
+                    ></span
+                  >
+                </button>
+                <button
+                  type="button"
+                  class="tab-card"
+                  data-tab="3"
+                  aria-pressed="false"
+                >
+                  <span class="tab-preview"
+                    ><img
+                      src="./assets/music.svg"
+                      alt=""
+                      width="320"
+                      height="200"
+                    /><span class="current-badge" data-current="3" hidden
+                      >当前页面</span
+                    ></span
+                  ><span class="tab-meta"
+                    ><span class="favicon f-music" aria-hidden="true">♫</span
+                    ><span
+                      ><span class="tab-title">Deep focus</span
+                      ><span class="tab-url">music.example</span></span
+                    ></span
+                  >
+                </button>
+              </div>
+              <div class="demo-success" id="demo-success" hidden>
+                <span aria-hidden="true">✓</span> 切换完成，思路继续
+              </div>
+            </div>
+          </div>
+          <div class="shortcut-display" aria-hidden="true">
+            <kbd>alt <span>⌥</span></kbd
+            ><span class="key-plus">+</span><kbd>Q</kbd
+            ><span class="shortcut-caption">按住，选择，松手即达</span>
+          </div>
+        </div>
+        <div class="demo-controls" id="demo-controls" hidden>
+          <p id="demo-status" role="status" aria-live="polite">
+            试着点击一张卡片，或开始键盘体验
+          </p>
+          <button
+            type="button"
+            class="text-button"
+            id="demo-start"
+            aria-controls="switcher"
+            aria-expanded="true"
+          >
+            开始键盘体验 <span aria-hidden="true">→</span>
+          </button>
+        </div>
+        <p class="demo-disclaimer">
+          网页模拟，不会读取你的标签页。安装后用 <kbd>Alt</kbd> +
+          <kbd>Q</kbd> 唤起，Mac 上是 <kbd>⌥</kbd> + <kbd>Q</kbd>
+        </p>
+        <noscript
+          ><p class="no-script">
+            上方为界面示意。启用 JavaScript
+            可体验切换，也可以直接安装扩展开始使用。
+          </p></noscript
+        >
+      </section>
+
+      <section class="features wrap" aria-label="为什么选择 QuickTab">
+        <article>
+          <span class="feature-icon" aria-hidden="true">↔</span>
+          <h3>刚才的页面，一按就回</h3>
+          <p>
+            按最近访问排序，不用沿着标签栏找。快速按一下 Alt +
+            Q，就能回到上一个标签。
+          </p>
+        </article>
+        <article>
+          <span class="feature-icon" aria-hidden="true">▧</span>
+          <h3>看一眼，就知道是哪页</h3>
+          <p>
+            用页面缩略图认出目标，而不是猜一排省略的标题。标签多了，卡片会自动换行。
+          </p>
+          
+        </article>
+        <article>
+          <span class="feature-icon" aria-hidden="true">⌁</span>
+          <h3>轻装上阵，数据留在本地</h3>
+          <p>
+            无需账号，没有分析追踪。标签记录和缩略图只留在浏览器会话中，不上传服务器。
+          </p>
+        </article>
+      </section>
+
+      <section class="showcase" aria-labelledby="showcase-title">
+        <div class="wrap">
+          <h2 id="showcase-title">先看到页面，再决定去哪</h2>
+          <p>最近用过的标签页排成缩略图，标题再长也不用读。</p>
+          <img
+            src="./assets/showcase.png"
+            width="1800"
+            height="1080"
+            alt="QuickTab 面板：最近 8 个标签页的缩略图排成两行"
+            loading="lazy"
+          />
+        </div>
+      </section>
+
+      <section id="how-it-works" class="how-section">
+        <div class="wrap">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">从安装，到顺手</p>
+              <h2>不用学，试一次就会</h2>
+            </div>
+            <p>手不用离开键盘，<br />注意力也不用离开正在做的事。</p>
+          </div>
+          <div class="steps">
+            <article class="step">
+              <span class="step-number">01 /</span>
+              <div class="step-visual install-visual" aria-hidden="true">
+                <img
+                  src="./assets/icon.png"
+                  width="58"
+                  height="58"
+                  alt=""
+                /><span>+ 添加扩展程序</span>
+              </div>
+              <h3>先把 QuickTab 装好</h3>
+              <p>
+                在 Chrome 应用商店点击「添加至
+                Chrome」，确认添加扩展程序。不用登录，也不用配置。
+              </p>
+            </article>
+            <article class="step">
+              <span class="step-number">02 /</span>
+              <div class="step-visual keys-visual" aria-hidden="true">
+                <kbd>Alt <small>⌥</small></kbd
+                ><span>+</span><kbd>Q</kbd>
+              </div>
+              <h3>按住 Alt，再按 Q</h3>
+              <p>
+                在普通网页上唤起最近标签。继续按
+                Q，或用方向键，选择你想回到的页面。
+              </p>
+            </article>
+            <article class="step">
+              <span class="step-number">03 /</span>
+              <div class="step-visual release-visual" aria-hidden="true">
+                <span class="release-key">↵</span
+                ><span class="release-check">✓</span>
+              </div>
+              <h3>松开 Alt，就到了</h3>
+              <p>
+                选中后松开 Alt，立即切换。也可以按 Enter 确认，或按 Esc
+                取消，留在原来的页面。
+              </p>
+            </article>
+          </div>
+          <p class="tip">
+            <span>一个小提示</span>不想一直按住 Alt？在扩展设置中开启「Sticky
+            panel mode」，用 Enter 确认就好。
+          </p>
+        </div>
+      </section>
+
+      <section id="questions" class="faq wrap" aria-labelledby="faq-title">
+        <div class="faq-heading">
+          <p class="eyebrow">有些事，你可能想知道</p>
+          <h2 id="faq-title">简单，也说明白</h2>
+          <a
+            href="https://github.com/aydengen/quick-tab/issues"
+            target="_blank"
+            rel="noopener noreferrer"
+            >还有问题？来 GitHub 聊聊 <span aria-hidden="true">↗</span></a
+          >
+        </div>
+        <div class="faq-list">
+          <details>
+            <summary>
+              快捷键没有反应，怎么办？<span aria-hidden="true">+</span>
+            </summary>
+            <div>
+              <p>
+                先在一个普通网页（如 GitHub）试试。如果仍然没有反应，打开
+                <code>chrome://extensions/shortcuts</code>，找到
+                QuickTab，为它设置一个没有被其他扩展或系统占用的快捷键。
+              </p>
+              <p>
+                Mac 上 Alt 对应
+                Option（⌥）键。安装后，已打开的页面如果没有响应，可以刷新后再试。
+              </p>
+            </div>
+          </details>
+          <details>
+            <summary>
+              为什么有些页面不能显示面板？<span aria-hidden="true">+</span>
+            </summary>
+            <div>
+              <p>
+                Chrome 不允许扩展在新标签页、<code>chrome://</code>、Chrome
+                应用商店和部分 PDF
+                页面显示面板。在这些页面上按快捷键，会直接切回上一个标签。
+              </p>
+            </div>
+          </details>
+          <details>
+            <summary>
+              为什么需要读取标签页和网站权限？<span aria-hidden="true">+</span>
+            </summary>
+            <div>
+              <p>
+                读取标签页，是为了显示标题、网站图标并切换页面。网站权限用于截取当前可见页面，作为标签缩略图。没有服务器接收这些数据，源代码也完全公开。
+              </p>
+              <p>
+                最近标签记录和缩略图使用浏览器本地会话存储，关闭浏览器后清空；快捷键与偏好设置会保留。
+              </p>
+            </div>
+          </details>
+          <details>
+            <summary>
+              免费吗？支持哪些浏览器？<span aria-hidden="true">+</span>
+            </summary>
+            <div>
+              <p>
+                完全免费，使用 MIT 开源协议。QuickTab 为桌面版 Chrome 开发，支持
+                Mac、Windows 和 Linux；其他 Chromium
+                浏览器可能兼容，但尚未逐一验证。手机浏览器无法安装这个扩展。
+              </p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section class="closing wrap" aria-labelledby="closing-title">
+        <div>
+          <p class="eyebrow">下一个标签，回到心流</p>
+          <h2 id="closing-title">少一次寻找，<br />多一分专注。</h2>
+        </div>
+        <div>
+          <a
+            class="button button-primary"
+            href="https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimheklaj"
+            target="_blank"
+            rel="noopener noreferrer"
+            >免费添加到 Chrome <span aria-hidden="true">↗</span></a
+          >
+          <p>一个快捷键，让浏览器更顺手。</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer wrap">
+      <a class="brand" href="#"
+        ><img
+          src="./assets/icon.png"
+          width="26"
+          height="26"
+          alt=""
+        />QuickTab<span class="brand-dot">.</span></a
+      >
+      <p>只做一件事，把标签切换做好。</p>
+      <div>
+        <a
+          href="https://github.com/aydengen/quick-tab"
+          target="_blank"
+          rel="noopener noreferrer"
+          >源代码 ↗</a
+        ><a
+          href="https://github.com/aydengen/quick-tab/blob/main/LICENSE"
+          target="_blank"
+          rel="noopener noreferrer"
+          >MIT License</a
+        >
+      </div>
+    </footer>
+  </body>
+</html>
