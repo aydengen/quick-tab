@@ -104,8 +104,8 @@
       if (open) event.preventDefault();
       return;
     }
-    // event.code, because Option+Q types "œ" on a Mac.
-    if (event.altKey && event.code === "KeyQ" && !event.ctrlKey && !event.metaKey) {
+    // keyCode follows the layout (AZERTY's Q too), unlike event.key, which is "œ" for Option+Q.
+    if (event.altKey && event.keyCode === 81 && !event.ctrlKey && !event.metaKey) {
       event.preventDefault();
       press("q", true);
       if (!open) show();
@@ -128,7 +128,7 @@
   });
 
   window.addEventListener("keyup", (event) => {
-    if (event.code === "KeyQ") press("q", false);
+    if (event.keyCode === 81) press("q", false);
     if (event.key !== "Alt") return;
     press("alt", false);
     if (open) {
