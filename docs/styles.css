@@ -201,27 +201,6 @@ button:disabled {
   margin: 0 5px;
   color: #a8aeba;
 }
-.demo-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 0 0 16px;
-}
-.demo-heading h2 {
-  font-size: 12px;
-  font-weight: 500;
-  margin: 0;
-  color: var(--muted);
-}
-.demo-label {
-  font-size: 11px;
-  color: var(--blue);
-  letter-spacing: 0.05em;
-}
-.demo-label span {
-  font-size: 17px;
-  margin-left: 8px;
-}
 .demo-canvas {
   position: relative;
   padding: 49px 54px 28px;
@@ -231,14 +210,6 @@ button:disabled {
     radial-gradient(ellipse at 70% 85%, #bfcff5 0%, transparent 60%),
     linear-gradient(130deg, #ecf1fb, #dfe8fc);
   overflow: hidden;
-}
-.canvas-note {
-  position: absolute;
-  right: 24px;
-  top: 19px;
-  letter-spacing: 0.15em;
-  font-size: 8px;
-  color: #687da8;
 }
 .browser {
   position: relative;
@@ -518,6 +489,25 @@ button:disabled {
   font-size: 20px;
   justify-content: center;
 }
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.shortcut-display kbd {
+  transition:
+    transform 80ms ease-out,
+    background-color 80ms ease-out,
+    color 80ms ease-out;
+}
+.shortcut-display kbd.is-pressed {
+  transform: translateY(2px);
+  background: #e8edfc;
+  color: var(--blue);
+}
 .key-plus {
   color: #8d9dbb;
   font-size: 15px;
@@ -527,41 +517,6 @@ button:disabled {
   font-size: 11px;
   letter-spacing: 0.06em;
   color: #586d96;
-}
-.demo-controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 17px 0;
-  border-bottom: 1px solid var(--line);
-}
-.demo-controls p {
-  font-size: 12px;
-  color: #5b6574;
-  margin: 0;
-}
-.text-button {
-  font-size: 12px;
-  white-space: nowrap;
-  background: none;
-  border: none;
-  padding: 5px 0;
-  color: var(--blue);
-  font-weight: 600;
-}
-.text-button span {
-  margin-left: 12px;
-}
-.demo-disclaimer {
-  text-align: center;
-  color: #7d8590;
-  font-size: 10px;
-  line-height: 1.8;
-  margin-top: 15px;
-}
-.demo-disclaimer kbd {
-  font-family: var(--font);
 }
 .no-script {
   text-align: center;
@@ -1114,16 +1069,6 @@ button:disabled {
     font-size: 9px;
     margin-left: 4px;
   }
-  .demo-disclaimer {
-    font-size: 9px;
-    text-wrap: balance;
-  }
-  .demo-controls p {
-    font-size: 10px;
-  }
-  .text-button {
-    font-size: 10px;
-  }
   .features {
     gap: 24px;
     padding-top: 40px;
@@ -1267,11 +1212,6 @@ button:disabled {
     padding: 35px 10px 20px;
     border-radius: 10px;
   }
-  .canvas-note {
-    font-size: 6px;
-    top: 15px;
-    right: 15px;
-  }
   .browser {
     border-radius: 7px;
   }
@@ -1316,26 +1256,6 @@ button:disabled {
   }
   .current-badge {
     font-size: 6px;
-  }
-  .demo-heading h2,
-  .demo-label {
-    font-size: 10px;
-  }
-  .demo-controls {
-    align-items: flex-start;
-    gap: 10px;
-    padding-block: 14px;
-  }
-  .demo-controls p {
-    max-width: 60%;
-    line-height: 1.7;
-  }
-  .text-button {
-    font-size: 10px;
-    line-height: 1.7;
-  }
-  .text-button span {
-    margin-left: 4px;
   }
   .demo-success {
     bottom: 12px;

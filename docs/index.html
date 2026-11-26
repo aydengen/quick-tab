@@ -54,10 +54,6 @@
     <main id="main">
       <section class="hero wrap" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow">
-            <span class="status-dot" aria-hidden="true"></span>
-            少一点寻找，多一点专注
-          </p>
           <h1 id="hero-title">
             切换标签，<br />不切断<span class="accent"
               >思路<span class="underline" aria-hidden="true"></span
@@ -65,9 +61,7 @@
           </h1>
         </div>
         <div class="hero-aside">
-          <p>
-            刚才的页面，不必再找一遍。<br />让标签切换，像切换应用一样自然。
-          </p>
+          <p>刚才的页面，一键回来。</p>
           <a
             class="button button-primary"
             href="https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimheklaj"
@@ -87,10 +81,7 @@
               <path d="M12 8h8.6M8.5 14 4.2 6.6M15.5 14l-4.3 7.4" /></svg
             >免费添加到 Chrome <span aria-hidden="true">↗</span></a
           >
-          <p class="hero-note">
-            无需注册 <span>·</span> 开源免费 <span>·</span> Mac / Windows /
-            Linux
-          </p>
+          <p class="hero-note">免费开源 <span>·</span> 无需注册</p>
         </div>
       </section>
 
@@ -99,16 +90,7 @@
         class="experience wrap"
         aria-labelledby="experience-title"
       >
-        <div class="demo-heading">
-          <h2 id="experience-title">你的标签，触手可及</h2>
-          <span class="demo-label"
-            >交互演示 <span aria-hidden="true">↙</span></span
-          >
-        </div>
         <div class="demo-canvas">
-          <div class="canvas-note" aria-hidden="true">
-            LESS SEARCHING. MORE DOING.
-          </div>
           <div class="browser">
             <div class="browser-bar" aria-hidden="true">
               <div class="traffic-lights"><i></i><i></i><i></i></div>
@@ -143,10 +125,11 @@
                 width="960"
                 height="600"
               />
-              <div class="demo-shade" id="demo-shade"></div>
+              <div class="demo-shade" id="demo-shade" hidden></div>
               <div
                 class="switcher"
                 id="switcher"
+                hidden
                 role="group"
                 aria-label="模拟标签切换器，点击卡片切换页面"
               >
@@ -244,39 +227,19 @@
                 </button>
               </div>
               <div class="demo-success" id="demo-success" hidden>
-                <span aria-hidden="true">✓</span> 切换完成，思路继续
+                <span aria-hidden="true">✓</span> 切换完成
               </div>
             </div>
           </div>
           <div class="shortcut-display" aria-hidden="true">
-            <kbd>alt <span>⌥</span></kbd
-            ><span class="key-plus">+</span><kbd>Q</kbd
-            ><span class="shortcut-caption">按住，选择，松手即达</span>
+            <kbd data-key="alt">alt <span>⌥</span></kbd
+            ><span class="key-plus">+</span><kbd data-key="q">Q</kbd
+            ><span class="shortcut-caption">按住 Alt，再按 Q</span>
           </div>
         </div>
-        <div class="demo-controls" id="demo-controls" hidden>
-          <p id="demo-status" role="status" aria-live="polite">
-            试着点击一张卡片，或开始键盘体验
-          </p>
-          <button
-            type="button"
-            class="text-button"
-            id="demo-start"
-            aria-controls="switcher"
-            aria-expanded="true"
-          >
-            开始键盘体验 <span aria-hidden="true">→</span>
-          </button>
-        </div>
-        <p class="demo-disclaimer">
-          网页模拟，不会读取你的标签页。安装后用 <kbd>Alt</kbd> +
-          <kbd>Q</kbd> 唤起，Mac 上是 <kbd>⌥</kbd> + <kbd>Q</kbd>
-        </p>
+        <p id="demo-status" class="sr-only" role="status" aria-live="polite"></p>
         <noscript
-          ><p class="no-script">
-            上方为界面示意。启用 JavaScript
-            可体验切换，也可以直接安装扩展开始使用。
-          </p></noscript
+          ><p class="no-script">启用 JavaScript 后可以试用这个演示。</p></noscript
         >
       </section>
 
@@ -284,25 +247,18 @@
         <article>
           <span class="feature-icon" aria-hidden="true">↔</span>
           <h3>刚才的页面，一按就回</h3>
-          <p>
-            按最近访问排序，不用沿着标签栏找。快速按一下 Alt +
-            Q，就能回到上一个标签。
-          </p>
+          <p>按最近使用排序，轻按 Alt+Q 回到上一页。</p>
         </article>
         <article>
           <span class="feature-icon" aria-hidden="true">▧</span>
           <h3>看一眼，就知道是哪页</h3>
-          <p>
-            用页面缩略图认出目标，而不是猜一排省略的标题。标签多了，卡片会自动换行。
-          </p>
+          <p>看缩略图认页面，不用猜标题。</p>
           
         </article>
         <article>
           <span class="feature-icon" aria-hidden="true">⌁</span>
           <h3>轻装上阵，数据留在本地</h3>
-          <p>
-            无需账号，没有分析追踪。标签记录和缩略图只留在浏览器会话中，不上传服务器。
-          </p>
+          <p>不用注册，不做追踪，数据只在本机。</p>
         </article>
       </section>
 
@@ -324,10 +280,8 @@
         <div class="wrap">
           <div class="section-heading">
             <div>
-              <p class="eyebrow">从安装，到顺手</p>
               <h2>不用学，试一次就会</h2>
             </div>
-            <p>手不用离开键盘，<br />注意力也不用离开正在做的事。</p>
           </div>
           <div class="steps">
             <article class="step">
@@ -341,10 +295,7 @@
                 /><span>+ 添加扩展程序</span>
               </div>
               <h3>先把 QuickTab 装好</h3>
-              <p>
-                在 Chrome 应用商店点击「添加至
-                Chrome」，确认添加扩展程序。不用登录，也不用配置。
-              </p>
+              <p>在 Chrome 应用商店添加，无需登录。</p>
             </article>
             <article class="step">
               <span class="step-number">02 /</span>
@@ -353,10 +304,7 @@
                 ><span>+</span><kbd>Q</kbd>
               </div>
               <h3>按住 Alt，再按 Q</h3>
-              <p>
-                在普通网页上唤起最近标签。继续按
-                Q，或用方向键，选择你想回到的页面。
-              </p>
+              <p>最近的标签排成卡片，继续按 Q 选择。</p>
             </article>
             <article class="step">
               <span class="step-number">03 /</span>
@@ -365,23 +313,16 @@
                 ><span class="release-check">✓</span>
               </div>
               <h3>松开 Alt，就到了</h3>
-              <p>
-                选中后松开 Alt，立即切换。也可以按 Enter 确认，或按 Esc
-                取消，留在原来的页面。
-              </p>
+              <p>松开即切换，按 Esc 取消。</p>
             </article>
           </div>
-          <p class="tip">
-            <span>一个小提示</span>不想一直按住 Alt？在扩展设置中开启「Sticky
-            panel mode」，用 Enter 确认就好。
-          </p>
+          <p class="tip">不想一直按住 Alt？在设置里打开 Sticky 模式，用 Enter 确认。</p>
         </div>
       </section>
 
       <section id="questions" class="faq wrap" aria-labelledby="faq-title">
         <div class="faq-heading">
-          <p class="eyebrow">有些事，你可能想知道</p>
-          <h2 id="faq-title">简单，也说明白</h2>
+          <h2 id="faq-title">常见问题</h2>
           <a
             href="https://github.com/aydengen/quick-tab/issues"
             target="_blank"
@@ -448,7 +389,6 @@
 
       <section class="closing wrap" aria-labelledby="closing-title">
         <div>
-          <p class="eyebrow">下一个标签，回到心流</p>
           <h2 id="closing-title">少一次寻找，<br />多一分专注。</h2>
         </div>
         <div>
@@ -459,7 +399,6 @@
             rel="noopener noreferrer"
             >免费添加到 Chrome <span aria-hidden="true">↗</span></a
           >
-          <p>一个快捷键，让浏览器更顺手。</p>
         </div>
       </section>
     </main>
@@ -473,7 +412,6 @@
           alt=""
         />QuickTab<span class="brand-dot">.</span></a
       >
-      <p>只做一件事，把标签切换做好。</p>
       <div>
         <a
           href="https://github.com/aydengen/quick-tab"
