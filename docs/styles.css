@@ -663,6 +663,11 @@ button:disabled {
   border-radius: 5px;
 }
 .keys-visual kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  white-space: nowrap;
   height: 51px;
   width: 58px;
   border-radius: 8px;
@@ -670,7 +675,7 @@ button:disabled {
   border: 1px solid #d3d8e2;
   background: white;
   font-size: 20px;
-  padding: 13px;
+  padding: 8px;
   font-family: var(--font);
 }
 .keys-visual small {

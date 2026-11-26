@@ -1,0 +1,2 @@
+# Keep the website out of extension packages created with git archive.
+* export-ignore
