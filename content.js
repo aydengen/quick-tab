@@ -21,6 +21,8 @@
   let confirmPending = false;
   let stickyMode = false;
   let panelRequestId = 0;
+  // 页面实际观察到的 Alt 状态：true / false / null（未知，如刚注入或失焦后）
+  let altHeld = null;
 
   // 首次打开面板时再读取设置，避免每个页面加载都访问存储
   let settingsReady = null;
@@ -51,7 +53,8 @@
     // 立即标记为可见，防止连续按键时重复调用
     panelVisible = true;
     altKeyDown = true;
-    confirmPending = false;
+    // 快捷键消息到达前 Alt 已松开（快速轻按）
+    confirmPending = altHeld === false;
     const requestId = ++panelRequestId;
 
     Promise.all([
@@ -273,7 +276,12 @@
 
   // ========== 键盘交互 ==========
 
+  function trackAlt(e) {
+    altHeld = e.key === 'Alt' ? e.type === 'keydown' : e.altKey;
+  }
+
   function onKeyDown(e) {
+    trackAlt(e);
     if (!panelVisible) return;
     // 面板打开期间不让按键漏到页面快捷键
     e.stopImmediatePropagation();
@@ -307,6 +315,7 @@
 
   // 松开 Alt 时自动切换（仅非 sticky 模式）
   function onKeyUp(e) {
+    trackAlt(e);
     if (!panelVisible) return;
     e.stopImmediatePropagation();
     if (stickyMode || e.key !== 'Alt' || !altKeyDown) return;
@@ -322,11 +331,14 @@
 
   // 焦点离开页面（地址栏、其他窗口）时收不到 Alt 松开事件，直接关闭
   function onBlur() {
+    altHeld = null;
     if (panelVisible) hidePanel();
   }
 
   function onVisibilityChange() {
-    if (document.hidden && panelVisible) hidePanel();
+    if (!document.hidden) return;
+    altHeld = null;
+    if (panelVisible) hidePanel();
   }
 
   // ========== 消息监听 ==========
