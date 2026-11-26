@@ -18,6 +18,7 @@
   let altKeyDown = false;
   // 面板渲染前就松开了 Alt：数据返回后直接切换
   let confirmPending = false;
+  let panelOpenReported = false;
   let stickyMode = false;
   let altShortcutOpen = true;
   let panelRequestId = 0;
@@ -60,6 +61,7 @@
     confirmPending = altShortcut && altHeld === false &&
       performance.now() - lastAltUpAt < QUICK_TAP_WINDOW_MS;
     const requestId = ++panelRequestId;
+    panelOpenReported = true;
 
     Promise.all([
       // 快速轻按不会显示面板，不必等当前标签截图
@@ -360,7 +362,9 @@
 
   function hidePanel() {
     panelRequestId += 1;
-    if (host?.isConnected) {
+    // 快速轻按时面板没渲染过，也要通知 background 恢复截图
+    if (panelOpenReported) {
+      panelOpenReported = false;
       chrome.runtime.sendMessage({ action: 'panelClosed' }).catch(() => {});
     }
     root?.replaceChildren();
