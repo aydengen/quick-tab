@@ -42,7 +42,7 @@
       card.classList.toggle("is-selected", i === selected);
       card.setAttribute("aria-pressed", String(i === selected));
     });
-    if (focus) cards[selected].focus({ preventScroll: true });
+    if (focus) cards[selected].focus();
   }
 
   function updateBrowser() {
@@ -67,7 +67,7 @@
     status.textContent = confirmed
       ? `已切换到「${tabs[current].title}」。安装后，松开 Alt 就能完成这一步`
       : "已取消，仍留在原来的页面";
-    start.focus({ preventScroll: true });
+    start.focus();
   }
 
   function confirm(index) {
