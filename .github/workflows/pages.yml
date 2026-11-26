@@ -75,9 +75,13 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: actions/configure-pages@v5
+      # Re-runs keep the earlier attempt's artifact, so give each attempt its own name.
       - uses: actions/upload-pages-artifact@v4
         with:
           path: docs
+          name: github-pages-${{ github.run_attempt }}
       - name: Deploy website
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages-${{ github.run_attempt }}
