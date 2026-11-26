@@ -314,17 +314,14 @@ function scheduleCapture(tabId) {
 }
 
 // 用 Chrome 自带的图标缓存（_favicon），后台转成 data URL：不受页面 CSP 影响，chrome:// 页面也有图标
+const FAVICON_CACHE_LIMIT = 200;
 const faviconCache = new Map();
 function getFavicon(pageUrl) {
   if (!pageUrl) return Promise.resolve('');
-  let key;
-  try {
-    const url = new URL(pageUrl);
-    key = url.protocol.startsWith('http') ? url.origin : withoutHash(pageUrl);
-  } catch {
-    return Promise.resolve('');
-  }
+  // 同一站点不同页面的图标可能不同，按页面缓存
+  const key = withoutHash(pageUrl);
   if (!faviconCache.has(key)) {
+    if (faviconCache.size >= FAVICON_CACHE_LIMIT) faviconCache.clear();
     const iconUrl = new URL(chrome.runtime.getURL('/_favicon/'));
     iconUrl.searchParams.set('pageUrl', pageUrl);
     iconUrl.searchParams.set('size', '32');
