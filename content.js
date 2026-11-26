@@ -143,12 +143,28 @@
       .then((bitmap) => {
         canvas.width = bitmap.width;
         canvas.height = bitmap.height;
-        canvas.getContext('2d').drawImage(bitmap, 0, 0);
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(bitmap, 0, 0);
         bitmap.close();
+        canvas.classList.toggle('quicktab-icon-dark', isDarkIcon(ctx, canvas.width, canvas.height));
         canvas.classList.add('quicktab-loaded');
       })
       .catch(() => canvas.remove());
     return canvas;
+  }
+
+  // 黑色图标（如 GitHub）在深色面板上看不清，深色模式下给它垫一层浅色底
+  function isDarkIcon(ctx, width, height) {
+    if (width * height > 256 * 256) return false;
+    const { data } = ctx.getImageData(0, 0, width, height);
+    let opaque = 0;
+    let luminance = 0;
+    for (let i = 0; i < data.length; i += 4) {
+      if (data[i + 3] < 128) continue;
+      opaque += 1;
+      luminance += 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
+    }
+    return opaque > 0 && luminance / opaque < 70;
   }
 
   function createGlobe(className) {
