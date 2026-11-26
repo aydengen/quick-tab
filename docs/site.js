@@ -43,6 +43,8 @@
   let current = 0;
   let selected = 1;
   let open = false;
+  // Only a switcher opened with Alt+Q owns the arrow, Enter and Esc keys.
+  let fromKeyboard = false;
   let successTimer;
 
   function select(index) {
@@ -65,8 +67,9 @@
     document.querySelector("#demo-address").textContent = tabs[current].address;
   }
 
-  function show() {
+  function show(keyboard = false) {
     open = true;
+    fromKeyboard = keyboard;
     clearTimeout(successTimer);
     switcher.hidden = false;
     shade.hidden = false;
@@ -109,11 +112,11 @@
       event.preventDefault();
       press("q", true);
       if (event.repeat) return;
-      if (!open) show();
+      if (!open) show(true);
       else select(selected + (event.shiftKey ? -1 : 1));
       return;
     }
-    if (!open) return;
+    if (!open || !fromKeyboard) return;
     const columns = getComputedStyle(switcher).gridTemplateColumns.split(" ").length;
     const moves = {
       ArrowLeft: -1,
