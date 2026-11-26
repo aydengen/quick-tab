@@ -2,7 +2,8 @@
   "manifest_version": 3,
   "name": "QuickTab",
   "description": "Fast tab switcher for Chrome",
-  "version": "1.1.1",
+  "version": "1.2.0",
+  "minimum_chrome_version": "102",
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -17,25 +18,13 @@
   },
   "permissions": [
     "tabs",
-    "storage"
+    "storage",
+    "scripting",
+    "activeTab"
   ],
   "background": {
     "service_worker": "background.js"
   },
-  "content_scripts": [
-    {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "content.js"
-      ],
-      "css": [
-        "content.css"
-      ],
-      "run_at": "document_end"
-    }
-  ],
   "commands": {
     "toggle-panel": {
       "suggested_key": {
