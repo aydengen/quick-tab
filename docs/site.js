@@ -2,28 +2,36 @@
   "use strict";
 
   // This is a self-contained simulation, not an extension API integration.
-  const tabs = [
-    {
-      title: "周五，做点喜欢的事",
-      address: "notes.example / my-space",
-      image: "./assets/notes.svg",
-    },
-    {
-      title: "下一点灵感",
-      address: "design.example / inspiration",
-      image: "./assets/design.svg",
-    },
-    {
-      title: "aydengen / quick-tab",
-      address: "github.com / aydengen / quick-tab",
-      image: "./assets/code.svg",
-    },
-    {
-      title: "Deep focus",
-      address: "music.example / deep-focus",
-      image: "./assets/music.svg",
-    },
+  const en = document.documentElement.lang.startsWith("en");
+  const text = en
+    ? {
+        titles: ["Friday side project", "Moodboard", "aydengen / quick-tab", "Deep focus"],
+        alt: (title) => `Simulated tab: ${title}`,
+        again: "Try again →",
+        restart: "Start over →",
+        switched: (title) => `Switched to “${title}”. With the extension, releasing Alt does this.`,
+        cancelled: "Cancelled. You stayed on the same page.",
+        hint: "Use ← → or Q to choose, Enter to confirm, Esc to cancel, or click a card",
+      }
+    : {
+        titles: ["周五，做点喜欢的事", "下一点灵感", "aydengen / quick-tab", "Deep focus"],
+        alt: (title) => `模拟标签页：${title}`,
+        again: "再试一次 →",
+        restart: "重新开始 →",
+        switched: (title) => `已切换到「${title}」。安装后，松开 Alt 就能完成这一步`,
+        cancelled: "已取消，仍留在原来的页面",
+        hint: "用 ← → 或 Q 选择，Enter 确认，Esc 取消；也可以直接点击卡片",
+      };
+  const addresses = [
+    "notes.example / my-space",
+    "design.example / inspiration",
+    "github.com / aydengen / quick-tab",
+    "music.example / deep-focus",
   ];
+  // Image paths come from the markup so the page works from any directory.
+  const tabs = [...document.querySelectorAll("[data-tab] .tab-preview img")].map(
+    (img, i) => ({ title: text.titles[i], address: addresses[i], image: img.getAttribute("src") })
+  );
   const stage = document.querySelector("#demo-stage");
   const switcher = document.querySelector("#switcher");
   const cards = [...document.querySelectorAll("[data-tab]")];
@@ -53,7 +61,7 @@
       badge.hidden = i !== current;
     });
     page.src = tabs[current].image;
-    page.alt = `模拟标签页：${tabs[current].title}`;
+    page.alt = text.alt(tabs[current].title);
     document.querySelector("#demo-address").textContent = tabs[current].address;
   }
 
@@ -63,10 +71,8 @@
     shade.hidden = true;
     success.hidden = !confirmed;
     start.setAttribute("aria-expanded", "false");
-    start.textContent = "再试一次 →";
-    status.textContent = confirmed
-      ? `已切换到「${tabs[current].title}」。安装后，松开 Alt 就能完成这一步`
-      : "已取消，仍留在原来的页面";
+    start.textContent = text.again;
+    status.textContent = confirmed ? text.switched(tabs[current].title) : text.cancelled;
     start.focus();
   }
 
@@ -82,9 +88,8 @@
     shade.hidden = false;
     success.hidden = true;
     start.setAttribute("aria-expanded", "true");
-    status.textContent =
-      "用 ← → 或 Q 选择，Enter 确认，Esc 取消；也可以直接点击卡片";
-    start.textContent = "重新开始 →";
+    status.textContent = text.hint;
+    start.textContent = text.restart;
     select(current + 1, true);
   });
 

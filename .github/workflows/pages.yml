@@ -37,6 +37,10 @@ jobs:
 
           root = Path('docs').resolve()
           class CheckLinks(HTMLParser):
+              def __init__(self, page):
+                  super().__init__()
+                  self.base = (root / page).parent
+
               def handle_starttag(self, tag, attrs):
                   for key, value in attrs:
                       if key not in ('href', 'src') or not value:
@@ -45,11 +49,14 @@ jobs:
                       if url.scheme or url.netloc or not url.path:
                           continue
                       assert not url.path.startswith('/'), f'Root-relative URL: {value}'
-                      target = (root / unquote(url.path)).resolve()
+                      target = (self.base / unquote(url.path)).resolve()
+                      if url.path.endswith('/'):
+                          target = target / 'index.html'
                       assert target.is_relative_to(root), f'Path leaves website: {value}'
                       assert target.is_file(), f'Missing website asset: {value}'
 
-          CheckLinks().feed((root / 'index.html').read_text())
+          for page in ('index.html', 'en/index.html'):
+              CheckLinks(page).feed((root / page).read_text())
           print('All local website links and assets exist.')
           PY
 
