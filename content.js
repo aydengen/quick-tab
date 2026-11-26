@@ -217,6 +217,8 @@
       grid.classList.toggle('quicktab-fade-end', grid.scrollLeft < max - 1);
     };
     grid.addEventListener('scroll', updateEdges, { passive: true });
+    // 面板打开时窗口缩放也要更新
+    new ResizeObserver(updateEdges).observe(grid);
 
     // 默认选中上一个访问的标签
     const cards = getCards();
