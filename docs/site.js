@@ -104,10 +104,11 @@
         getComputedStyle(switcher).gridTemplateColumns.split(" ").length;
       let next = selected;
       if (key === "arrowleft") next -= 1;
-      else if (key === "arrowup") next = Math.max(0, selected - columns);
-      else if (key === "arrowdown")
-        next = Math.min(tabs.length - 1, selected + columns);
-      else next += 1;
+      else if (key === "arrowup") {
+        if (selected >= columns) next -= columns;
+      } else if (key === "arrowdown") {
+        if (selected + columns < tabs.length) next += columns;
+      } else next += 1;
       select(next, true);
     } else if (key === "escape") {
       event.preventDefault();
