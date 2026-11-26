@@ -8,6 +8,8 @@
   globalThis.__quicktabCleanup?.();
 
   const QUICK_TAP_WINDOW_MS = 1000;
+  // 面板到窗口边缘的最小距离
+  const PANEL_MARGIN = 16;
     const IS_MAC = /mac|iphone|ipad/i.test(navigator.userAgentData?.platform || navigator.platform || '');
   const ALT_LABEL = IS_MAC ? '⌥' : 'Alt';
 
@@ -19,7 +21,6 @@
   // 面板渲染前就松开了 Alt：数据返回后直接切换
   let confirmPending = false;
   let panelOpenReported = false;
-  let pointerFocus = false;
   let stickyMode = false;
   let altShortcutOpen = true;
   let panelRequestId = 0;
@@ -193,7 +194,6 @@
     grid.className = 'quicktab-grid';
     grid.setAttribute('role', 'listbox');
     grid.setAttribute('aria-label', 'Recent tabs');
-    grid.style.setProperty('--quicktab-columns', String(Math.max(1, tabs.length)));
 
     if (tabs.length === 0) {
       const empty = document.createElement('div');
@@ -209,21 +209,35 @@
 
     root.replaceChildren(overlay, panel);
     document.documentElement.appendChild(host);
-
-    // 卡片放不下一行时横向滚动，被裁切的一侧渐隐
-    const updateEdges = () => {
-      const max = grid.scrollWidth - grid.clientWidth;
-      grid.classList.toggle('quicktab-fade-start', grid.scrollLeft > 1);
-      grid.classList.toggle('quicktab-fade-end', grid.scrollLeft < max - 1);
-    };
-    grid.addEventListener('scroll', updateEdges, { passive: true });
-    // 面板打开时窗口缩放也要更新
-    new ResizeObserver(updateEdges).observe(grid);
+    layoutPanel();
 
     // 默认选中上一个访问的标签
     const cards = getCards();
     (cards[1] || cards[0])?.focus({ preventScroll: true });
-    updateEdges();
+  }
+
+  // 卡片尺寸固定：一行放不下就换成两行，两行还放不下再整体等比缩小
+  function layoutPanel() {
+    const panel = root?.querySelector('.quicktab-panel');
+    const grid = panel?.querySelector('.quicktab-grid');
+    if (!grid) return;
+    const count = getCards().length || 1;
+    const styles = getComputedStyle(panel);
+    const card = parseFloat(styles.getPropertyValue('--qt-card-width'));
+    const gap = parseFloat(styles.getPropertyValue('--qt-gap'));
+    const chrome = 2 * parseFloat(styles.paddingLeft) + 2 * PANEL_MARGIN;
+    const fit = Math.max(1, Math.floor((window.innerWidth - chrome + gap) / (card + gap)));
+    const columns = count <= fit ? count : Math.ceil(count / 2);
+    grid.style.setProperty('--quicktab-columns', String(columns));
+    panel.classList.toggle('quicktab-multirow', columns < count);
+
+    panel.style.setProperty('--qt-scale', '1');
+    const scale = Math.min(
+      1,
+      (window.innerWidth - 2 * PANEL_MARGIN) / panel.offsetWidth,
+      (window.innerHeight - 2 * PANEL_MARGIN) / panel.offsetHeight
+    );
+    panel.style.setProperty('--qt-scale', String(scale));
   }
 
   function createHints() {
@@ -231,7 +245,7 @@
     hints.className = 'quicktab-hints';
 
     const items = [
-      [['←', '→'], 'Select'],
+      [['←', '→', '↑', '↓'], 'Select'],
       [['↵'], 'Switch'],
       [['esc'], 'Close']
     ];
@@ -246,6 +260,7 @@
       for (const key of keys) {
         const kbd = document.createElement('kbd');
         kbd.textContent = key;
+        if (key === '↑' || key === '↓') kbd.className = 'quicktab-key-rows';
         item.appendChild(kbd);
       }
       item.append(label);
@@ -309,16 +324,9 @@
     card.addEventListener('click', () => switchToTab(tab.id));
     // 只响应真实的鼠标移动：面板弹出时光标恰好停在某张卡片上不改变选中项
     card.addEventListener('mousemove', () => {
-      if (root.activeElement === card) return;
-      // 鼠标选中不滚动，否则卡片会从指针下移走，点击落空
-      pointerFocus = true;
-      card.focus({ preventScroll: true });
-      pointerFocus = false;
+      if (root.activeElement !== card) card.focus({ preventScroll: true });
     });
-    card.addEventListener('focus', () => {
-      card.setAttribute('aria-selected', 'true');
-      if (!pointerFocus) card.scrollIntoView({ block: 'nearest', inline: 'nearest' });
-    });
+    card.addEventListener('focus', () => card.setAttribute('aria-selected', 'true'));
     card.addEventListener('blur', () => card.setAttribute('aria-selected', 'false'));
 
     return card;
@@ -361,6 +369,23 @@
     const currentIndex = cards.indexOf(root.activeElement);
     const nextIndex = (currentIndex + direction + cards.length) % cards.length;
     cards[nextIndex].focus({ preventScroll: true });
+  }
+
+  // 两行时上下键按行移动；只有一行时等同左右
+  function moveRow(direction) {
+    const cards = getCards();
+    const columns = Number(root.querySelector('.quicktab-grid')?.style.getPropertyValue('--quicktab-columns')) || 1;
+    if (cards.length <= columns) {
+      cycleSelection(direction);
+      return;
+    }
+    const index = cards.indexOf(root.activeElement);
+    if (index === -1) return;
+    const next = index + direction * columns;
+    // 首行向上、末行向下不动；下一行不满时落到最后一张
+    const lastRow = Math.floor((cards.length - 1) / columns);
+    if (next < 0 || Math.floor(index / columns) === lastRow && direction > 0) return;
+    cards[Math.min(cards.length - 1, next)].focus({ preventScroll: true });
   }
 
   function hidePanel() {
@@ -412,12 +437,15 @@
     if (e.key === 'Tab') {
       e.preventDefault();
       cycleSelection(e.shiftKey ? -1 : 1);
-    } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || key === 'j') {
+    } else if (e.key === 'ArrowRight' || key === 'j') {
       e.preventDefault();
       cycleSelection(1);
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || key === 'k') {
+    } else if (e.key === 'ArrowLeft' || key === 'k') {
       e.preventDefault();
       cycleSelection(-1);
+    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      moveRow(e.key === 'ArrowDown' ? 1 : -1);
     }
   }
 
@@ -461,6 +489,9 @@
   window.addEventListener('keydown', onKeyDown, true);
   window.addEventListener('keyup', onKeyUp, true);
   window.addEventListener('blur', onBlur);
+  window.addEventListener('resize', () => {
+    if (panelVisible) layoutPanel();
+  });
   document.addEventListener('visibilitychange', onVisibilityChange);
   chrome.storage.onChanged.addListener(onStorageChanged);
   chrome.runtime.onMessage.addListener(onMessage);

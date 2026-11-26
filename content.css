@@ -25,6 +25,9 @@
     0 18px 48px -8px rgba(0, 0, 0, 0.22),
     0 48px 120px -24px rgba(0, 0, 0, 0.28);
 
+  --qt-card-width: 208px;
+  --qt-gap: 4px;
+  --qt-scale: 1;
   --qt-panel-radius: 22px;
   --qt-panel-padding: 10px;
   --qt-card-padding: 6px;
@@ -71,8 +74,6 @@
   top: 50%;
   left: 50%;
   box-sizing: border-box;
-  max-width: calc(100vw - 32px);
-  max-height: calc(100vh - 32px);
   display: flex;
   flex-direction: column;
   padding: var(--qt-panel-padding);
@@ -88,7 +89,8 @@
   -webkit-font-smoothing: antialiased;
   user-select: none;
   cursor: default;
-  transform: translate(-50%, -50%);
+  /* 两行仍放不下时由 layoutPanel 设置 --qt-scale 整体缩小 */
+  transform: translate(-50%, -50%) scale(var(--qt-scale));
   animation: quicktab-pop 180ms cubic-bezier(0.2, 0.9, 0.3, 1.15) 70ms both;
 }
 
@@ -99,7 +101,7 @@
 @keyframes quicktab-pop {
   from {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(0.96);
+    transform: translate(-50%, -50%) scale(calc(var(--qt-scale) * 0.96));
   }
 }
 
@@ -112,40 +114,9 @@
 
 /* ========== 卡片网格 ========== */
 .quicktab-grid {
-  /* 单行：卡片随窗口宽度等比缩小，窄到下限后横向滚动 */
-  --qt-gap: 4px;
-  --qt-fit-width: calc(
-    (100vw - 32px - 2 * var(--qt-panel-padding) - (var(--quicktab-columns) - 1) * var(--qt-gap))
-      / var(--quicktab-columns)
-  );
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: clamp(128px, var(--qt-fit-width), 232px);
+  grid-template-columns: repeat(var(--quicktab-columns, 1), var(--qt-card-width));
   gap: var(--qt-gap);
-  overflow-x: auto;
-  overflow-y: hidden;
-  overscroll-behavior: contain;
-  scroll-padding-inline: 28px;
-  scrollbar-width: none;
-}
-
-.quicktab-grid::-webkit-scrollbar {
-  display: none;
-}
-
-.quicktab-fade-start {
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 28px);
-  mask-image: linear-gradient(to right, transparent, #000 28px);
-}
-
-.quicktab-fade-end {
-  -webkit-mask-image: linear-gradient(to left, transparent, #000 28px);
-  mask-image: linear-gradient(to left, transparent, #000 28px);
-}
-
-.quicktab-fade-start.quicktab-fade-end {
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent);
-  mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent);
 }
 
 /* ========== 卡片 ========== */
@@ -309,6 +280,10 @@
   line-height: 17px;
   color: var(--qt-text);
   text-align: center;
+}
+
+.quicktab-panel:not(.quicktab-multirow) .quicktab-key-rows {
+  display: none;
 }
 
 .quicktab-hint kbd + kbd {
