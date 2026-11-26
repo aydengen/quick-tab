@@ -4,6 +4,8 @@
 const MAX_TABS = 10;
 const MAX_STORED_TABS = 20;
 const STORAGE_KEY = 'lastTabs';
+const ONBOARDING_URL = chrome.runtime.getURL('onboarding.html');
+const PRACTICE_URL = chrome.runtime.getURL('practice.html');
 
 const NON_INJECTABLE_PREFIXES = [
   'chrome://',
@@ -159,6 +161,12 @@ async function updateTabInfo(tabId, changeInfo, tab) {
 }
 
 // ========== 事件监听 ==========
+
+chrome.runtime.onInstalled.addListener(({ reason }) => {
+  if (reason === 'install') {
+    chrome.tabs.create({ url: ONBOARDING_URL }).catch(console.error);
+  }
+});
 
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
   await recordTabActivation(activeInfo.tabId);
@@ -349,21 +357,70 @@ function getPanelCss() {
   return panelCssPromise;
 }
 
-// 用户可在 chrome://extensions/shortcuts 改成不含 Alt 的快捷键，此时没有“松开 Alt 确认”
-async function shortcutUsesAlt() {
+async function getPanelShortcut() {
   const commands = await chrome.commands.getAll();
-  const shortcut = commands.find((c) => c.name === 'toggle-panel')?.shortcut || '';
+  return commands.find((c) => c.name === 'toggle-panel')?.shortcut || '';
+}
+
+// 用户可在 chrome://extensions/shortcuts 改成不含 Alt 的快捷键，此时没有“松开 Alt 确认”
+function shortcutUsesAlt(shortcut) {
   // 按键名会本地化（如祖鲁语 I-Alt）；要求 alt 位于键名末尾，避免匹配德语 Shift 的 Umschalttaste
   return shortcut.includes('⌥') ||
     shortcut.split('+').some((key) => /(^|[^a-z])alt$/i.test(key.trim()));
 }
 
+function practiceUrl(guideId) {
+  return `${PRACTICE_URL}?guide=${guideId}`;
+}
+
+function isPracticeTab(tab) {
+  return tab?.url?.startsWith(`${PRACTICE_URL}?guide=`);
+}
+
+async function getPracticeGuide(tab) {
+  const guideId = Number(new URL(tab.url).searchParams.get('guide'));
+  if (!Number.isInteger(guideId) || tab.url !== practiceUrl(guideId)) return null;
+  const guide = await chrome.tabs.get(guideId).catch(() => null);
+  return guide?.url === ONBOARDING_URL && guide.windowId === tab.windowId ? guide : null;
+}
+
+async function openPractice(guide) {
+  const url = practiceUrl(guide.id);
+  const tabs = await chrome.tabs.query({ windowId: guide.windowId });
+  const practice = tabs.find((tab) => tab.url === url || tab.pendingUrl === url);
+  if (practice) await chrome.tabs.update(practice.id, { active: true });
+  else await chrome.tabs.create({ windowId: guide.windowId, url, openerTabId: guide.id });
+}
+
+async function closePractice(guide) {
+  const tabs = await chrome.tabs.query({ windowId: guide.windowId });
+  const url = practiceUrl(guide.id);
+  const ids = tabs.filter((tab) => tab.url === url || tab.pendingUrl === url).map((tab) => tab.id);
+  if (ids.length) await chrome.tabs.remove(ids);
+}
+
+async function getOnboardingControls() {
+  const [shortcut, { stickyMode }] = await Promise.all([
+    getPanelShortcut(),
+    chrome.storage.local.get('stickyMode')
+  ]);
+  return { shortcut, releaseAlt: shortcutUsesAlt(shortcut) && !stickyMode };
+}
+
 // content.js 通过 manifest 注入；安装/更新前已打开的页面没有它，
 // 借助快捷键授予的 activeTab 权限补注入
 async function openPanel(tab) {
-  if (!isInjectableUrl(tab.url)) return false;
+  const practice = isPracticeTab(tab);
+  if (!practice && !isInjectableUrl(tab.url)) return false;
 
-  const message = { action: 'togglePanel', altShortcut: await shortcutUsesAlt() };
+  const altShortcut = shortcutUsesAlt(await getPanelShortcut());
+  if (practice) {
+    if (!(await getPracticeGuide(tab))) return false;
+    await chrome.runtime.sendMessage({ action: 'togglePracticePanel', tabId: tab.id, altShortcut });
+    return true;
+  }
+
+  const message = { action: 'togglePanel', altShortcut };
   try {
     await chrome.tabs.sendMessage(tab.id, message);
     return true;
@@ -441,6 +498,13 @@ async function withPreviews(entries) {
 }
 
 async function buildPanelData(senderTab, includeCss, capture) {
+  if (isPracticeTab(senderTab)) {
+    const guide = await getPracticeGuide(senderTab);
+    const tabs = [{ id: senderTab.id, title: 'Practice tab', current: true }];
+    if (guide) tabs.push({ id: guide.id, title: 'QuickTab guide' });
+    return { tabs, css: includeCss ? await getPanelCss() : null };
+  }
+
   if (senderTab && capture) await refreshCurrentThumb(senderTab).catch(() => {});
   const [tabs, settings, css] = await Promise.all([
     getTabList(),
@@ -464,7 +528,37 @@ async function buildPanelData(senderTab, includeCss, capture) {
   return { tabs: await withPreviews(list), css };
 }
 
+async function switchFromPanel(senderTab, tabId) {
+  if (!isPracticeTab(senderTab)) {
+    await activateTab(tabId);
+    return;
+  }
+
+  const guide = await getPracticeGuide(senderTab);
+  if (!guide || tabId !== guide.id) return;
+  await activateTab(guide.id);
+  await chrome.runtime.sendMessage({ action: 'onboardingComplete', tabId: guide.id }).catch(() => {});
+  await chrome.tabs.remove(senderTab.id);
+}
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (sender.tab && (sender.url === ONBOARDING_URL || isPracticeTab(sender.tab))) {
+    let result;
+    if (message.action === 'getOnboardingControls') result = getOnboardingControls();
+    if (message.action === 'openShortcutSettings') {
+      result = chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
+    }
+    if (sender.url === ONBOARDING_URL) {
+      if (message.action === 'startPractice') result = openPractice(sender.tab);
+      if (message.action === 'skipPractice') result = closePractice(sender.tab);
+      if (message.action === 'closeOnboarding') result = chrome.tabs.remove(sender.tab.id);
+    }
+    if (result) {
+      result.then((data) => sendResponse({ data }), (error) => sendResponse({ error: error.message }));
+      return true;
+    }
+  }
+
   if (message.action === 'getTabList') {
     buildPanelData(sender.tab, Boolean(message.includeCss), message.capture !== false)
       .then(sendResponse)
@@ -478,7 +572,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.action === 'switchToTab') {
-    activateTab(message.tabId)
+    switchFromPanel(sender.tab, message.tabId)
       .then(() => sendResponse({ success: true }))
       .catch((error) => sendResponse({ success: false, error: error.message }));
     return true;
