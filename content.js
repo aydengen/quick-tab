@@ -192,7 +192,8 @@
     grid.className = 'quicktab-grid';
     grid.setAttribute('role', 'listbox');
     grid.setAttribute('aria-label', 'Recent tabs');
-    grid.style.setProperty('--quicktab-columns', String(Math.max(1, Math.min(tabs.length, 5))));
+    const columns = Math.max(1, Math.min(tabs.length, 5));
+    grid.style.setProperty('--quicktab-columns', String(columns));
 
     if (tabs.length === 0) {
       const empty = document.createElement('div');
@@ -204,7 +205,7 @@
     }
 
     panel.appendChild(grid);
-    panel.appendChild(createHints());
+    panel.appendChild(createHints(tabs.length > columns));
 
     root.replaceChildren(overlay, panel);
     document.documentElement.appendChild(host);
@@ -214,12 +215,12 @@
     (cards[1] || cards[0])?.focus({ preventScroll: true });
   }
 
-  function createHints() {
+  function createHints(multiRow) {
     const hints = document.createElement('div');
     hints.className = 'quicktab-hints';
 
     const items = [
-      [['←', '→'], 'Select'],
+      [multiRow ? ['←', '→', '↑', '↓'] : ['←', '→'], 'Select'],
       [['↵'], 'Switch'],
       [['esc'], 'Close']
     ];
