@@ -1,0 +1,24 @@
+# GitHub Actions - 语法检查和打包校验
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    name: 检查
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v5
+
+      - name: 语法检查
+        run: |
+          for f in *.js; do node --check "$f"; done
+          jq empty manifest.json
+
+      - name: 打包校验
+        run: scripts/package.sh releases/quick-tab.zip

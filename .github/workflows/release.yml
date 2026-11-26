@@ -46,18 +46,15 @@ jobs:
 
       - name: 构建扩展
         run: |
-          MANIFEST_VERSION=$(sed -n 's/.*"version": "\(.*\)".*/\1/p' manifest.json)
+          MANIFEST_VERSION=$(jq -r .version manifest.json)
           RELEASE_VERSION="${{ steps.version.outputs.version }}"
-          ZIP_PATH="releases/quick-tab-v${RELEASE_VERSION}.zip"
 
           if [ "$MANIFEST_VERSION" != "$RELEASE_VERSION" ]; then
             echo "❌ manifest.json 版本 ($MANIFEST_VERSION) 与发布版本 ($RELEASE_VERSION) 不一致"
             exit 1
           fi
 
-          mkdir -p releases
-          rm -f "$ZIP_PATH"
-          zip -qr "$ZIP_PATH" manifest.json background.js content.js content.css icons/icon_32.png icons/icon_36.png icons/icon_48.png icons/icon_128.png
+          scripts/package.sh "releases/quick-tab-v${RELEASE_VERSION}.zip"
 
       - name: 上传构建产物
         uses: actions/upload-artifact@v4
