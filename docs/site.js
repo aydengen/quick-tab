@@ -118,11 +118,15 @@
     Object.keys(keycaps).forEach((key) => press(key, false));
   }
 
+  function isQKey(event) {
+    return event.key === "q" || event.key === "Q" || (event.altKey && event.code === "KeyQ");
+  }
+
   stage.addEventListener("keydown", (event) => {
     if (event.ctrlKey || event.metaKey) return;
     if (event.key === "Alt" || event.key === "Shift") {
       press(event.key, true);
-    } else if (event.code === "KeyQ") {
+    } else if (isQKey(event)) {
       event.preventDefault();
       if (event.repeat) return;
       press("KeyQ", true);
@@ -143,7 +147,7 @@
       else press("Alt", Boolean(gesture));
     } else if (event.key === "Shift") {
       press("Shift", reverse || event.shiftKey);
-    } else if (event.code === "KeyQ") {
+    } else if (isQKey(event)) {
       press("KeyQ", false);
     }
   });
