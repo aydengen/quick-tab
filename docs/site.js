@@ -94,7 +94,7 @@
     const { top, bottom, height } = stage.getBoundingClientRect();
     const viewportHeight = document.documentElement.clientHeight;
     if (top < 0 || bottom > viewportHeight) {
-      stage.scrollIntoView({ block: height > viewportHeight ? "start" : "nearest", inline: "nearest", behavior: "instant" });
+      stage.scrollIntoView({ block: height > viewportHeight ? "end" : "nearest", inline: "nearest", behavior: "instant" });
     }
     backdrop.hidden = false;
     stage.getBoundingClientRect();
