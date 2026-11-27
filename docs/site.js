@@ -210,10 +210,7 @@
 
   function cycle(backward, physicalAlt = false) {
     if (guideStep === "done" || guideStep === "closing") return;
-    if (stopAutoplay() && !stage.contains(document.activeElement)) {
-      revealDemo();
-      stage.focus({ preventScroll: true });
-    }
+    stopAutoplay();
     const step = backward ? -1 : 1;
     if (!gesture) {
       if (!guideStep && !startGuide()) revealDemo();
@@ -224,6 +221,10 @@
         scaleSpotlight();
       }
       return;
+    }
+    if (!stage.contains(document.activeElement)) {
+      revealDemo();
+      stage.focus({ preventScroll: true });
     }
     if (physicalAlt) gesture = "physical";
     select(selected + step);
@@ -286,7 +287,7 @@
     } else if (event.key === "Escape" && gesture) {
       event.preventDefault();
       hide(false);
-    } else if (event.key === "Enter" && gesture && !target.closest?.("a, button:not([data-tab]), summary")) {
+    } else if (event.key === "Enter" && gesture && stage.contains(target) && !target.closest?.("a, button:not([data-tab]), summary")) {
       event.preventDefault();
       confirm(selected);
     }
