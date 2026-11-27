@@ -56,6 +56,7 @@
   let current = 0;
   let selected = 0;
   let gesture = null;
+  let qSteps = 0;
   let switchedTabs = false;
   let successTimer;
   let guideAvailable = new URLSearchParams(location.search).get("guide") === "1";
@@ -199,13 +200,17 @@
         cards[selected].focus({ preventScroll: true });
       }
     }
-    if (!guideStep && (selected === 1 || selected === 2)) {
-      showInstallPrompt(text.selected(tabs[selected].title));
+    if (!guideStep) {
+      qSteps = Math.max(0, qSteps + step);
+      if (!backward && qSteps >= tabs.length && selected === 2) {
+        showInstallPrompt(text.selected(tabs[selected].title));
+      }
     }
   }
 
   function hide(confirmed) {
     gesture = null;
+    qSteps = 0;
     if (cards.includes(document.activeElement)) stage.focus({ preventScroll: true });
     switcher.hidden = true;
     shade.hidden = true;
@@ -298,7 +303,10 @@
 
   cards.forEach((card, index) => {
     card.addEventListener("click", () => confirm(index));
-    card.addEventListener("focus", () => select(index));
+    card.addEventListener("focus", () => {
+      if (index !== selected) qSteps = 0;
+      select(index);
+    });
   });
 
   altKey.addEventListener("click", () => {
