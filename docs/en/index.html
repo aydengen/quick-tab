@@ -6,13 +6,13 @@
     <meta name="theme-color" content="#f7f7f2" />
     <meta
       name="description"
-      content="QuickTab is a small, open-source tab switcher for Chrome. Hold Alt + Q, pick a recent tab, let go."
+      content="Switch between recent Chrome tabs with Alt + Q."
     />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="QuickTab — Switch tabs without losing your train of thought" />
     <meta
       property="og:description"
-      content="Switch Chrome tabs the way you switch apps. One shortcut takes you back to the page you were just on. Free, open source, no sign-up."
+      content="Switch between recent Chrome tabs with Alt + Q."
     />
     <meta property="og:image" content="https://aydengen.github.io/quick-tab/assets/og-en.png" />
     <meta property="og:url" content="https://aydengen.github.io/quick-tab/en/" />
@@ -54,14 +54,12 @@
     <main id="main">
       <section class="hero wrap" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <p class="eyebrow">A small shortcut for your browser.</p>
           <h1 id="hero-title">Switch tabs.<br class="mobile-break" /> Keep your focus.</h1>
-          <p class="hero-description">Alt + Q. Back to the page you just left.</p>
+          <p class="hero-description">Alt + Q. Back to your last tab.</p>
           <div class="hero-actions">
-            <a class="button button-primary" href="https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimheklaj" target="_blank" rel="noopener noreferrer">Add to Chrome, free <span aria-hidden="true">↗</span></a>
-            <p class="hero-note">Open source. No account. All local.</p>
+            <a class="button button-primary" href="https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimheklaj" target="_blank" rel="noopener noreferrer">Add to Chrome <span aria-hidden="true">↗</span></a>
           </div>
-          <p class="mobile-note">Try the demo here. Install on desktop Chrome.</p>
+          <p class="mobile-note">Install on desktop Chrome.</p>
         </div>
       </section>
 
@@ -219,10 +217,9 @@
               <span class="desktop-instruction">Hold Alt, press Q. Or click a card.</span>
               <span class="touch-instruction">Tap a card to try switching.</span>
             </p>
-            <span class="demo-label">Interactive demo</span>
           </div>
         </div>
-        <p class="demo-disclaimer">A preview, not your real tabs. Nothing is read from your browser.</p>
+        <p class="demo-disclaimer">Demo only. Your tabs aren’t accessed.</p>
         <p id="demo-status" class="sr-only" role="status" aria-live="polite"></p>
         <noscript
           ><p class="no-script">Turn on JavaScript to try the demo.</p></noscript
@@ -231,16 +228,16 @@
 
       <section class="features wrap" aria-label="Why QuickTab">
         <article>
-          <h3>Back to the last page in one tap</h3>
-          <p>Ordered by recent use. Tap Alt+Q to go back one tab.</p>
+          <h3>Quick switching</h3>
+          <p>Recent tabs first.</p>
         </article>
         <article>
-          <h3>Recognize pages by sight</h3>
-          <p>Spot pages by thumbnail, not by truncated titles.</p>
+          <h3>Page previews</h3>
+          <p>Find tabs without opening each one.</p>
         </article>
         <article>
-          <h3>Your tabs stay yours</h3>
-          <p>No account, no tracking. Your data stays on your device.</p>
+          <h3>Local only</h3>
+          <p>No tabs or thumbnails uploaded.</p>
         </article>
       </section>
 
@@ -248,75 +245,75 @@
         <div class="wrap">
           <div class="section-heading">
             <div>
-              <h2>Three steps. Then it’s second nature.</h2>
+              <h2>How it works</h2>
             </div>
           </div>
           <div class="steps">
             <article class="step">
               <span class="step-number">01</span>
-              <h3>Install QuickTab</h3>
-              <p>Add it from the Chrome Web Store. No sign-in.</p>
+              <h3>Install</h3>
+              <p>Add QuickTab from the Chrome Web Store.</p>
             </article>
             <article class="step">
               <span class="step-number">02</span>
-              <h3>Hold Alt, press Q</h3>
-              <p>Recent tabs appear as cards. Press Q again to move on.</p>
+              <h3>Choose a tab</h3>
+              <p>Hold Alt and press Q to cycle.</p>
             </article>
             <article class="step">
               <span class="step-number">03</span>
-              <h3>Let go of Alt</h3>
-              <p>Release to switch, or press Esc to cancel.</p>
+              <h3>Release to switch</h3>
+              <p>Release Alt to confirm. Esc to cancel.</p>
             </article>
           </div>
-          <p class="tip">Rather not hold Alt? Turn on Sticky mode in settings and confirm with Enter.</p>
+          <p class="tip">Enable Sticky mode in settings to confirm with Enter.</p>
         </div>
       </section>
 
       <section id="questions" class="faq wrap" aria-labelledby="faq-title">
         <div class="faq-heading">
-          <h2 id="faq-title">Common questions</h2>
+          <h2 id="faq-title">FAQ</h2>
           <a
             href="https://github.com/aydengen/quick-tab/issues"
             target="_blank"
             rel="noopener noreferrer"
-            >Something else? Ask on GitHub <span aria-hidden="true">↗</span></a
+            >Report an issue <span aria-hidden="true">↗</span></a
           >
         </div>
         <div class="faq-list">
           <details>
             <summary>
-              The shortcut does nothing. What now?<span aria-hidden="true">+</span>
+              Shortcut not working?<span aria-hidden="true">+</span>
             </summary>
             <div>
               <p>
-                First try it on a regular web page such as GitHub. If nothing happens, open
-                <code>chrome://extensions/shortcuts</code>, find QuickTab, and give it a shortcut that no other extension or system feature is using.
+                Reload a regular web page and try again. Still nothing? Set an unused shortcut for QuickTab at
+                <code>chrome://extensions/shortcuts</code>.
               </p>
               <p>
-                On a Mac, Alt is the Option (⌥) key. If a page that was open before installing does not respond, reload it and try again.
+                On Mac, Alt is Option (⌥).
               </p>
             </div>
           </details>
           <details>
             <summary>
-              Why doesn’t the panel show on some pages?<span aria-hidden="true">+</span>
+              Where is the panel unavailable?<span aria-hidden="true">+</span>
             </summary>
             <div>
               <p>
-                Chrome does not let extensions draw on the New Tab page,<code>chrome://</code> pages, the Chrome Web Store, or some PDFs. On those pages the shortcut switches straight back to the previous tab.
+                Chrome blocks the panel on New Tab, <code>chrome://</code>, the Chrome Web Store, and some PDFs. The shortcut switches directly to the previous tab.
               </p>
             </div>
           </details>
           <details>
             <summary>
-              Why does it need tab and site permissions?<span aria-hidden="true">+</span>
+              Why these permissions?<span aria-hidden="true">+</span>
             </summary>
             <div>
               <p>
-                Tab access is used to show titles and icons and to switch tabs. Site access is used to capture the visible page as a thumbnail. There is no server receiving any of this, and the source code is public.
+                Tab access shows titles and icons and lets you switch. Site access creates page thumbnails. Nothing is uploaded.
               </p>
               <p>
-                Recent tabs and thumbnails are kept in local session storage and cleared when you quit Chrome. Your shortcut and settings are kept.
+                Tab history and thumbnails clear when you quit Chrome. Settings are kept.
               </p>
             </div>
           </details>
@@ -326,24 +323,21 @@
             </summary>
             <div>
               <p>
-                Yes, it is free under the MIT license. QuickTab is built for desktop Chrome on Mac, Windows, and Linux. Other Chromium browsers may work but have not been tested. Mobile browsers cannot install it.
+                Free and MIT-licensed. Built for desktop Chrome on Mac, Windows, and Linux. Mobile is unsupported; other Chromium browsers are untested.
               </p>
             </div>
           </details>
         </div>
       </section>
 
-      <section class="closing wrap" aria-labelledby="closing-title">
-        <div>
-          <h2 id="closing-title">Spend less time<br />finding tabs.</h2>
-        </div>
+      <section class="closing wrap" aria-label="Install QuickTab">
         <div>
           <a
             class="button button-primary"
             href="https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimheklaj"
             target="_blank"
             rel="noopener noreferrer"
-            >Add to Chrome, free <span aria-hidden="true">↗</span></a
+            >Add to Chrome <span aria-hidden="true">↗</span></a
           >
         </div>
       </section>

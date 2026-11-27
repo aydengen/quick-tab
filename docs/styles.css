@@ -79,7 +79,6 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
 .header-github { font-size: 12px; }
 .header-github span { margin-left: 5px; }
 .hero { padding-block: 42px 30px; }
-.eyebrow { margin: 0 0 14px; font-size: 12px; color: var(--muted); }
 .hero h1 {
   font-size: clamp(36px, 3.6vw, 52px);
   line-height: 1.22;
@@ -106,7 +105,6 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
 }
 .button-primary { color: #fff; background: var(--ink); }
 .button-primary:hover { background: #45483f; }
-.hero-note { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.7; }
 .mobile-note { display: none; margin: 13px 0 0; font-size: 11px; color: var(--muted); line-height: 1.6; }
 .demo-canvas { padding: 30px 34px 0; border-radius: 6px; background: #e7e8e0; overflow: hidden; }
 .browser {
@@ -285,7 +283,6 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
 .key-plus { color: var(--muted); font-size: 11px; }
 .demo-instruction { margin: 0; color: #555e4d; font-size: 11px; line-height: 1.6; }
 .touch-instruction { display: none; }
-.demo-label { margin-left: auto; color: #555e4d; font-size: 10px; white-space: nowrap; }
 .demo-disclaimer, .no-script { margin: 12px 0 0; font-size: 10px; line-height: 1.6; color: var(--muted); }
 .features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 60px; padding-block: 50px 64px; }
 .features h3 { font-size: 16px; font-weight: 550; line-height: 1.5; margin: 0 0 10px; }
@@ -321,7 +318,6 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
 .faq-list p:last-child { margin-bottom: 0; }
 .faq-list code, .legal code { font-size: 0.9em; overflow-wrap: anywhere; }
 .closing { display: flex; align-items: center; justify-content: space-between; gap: 30px; border-top: 1px solid var(--line); padding-block: 42px; }
-.closing h2 { margin: 0; font-size: 28px; font-weight: 500; line-height: 1.45; letter-spacing: -0.045em; }
 .site-footer { min-height: 100px; padding-block: 25px; display: flex; align-items: center; justify-content: space-between; gap: 25px; border-top: 1px solid var(--line); }
 .site-footer .brand { font-size: 16px; }
 .site-footer .brand img { width: 23px; height: 23px; }
@@ -360,7 +356,6 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
   .hero h1 { font-size: clamp(33px, 5.8vw, 42px); line-height: 1.25; }
   .hero-description { font-size: 14px; }
   .hero-actions { gap: 14px; margin-top: 20px; }
-  .hero-note { max-width: 200px; font-size: 10px; }
   .demo-canvas { padding: 17px 17px 0; }
   .browser-bar { height: 29px; padding-inline: 9px; }
   .browser-tab { font-size: 8px; padding-inline: 7px; }
@@ -375,7 +370,6 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
   .tab-url { font-size: 8px; }
   .favicon { width: 17px; height: 17px; font-size: 11px; }
   .demo-footer { min-height: 57px; gap: 10px; }
-  .demo-label { display: none; }
   .features { gap: 24px; padding-block: 35px 45px; }
   .features h3 { font-size: 14px; }
   .features p { font-size: 12px; }
@@ -386,7 +380,6 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
   .section-heading h2, .faq h2 { font-size: 23px; }
   .faq { grid-template-columns: 1fr; gap: 25px; padding-block: 40px; }
   .faq-heading > a { margin-top: 10px; }
-  .closing h2 { font-size: 25px; }
   .site-footer { gap: 20px; }
   .site-footer > div { gap: 15px; }
   .legal { padding-block: 35px 60px; }
@@ -397,12 +390,10 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
   .site-header { gap: 15px; }
   .site-header nav { font-size: 11px; }
   .hero { padding-top: 28px; }
-  .eyebrow { font-size: 11px; margin-bottom: 13px; }
   .hero h1 { font-size: clamp(32px, 8.6vw, 40px); line-height: 1.3; }
   .mobile-break { display: block; }
   .hero-description { margin-top: 12px; font-size: 13px; }
   .hero-actions { flex-wrap: wrap; gap: 11px; margin-top: 20px; }
-  .hero-note { max-width: none; width: 100%; }
   .button { font-size: 12px; min-height: 42px; padding: 11px 17px; gap: 20px; }
   .demo-canvas { padding: 10px 10px 0; border-radius: 5px; }
   .browser { border-radius: 6px; }
@@ -435,7 +426,6 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
   .faq-list summary { padding-block: 18px; font-size: 12px; gap: 12px; }
   .faq-list p { font-size: 11px; }
   .closing { align-items: flex-start; flex-direction: column; gap: 20px; padding-block: 32px; }
-  .closing h2 { font-size: 26px; }
   .site-footer { flex-direction: column; align-items: flex-start; gap: 18px; min-height: 0; }
   .site-footer > div { font-size: 10px; gap: 20px; }
 }
