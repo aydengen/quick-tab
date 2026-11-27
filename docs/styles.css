@@ -1,16 +1,27 @@
-/* Self-contained marketing site. No framework, remote fonts, or tracking. */
+/* Self-contained marketing site. No framework, third-party requests, or tracking. */
+/* Inter is used only for Latin text; Apple devices use their system SF font.
+   Chinese glyphs remain in the platform's default font. See assets/fonts/. */
+@font-face {
+  font-family: "Inter";
+  src: url("./assets/fonts/InterVariable.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 :root {
   --paper: #f7f7f2;
   --ink: #252722;
   --muted: #686b61;
   --blue: #3963ed;
   --line: #dddfd5;
-  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
   color-scheme: light;
   font-family: var(--font);
   color: var(--ink);
   background: var(--paper);
   font-synthesis: none;
+  font-optical-sizing: auto;
   scroll-behavior: smooth;
   scroll-padding-top: 24px;
 }
