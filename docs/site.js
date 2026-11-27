@@ -120,10 +120,10 @@
     if (switchedTabs) showInstallPrompt(text.switched(tabs[current].title));
   }
 
-  function showInstallPrompt(message) {
+  function showInstallPrompt(message = "") {
     if (!install.hidden) return;
     install.hidden = false;
-    status.textContent = `${message} ${text.installReady}`;
+    status.textContent = message ? `${message} ${text.installReady}` : text.installReady;
   }
 
   function exitGuide() {
@@ -223,7 +223,8 @@
   }
 
   function confirm(index) {
-    if (index !== current) switchedTabs = true;
+    const switched = index !== current;
+    if (switched) switchedTabs = true;
     current = index;
     updateBrowser();
     hide(true);
@@ -231,6 +232,8 @@
       showGuideStep("done", text.guideDone);
       scaleSpotlight();
       guideTimer = setTimeout(exitGuide, 950);
+    } else if (!guideStep) {
+      showInstallPrompt(switched ? text.switched(tabs[current].title) : undefined);
     }
   }
 
@@ -260,7 +263,9 @@
     } else if (event.key === "Escape" && gesture) {
       event.preventDefault();
       hide(false);
-    } else if (event.key === "Enter" && gesture && stage.contains(target) && !target.closest?.("a, button:not([data-tab]), summary")) {
+    } else if (event.key === "Enter" && gesture &&
+        (target === document.body || stage.contains(target)) &&
+        !target.closest?.("a, button:not([data-tab]), summary")) {
       event.preventDefault();
       confirm(selected);
     }
