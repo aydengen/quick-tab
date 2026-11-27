@@ -493,6 +493,11 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
   .shortcut-display button { min-width: 44px; height: 44px; }
   .mobile-note { display: block; }
 }
+@media (max-width: 480px) and (max-height: 420px) {
+  .demo-footer:has(.demo-install:not([hidden])) .demo-instruction,
+  .demo-install p { display: none; }
+  .demo-install { width: auto; }
+}
 @media (prefers-reduced-motion: reduce) {
   :root { scroll-behavior: auto; }
   *, *::before, *::after { transition: none !important; animation: none !important; }
