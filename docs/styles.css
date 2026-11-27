@@ -343,6 +343,11 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
 .demo-guide { display: flex; flex: 1; align-items: center; justify-content: space-between; gap: 12px; }
 .demo-guide p { margin: 0; font-size: 13px; line-height: 1.5; }
 .demo-guide-skip { border: 0; background: none; padding: 8px 2px; font-size: 12px; color: var(--muted); text-decoration: underline; white-space: nowrap; }
+.demo-footer:has(.demo-install:not([hidden])) { flex-wrap: wrap; }
+.demo-install { display: flex; align-items: center; gap: 8px 12px; flex-wrap: wrap; margin-inline-start: auto; }
+.demo-install p { margin: 0; color: var(--ink); font-size: 13px; line-height: 1.5; }
+.demo-install .button { min-height: 44px; gap: 8px; padding: 8px 12px; white-space: nowrap; }
+.demo-install .icon { width: 14px; height: 14px; }
 .touch-instruction { display: none; }
 .demo-disclaimer, .no-script { margin: 12px 0 0; font-size: 12px; line-height: 1.6; color: var(--muted); }
 .features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; padding-block: 28px 40px; border-top: 1px solid var(--line); }
@@ -464,6 +469,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
   .browser-address { display: none; }
   .switcher { width: 96%; }
   .demo-footer { min-height: 51px; gap: 10px; }
+  .demo-install { width: 100%; justify-content: space-between; }
   .demo-instruction { font-size: 10px; }
   .shortcut-display { gap: 5px; }
   .shortcut-display button { min-width: 24px; height: 23px; padding-inline: 5px; font-size: 10px; gap: 5px; }
@@ -486,6 +492,11 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
   .demo-instruction { font-size: 12px; }
   .shortcut-display button { min-width: 44px; height: 44px; }
   .mobile-note { display: block; }
+}
+@media (max-width: 480px) and (max-height: 420px) {
+  .demo-footer:has(.demo-install:not([hidden])) .demo-instruction,
+  .demo-install p { display: none; }
+  .demo-install { width: auto; }
 }
 @media (prefers-reduced-motion: reduce) {
   :root { scroll-behavior: auto; }
