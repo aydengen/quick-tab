@@ -8,6 +8,7 @@
         titles: ["Friday side project", "Moodboard", "aydengen / quick-tab", "Deep focus"],
         alt: (title) => `Simulated tab: ${title}`,
         opened: "Use the arrow keys to choose a tab. Enter to switch. Esc to cancel.",
+        selected: (title) => `Selected “${title}”. Enter to switch. Esc to cancel.`,
         preview: "Demo ready. Click a card, or focus the demo and use the arrow keys, then Enter.",
         switched: (title) => `Switched to “${title}”`,
         cancelled: "Cancelled",
@@ -16,6 +17,7 @@
         titles: ["周五，做点喜欢的事", "下一点灵感", "aydengen / quick-tab", "Deep focus"],
         alt: (title) => `模拟标签页：${title}`,
         opened: "用方向键选择标签，Enter 切换，Esc 取消。",
+        selected: (title) => `已选择「${title}」，Enter 切换，Esc 取消。`,
         preview: "演示已就绪。点选卡片，或聚焦演示后用方向键选择、Enter 切换。",
         switched: (title) => `已切换到「${title}」`,
         cancelled: "已取消",
@@ -55,6 +57,7 @@
       card.classList.toggle("is-selected", i === selected);
       card.setAttribute("aria-pressed", String(i === selected));
     });
+    status.textContent = text.selected(tabs[selected].title);
   }
 
   function updateBrowser() {
@@ -115,14 +118,13 @@
     if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
     const navigation = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key);
     if (!navigation && event.key !== "Enter" && event.key !== "Escape") return;
-    if (event.key === "Escape" && (!open || !fromKeyboard)) return;
+    if (event.key === "Escape" && !open) return;
     if (!open) {
       if (event.repeat) return;
       show(true);
     }
     fromKeyboard = true;
     press(event.key, true);
-    status.textContent = text.opened;
     const columns = getComputedStyle(switcher).gridTemplateColumns.split(" ").length;
     const moves = {
       ArrowLeft: -1,
@@ -130,7 +132,11 @@
       ArrowUp: selected >= columns ? -columns : 0,
       ArrowDown: selected + columns < tabs.length ? columns : 0,
     };
-    if (event.key in moves) select(selected + moves[event.key]);
+    if (event.key in moves) {
+      select(selected + moves[event.key]);
+      // Keep native Space activation and Enter pointed at the same card.
+      cards[selected].focus({ preventScroll: true });
+    }
     else if (event.key === "Enter") confirm(selected);
     else if (event.key === "Escape") hide(false);
     else return;
@@ -153,7 +159,6 @@
 
   cards.forEach((card, index) => {
     card.addEventListener("click", () => confirm(index));
-    card.addEventListener("mouseenter", () => select(index));
     card.addEventListener("focus", () => select(index));
   });
 
