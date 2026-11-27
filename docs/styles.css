@@ -121,7 +121,6 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
 .button .icon { width: 16px; height: 16px; }
 .mobile-note { display: none; margin: 12px 0 0; font-size: 12px; color: var(--muted); line-height: 1.6; }
 .demo-canvas { padding: 16px 16px 0; border-radius: var(--radius); background: var(--wash); overflow: hidden; }
-:root.demo-guide-open { overflow: hidden; }
 .demo-guide-backdrop {
   position: fixed;
   inset: 0;
@@ -134,11 +133,11 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
 }
 .demo-guide-backdrop.is-visible { opacity: 1; }
 .demo-canvas.is-spotlight {
-  position: fixed;
-  inset: 0 auto auto 0;
+  position: relative;
   z-index: 11;
-  width: var(--guide-width);
-  transform-origin: top left;
+  transform: scale(var(--guide-scale, 1));
+  transform-origin: center;
+  scroll-margin-block: 24px;
   transition: transform 240ms ease;
   background: #f6f7fa;
   box-shadow: 0 18px 64px rgb(0 0 0 / 25%);
@@ -333,7 +332,6 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
   transition: transform 80ms ease-out, background-color 80ms ease-out;
 }
 .shortcut-display button:is(.is-pressed, :active) { transform: translateY(2px); background: #eaf0ff; color: var(--blue); box-shadow: none; }
-.demo-canvas[data-guide-step="alt"] [data-key="Alt"],
 .demo-canvas[data-guide-step="cycle"] [data-key="KeyQ"] {
   animation: demo-guide-pulse 1.15s ease-out 4;
 }

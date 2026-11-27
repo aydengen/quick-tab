@@ -9,8 +9,7 @@
         selected: (title) => `Selected “${title}”. Enter to switch. Esc to cancel.`,
         switched: (title) => `Switched to “${title}”`,
         cancelled: "Cancelled",
-        guideAlt: "Press or tap Alt to get started.",
-        guideCycle: "Release Alt, then press Q on its own. You can also tap Q.",
+        guideCycle: "Hold or tap Alt, then press Q. Or press Q on its own. On touch, tap Q, then Alt to switch.",
         guideConfirm: "Keep cycling with Q, or choose a card or tap Alt to switch.",
         guideDone: "You switched tabs!",
       }
@@ -19,8 +18,7 @@
         selected: (title) => `已选择「${title}」，Enter 切换，Esc 取消。`,
         switched: (title) => `已切换到「${title}」`,
         cancelled: "已取消",
-        guideAlt: "按下或点击 Alt，开始体验。",
-        guideCycle: "松开 Alt，单独按 Q 或点 Q 循环选择。",
+        guideCycle: "按住或点击 Alt，再按 Q；也可单独按 Q。触屏上点 Q 选择，再点 Alt 切换。",
         guideConfirm: "继续按 Q 循环选择，或点击卡片或 Alt 切换。",
         guideDone: "成功切换标签页！",
       };
@@ -42,7 +40,6 @@
   const status = document.querySelector("#demo-status");
   const page = document.querySelector("#active-page");
   const stage = document.querySelector("#demo-stage");
-  const spacer = document.querySelector(".demo-guide-spacer");
   const help = document.querySelector("#demo-help");
   const guide = stage.querySelector(".demo-guide");
   const guideCopy = document.querySelector("#demo-guide-copy");
@@ -90,36 +87,29 @@
     guide.hidden = false;
     help.hidden = true;
     stage.setAttribute("aria-describedby", guideCopy.id);
-    showGuideStep("alt", text.guideAlt);
-    return true;
-  }
-
-  function placeSpotlight() {
-    stage.style.setProperty("--guide-width", `${spacer.clientWidth}px`);
-    const width = stage.offsetWidth;
-    const height = stage.offsetHeight;
-    spacer.style.height = `${height}px`;
-    const scale = Math.min(reducedMotion.matches ? 1 : 1.12, (innerWidth - 24) / width, (innerHeight - 24) / height);
-    stage.style.transform = `translate(${(innerWidth - width * scale) / 2}px, ${(innerHeight - height * scale) / 2}px) scale(${scale})`;
-  }
-
-  function enterSpotlight() {
     showGuideStep("cycle", text.guideCycle);
-    press("Alt", true);
-    const { left, top, height, width } = stage.getBoundingClientRect();
-    spacer.style.height = `${height}px`;
-    spacer.hidden = false;
-    stage.style.setProperty("--guide-width", `${width}px`);
-    stage.style.transform = `translate(${left}px, ${top}px)`;
     stage.classList.add("is-spotlight");
     stage.setAttribute("role", "dialog");
     stage.setAttribute("aria-modal", "true");
-    document.documentElement.classList.add("demo-guide-open");
+    const { top, bottom } = stage.getBoundingClientRect();
+    if (top < 0 || bottom > document.documentElement.clientHeight) {
+      stage.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "instant" });
+    }
     backdrop.hidden = false;
     stage.getBoundingClientRect();
     backdrop.classList.add("is-visible");
-    placeSpotlight();
-    stage.focus({ preventScroll: true });
+    scaleSpotlight();
+    return true;
+  }
+
+  function scaleSpotlight() {
+    const { x, y, width, height } = stage.getBoundingClientRect();
+    const centerX = x + width / 2;
+    const centerY = y + height / 2;
+    const availableWidth = 2 * Math.min(centerX, document.documentElement.clientWidth - centerX) - 16;
+    const availableHeight = 2 * Math.min(centerY, document.documentElement.clientHeight - centerY);
+    const fit = Math.min(1.12, availableWidth / stage.offsetWidth, availableHeight / stage.offsetHeight);
+    stage.style.setProperty("--guide-scale", reducedMotion.matches || fit <= 0 ? 1 : fit);
   }
 
   function clearGuide() {
@@ -127,14 +117,9 @@
     delete stage.dataset.guideStep;
     if (document.activeElement === skip) stage.focus({ preventScroll: true });
     stage.classList.remove("is-spotlight");
-    stage.style.removeProperty("transform");
-    stage.style.removeProperty("--guide-width");
     stage.removeAttribute("aria-modal");
     stage.setAttribute("role", "group");
     stage.setAttribute("aria-describedby", help.id);
-    spacer.hidden = true;
-    spacer.style.removeProperty("height");
-    document.documentElement.classList.remove("demo-guide-open");
     backdrop.hidden = true;
     guide.hidden = true;
     help.hidden = false;
@@ -145,13 +130,8 @@
     clearTimeout(guideTimer);
     if (gesture) hide(false);
     else resetKeys();
-    if (guideStep === "alt") {
-      clearGuide();
-      return;
-    }
     guideStep = "closing";
-    const { left, top } = spacer.getBoundingClientRect();
-    stage.style.transform = `translate(${left}px, ${top}px)`;
+    stage.style.removeProperty("--guide-scale");
     backdrop.classList.remove("is-visible");
     stage.getBoundingClientRect();
     const animations = [...stage.getAnimations(), ...backdrop.getAnimations()];
@@ -199,13 +179,9 @@
 
   function cycle(backward, physicalAlt = false) {
     if (guideStep === "done" || guideStep === "closing") return;
-    if (guideStep === "alt") {
-      if (physicalAlt) enterSpotlight();
-      else exitGuide();
-    }
     if (guideStep === "cycle") {
       showGuideStep("confirm", text.guideConfirm);
-      placeSpotlight();
+      scaleSpotlight();
     }
     const step = backward ? -1 : 1;
     if (!gesture) {
@@ -236,10 +212,10 @@
     current = index;
     updateBrowser();
     hide(true);
-    if (guideStep === "confirm") {
+    if (guideStep === "cycle" || guideStep === "confirm") {
       rememberGuide();
       showGuideStep("done", text.guideDone);
-      placeSpotlight();
+      scaleSpotlight();
       guideTimer = setTimeout(exitGuide, 950);
     }
   }
@@ -271,7 +247,6 @@
         (event.shiftKey ? last : stage).focus();
       }
     } else if (event.key === "Alt") {
-      if (guideStep === "alt") enterSpotlight();
       press("Alt", true);
     } else if (isQKey(event)) {
       event.preventDefault();
@@ -290,7 +265,7 @@
   stage.addEventListener("keyup", (event) => {
     if (event.key === "Alt" && !event.altKey) {
       if (gesture === "physical") confirm(selected);
-      else press("Alt", Boolean(gesture) || guideStep === "cycle");
+      else press("Alt", Boolean(gesture));
     } else if (isQKey(event)) {
       press("KeyQ", false);
     }
@@ -304,7 +279,7 @@
 
   window.addEventListener("blur", leaveDemo);
   window.addEventListener("resize", () => {
-    if (stage.classList.contains("is-spotlight") && guideStep !== "closing") placeSpotlight();
+    if (guideStep && guideStep !== "closing") scaleSpotlight();
   });
   document.addEventListener("pointerdown", (event) => {
     if (stage.contains(event.target)) return;
@@ -312,18 +287,13 @@
     if (guideStep) exitGuide();
   });
   stage.addEventListener("pointerdown", () => { openingPointer = guideAvailable; });
-  stage.addEventListener("pointercancel", () => { openingPointer = false; });
+  document.addEventListener("pointerup", () => { openingPointer = false; });
+  document.addEventListener("pointercancel", () => { openingPointer = false; });
   stage.addEventListener("focusin", () => {
-    if (startGuide() && !openingPointer) guide.scrollIntoView({ block: "nearest", behavior: "instant" });
+    if (!openingPointer) startGuide();
   });
-  stage.addEventListener("click", (event) => {
-    if (!openingPointer && !startGuide()) return;
-    openingPointer = false;
-    startGuide();
-    event.preventDefault();
-    event.stopPropagation();
-    stage.focus({ preventScroll: true });
-    guide.scrollIntoView({ block: "nearest", behavior: "instant" });
+  stage.addEventListener("click", () => {
+    if (startGuide()) stage.focus({ preventScroll: true });
   }, true);
   stage.addEventListener("focusout", (event) => {
     if (!stage.contains(event.relatedTarget)) leaveDemo();
@@ -336,9 +306,8 @@
 
   const keyActions = {
     Alt: () => {
-      if (guideStep === "alt") enterSpotlight();
-      else if (gesture) confirm(selected);
-      else if (!guideStep) show(current, false);
+      if (gesture) confirm(selected);
+      else if (!guideStep || guideStep === "cycle") show(current, false);
     },
     KeyQ: (event) => cycle(event.shiftKey),
   };
