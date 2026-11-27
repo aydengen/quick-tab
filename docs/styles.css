@@ -359,6 +359,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
 .step h3 { font-size: 16px; line-height: 1.6; font-weight: 500; margin: 0; }
 .step p { font-size: 16px; line-height: 1.6; margin: 0; color: var(--muted); }
 .tip { grid-column: 2; font-size: 13px; line-height: 1.6; color: var(--muted); margin: 32px 0 0; }
+.how-promo { grid-column: 2; width: 100%; height: auto; margin-top: 32px; border-radius: var(--radius); }
 .faq { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 64px; padding-block: 72px; }
 .faq-heading > a { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; font-size: 13px; color: var(--muted); line-height: 1.6; margin-top: 12px; }
 .faq-list { min-width: 0; }
@@ -436,7 +437,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
   .how-section { padding-block: 48px; }
   .how-section > .wrap { grid-template-columns: 1fr; row-gap: 32px; }
   .step { padding-block: 16px; }
-  .tip { grid-column: 1; margin-top: 0; }
+  .tip, .how-promo { grid-column: 1; margin-top: 0; }
   .section-heading h2, .faq h2 { font-size: 26px; }
   .faq { grid-template-columns: 1fr; gap: 24px; padding-block: 48px; }
   .faq-heading > a { margin-top: 8px; }
