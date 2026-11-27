@@ -10,7 +10,6 @@
   const QUICK_TAP_WINDOW_MS = 1000;
   // 面板到窗口边缘的最小距离
   const PANEL_MARGIN = 16;
-  const MAX_ROWS = 3;
 
   let host = null;
   let root = null;
@@ -232,33 +231,17 @@
     if (cards.length) cards[initialSelectionIndex(cards.length)].focus({ preventScroll: true });
   }
 
-  // 卡片尺寸固定：一行放不下就逐步换成两行、三行，三行还放不下再整体等比缩小
   function layoutPanel() {
     const panel = root?.querySelector('.quicktab-panel');
     const grid = panel?.querySelector('.quicktab-grid');
     if (!grid) return;
-    const count = getCards().length || 1;
-    const measure = (columns) => {
-      grid.style.setProperty('--quicktab-columns', String(columns));
-      return Math.min(
-        1,
-        (window.innerWidth - 2 * PANEL_MARGIN) / panel.offsetWidth,
-        (window.innerHeight - 2 * PANEL_MARGIN) / panel.offsetHeight
-      );
-    };
-
-    panel.style.setProperty('--qt-scale', '1');
-    let best = { columns: count, scale: 0 };
-    for (let rows = 1; rows <= MAX_ROWS; rows += 1) {
-      const columns = Math.ceil(count / rows);
-      if (rows > 1 && columns === best.columns) continue;
-      const scale = measure(columns);
-      // 行数少的优先，只有明显更大时才多换一行
-      if (scale > best.scale + 0.001) best = { columns, scale };
-      if (scale >= 1) break;
-    }
-    grid.style.setProperty('--quicktab-columns', String(best.columns));
-    panel.style.setProperty('--qt-scale', String(best.scale));
+    grid.style.setProperty('--quicktab-columns', String(getCards().length || 1));
+    const scale = Math.min(
+      1,
+      (window.innerWidth - 2 * PANEL_MARGIN) / panel.offsetWidth,
+      (window.innerHeight - 2 * PANEL_MARGIN) / panel.offsetHeight
+    );
+    panel.style.setProperty('--qt-scale', String(scale));
   }
 
   function createTabCard(tab) {
@@ -376,23 +359,6 @@
     cards[nextIndex].focus({ preventScroll: true });
   }
 
-  // 多行时上下键按行移动；只有一行时等同左右
-  function moveRow(direction) {
-    const cards = getCards();
-    const columns = Number(root.querySelector('.quicktab-grid')?.style.getPropertyValue('--quicktab-columns')) || 1;
-    if (cards.length <= columns) {
-      cycleSelection(direction);
-      return;
-    }
-    const index = cards.indexOf(root.activeElement);
-    if (index === -1) return;
-    const next = index + direction * columns;
-    // 首行向上、末行向下不动；下一行不满时落到最后一张
-    const lastRow = Math.floor((cards.length - 1) / columns);
-    if (next < 0 || Math.floor(index / columns) === lastRow && direction > 0) return;
-    cards[Math.min(cards.length - 1, next)].focus({ preventScroll: true });
-  }
-
   function hidePanel() {
     panelRequestId += 1;
     // 快速轻按时面板没渲染过，也要通知 background 恢复截图
@@ -446,15 +412,12 @@
     } else if (e.key === 'Tab') {
       e.preventDefault();
       cycleSelection(e.shiftKey ? -1 : 1);
-    } else if (e.key === 'ArrowRight' || key === 'j') {
+    } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || key === 'j') {
       e.preventDefault();
       cycleSelection(1);
-    } else if (e.key === 'ArrowLeft' || key === 'k') {
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || key === 'k') {
       e.preventDefault();
       cycleSelection(-1);
-    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-      e.preventDefault();
-      moveRow(e.key === 'ArrowDown' ? 1 : -1);
     }
   }
 

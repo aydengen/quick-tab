@@ -1,7 +1,7 @@
 // QuickTab - Background Service Worker
 // 管理最近标签列表和消息通信，必要时补注入面板脚本
 
-const MAX_TABS = 10;
+const MAX_TABS = 8;
 const MAX_STORED_TABS = 20;
 const STORAGE_KEY = 'lastTabs';
 const ONBOARDING_URL = chrome.runtime.getURL('onboarding.html');
