@@ -198,14 +198,13 @@
   }
 
   function stopAutoplay() {
-    if (!autoplayActive) return false;
+    if (!autoplayActive) return;
     autoplayActive = false;
     clearTimeout(autoplayTimer);
     autoplayTimer = undefined;
     autoplayHint.hidden = true;
     delete help.dataset.autoplay;
     qKey.classList.remove("is-pressed");
-    return true;
   }
 
   function cycle(backward, physicalAlt = false) {
@@ -318,13 +317,11 @@
   window.addEventListener("resize", () => {
     if (guideStep && guideStep !== "closing") scaleSpotlight();
   });
-  document.addEventListener("pointerdown", (event) => {
+  document.addEventListener("click", (event) => {
     if (stage.contains(event.target)) return;
-    openingPointer = false;
     leaveDemo();
   });
   stage.addEventListener("pointerdown", () => {
-    stopAutoplay();
     openingPointer = guideAvailable;
   });
   document.addEventListener("pointerup", () => { openingPointer = false; });
