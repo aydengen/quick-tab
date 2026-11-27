@@ -131,7 +131,7 @@
     } else if (event.key === "Escape" && gesture) {
       event.preventDefault();
       hide(false);
-    } else if (event.key === "Enter" && gesture && !event.target.closest("[data-key]")) {
+    } else if (event.key === "Enter" && gesture) {
       event.preventDefault();
       confirm(selected);
     }
