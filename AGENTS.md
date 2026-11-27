@@ -57,7 +57,7 @@ git push origin v1.1.1
 
 ```
 background.js (Service Worker)
-├── 管理最近标签列表（存 20 个，面板显示 10 个，MAX_TABS 常量）
+├── 管理最近标签列表（存 20 个，面板单行显示最多 8 个，MAX_TABS 常量）
 ├── 使用 chrome.storage.session 存储（会话级，浏览器关闭自动清空），内存缓存避免重复读写
 ├── 监听标签激活、窗口焦点、关闭、更新、替换事件
 ├── 页面没有 content.js（安装/更新前已打开）时用 scripting 补注入
@@ -99,7 +99,7 @@ Alt+Q → chrome.commands → background 发消息到 content（旧页面未注�
 - **不可注入页面**: `chrome://`, `edge://`, `about:`, Chrome Web Store 页面
 - **存储类型**: `chrome.storage.session`（非持久化，隐私优先）
 - **本地预览授权**: 用户在引导页明确允许后，才开始记录最近标签页并截取缩略图；未授权时按快捷键会打开引导页。
-- **最大标签数**: 面板显示 10 个
+- **最大标签数**: 面板单行显示最多 8 个
 - **权限**: `tabs`、`storage`、`scripting`、`favicon`（读 `_favicon` 图标缓存），host `<all_urls>`（`captureVisibleTab` 截缩略图必需；content script 本就匹配所有网站，安装提示不变）
 - **快捷键**: 通过 `chrome.commands` API 处理，用户可在 `chrome://extensions/shortcuts` 自定义，连续按快捷键可循环切换
 
