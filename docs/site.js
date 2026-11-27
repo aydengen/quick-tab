@@ -9,8 +9,8 @@
         selected: (title) => `Selected “${title}”. Enter to switch. Esc to cancel.`,
         switched: (title) => `Switched to “${title}”`,
         cancelled: "Cancelled",
-        guideCycle: "Hold or tap Alt, then press Q. Or press Q on its own. On touch, tap Q, then Alt to switch.",
-        guideConfirm: "Keep cycling with Q, or choose a card or tap Alt to switch.",
+        guideCycle: "Hold Alt, press Q to switch",
+        guideConfirm: "Press Q to keep cycling",
         guideDone: "You switched tabs!",
       }
     : {
@@ -18,8 +18,8 @@
         selected: (title) => `已选择「${title}」，Enter 切换，Esc 取消。`,
         switched: (title) => `已切换到「${title}」`,
         cancelled: "已取消",
-        guideCycle: "按住或点击 Alt，再按 Q；也可单独按 Q。触屏上点 Q 选择，再点 Alt 切换。",
-        guideConfirm: "继续按 Q 循环选择，或点击卡片或 Alt 切换。",
+        guideCycle: "按住 Alt，按 Q 切换",
+        guideConfirm: "按 Q 继续选择",
         guideDone: "成功切换标签页！",
       };
   const addresses = [
