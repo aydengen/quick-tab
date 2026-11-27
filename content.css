@@ -127,7 +127,7 @@
   display: grid;
   grid-template-columns: repeat(var(--quicktab-columns, 1), var(--qt-card-width));
   gap: var(--qt-gap);
-  overflow-x: auto;
+  overflow: auto;
 }
 
 /* ========== 卡片 ========== */

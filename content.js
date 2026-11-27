@@ -363,9 +363,16 @@
     const grid = card.parentElement;
     const viewport = grid.getBoundingClientRect();
     const bounds = card.getBoundingClientRect();
+    const meta = card.querySelector('.quicktab-meta').getBoundingClientRect();
     const scale = viewport.width / grid.offsetWidth;
-    if (bounds.left < viewport.left) grid.scrollLeft -= Math.ceil((viewport.left - bounds.left) / scale);
-    else if (bounds.right > viewport.right) grid.scrollLeft += Math.ceil((bounds.right - viewport.right) / scale);
+    const left = viewport.left + grid.clientLeft * scale;
+    const right = left + grid.clientWidth * scale;
+    const top = viewport.top + grid.clientTop * scale;
+    const bottom = top + grid.clientHeight * scale;
+    if (bounds.left < left) grid.scrollLeft -= Math.ceil((left - bounds.left) / scale);
+    else if (bounds.right > right) grid.scrollLeft += Math.ceil((bounds.right - right) / scale);
+    if (meta.bottom > bottom) grid.scrollTop += Math.ceil((meta.bottom - bottom) / scale);
+    else if (meta.top < top) grid.scrollTop -= Math.ceil((top - meta.top) / scale);
   }
 
   function focusCard(card) {
