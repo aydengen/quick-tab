@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="600" viewBox="0 0 960 600">
+  <rect width="960" height="600" fill="#f7f8fb"/>
+  <path fill="#e7ebf5" d="M0 0h176v600H0z"/>
+  <path fill="#fff" d="M176 0h784v68H176z"/>
+  <g font-family="system-ui, sans-serif" fill="#28344c">
+    <rect x="22" y="24" width="28" height="28" rx="7" fill="#526ab0"/>
+    <circle cx="36" cy="38" r="8" stroke="#fff" stroke-width="1.5" fill="none"/>
+    <path d="M36 33v5l3 2" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+    <text x="60" y="44" font-size="16" font-weight="650">Daybook</text>
+    <rect x="14" y="91" width="148" height="34" rx="6" fill="#d7e0f5"/>
+    <g font-size="13">
+      <text x="26" y="112">Calendar</text>
+      <text x="26" y="153">Upcoming</text>
+      <text x="26" y="187">Shared with me</text>
+      <text x="212" y="42">MY WORKSPACE</text>
+    </g>
+    <text x="212" y="122" font-size="32" font-weight="700">This week</text>
+    <text x="212" y="150" font-size="13" fill="#66718b">June 8–12 · Week view</text>
+    <rect x="840" y="99" width="82" height="34" rx="7" fill="#526ab0"/>
+    <text x="881" y="120" font-size="12" fill="#fff" text-anchor="middle">+ New event</text>
+    <rect x="212" y="183" width="710" height="377" rx="10" fill="#fff" stroke="#e1e5ef"/>
+    <path d="M354 183v377m142-377v377m142-377v377m142-377v377M212 243h710m-710 78h710m-710 78h710m-710 78h710" fill="none" stroke="#e1e5ef"/>
+    <g font-size="13" font-weight="600" text-anchor="middle">
+      <text x="283" y="220">Mon 8</text><text x="425" y="220">Tue 9</text><text x="567" y="220">Wed 10</text>
+      <text x="709" y="220">Thu 11</text><text x="851" y="220">Fri 12</text>
+    </g>
+    <rect x="221" y="256" width="124" height="56" rx="6" fill="#e4eaff"/>
+    <rect x="363" y="335" width="124" height="117" rx="6" fill="#f1e5f6"/>
+    <rect x="505" y="275" width="124" height="100" rx="6" fill="#dceee9"/>
+    <rect x="647" y="422" width="124" height="56" rx="6" fill="#f9edda"/>
+    <rect x="789" y="292" width="124" height="57" rx="6" fill="#e4eaff"/>
+    <g font-size="12" font-weight="550">
+      <text x="231" y="280">Weekly planning</text><text x="373" y="359">Design review</text>
+      <text x="515" y="299">Focus time</text><text x="657" y="446">Coffee with Mei</text><text x="799" y="316">Wrap-up</text>
+    </g>
+  </g>
+</svg>

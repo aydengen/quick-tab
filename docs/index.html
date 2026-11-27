@@ -89,6 +89,12 @@
                 <div class="browser-tab" data-browser-tab="3">
                   <span class="favicon f-music"><svg class="icon" aria-hidden="true" focusable="false"><use href="./assets/icons/lucide.svg#music"></use></svg></span><span>Deep focus</span>
                 </div>
+                <div class="browser-tab" data-browser-tab="4">
+                  <span class="favicon f-calendar"><svg class="icon" aria-hidden="true" focusable="false"><use href="./assets/icons/lucide.svg#clock"></use></svg></span><span>本周日程</span>
+                </div>
+                <div class="browser-tab" data-browser-tab="5">
+                  <span class="favicon f-guide"><svg class="icon" aria-hidden="true" focusable="false"><use href="./assets/icons/lucide.svg#library"></use></svg></span><span>城市漫游指南</span>
+                </div>
                 <svg class="icon new-tab" aria-hidden="true" focusable="false"><use href="./assets/icons/lucide.svg#plus"></use></svg>
               </div>
               <div class="browser-address" aria-hidden="true">
@@ -205,6 +211,52 @@
                       ></span
                     >
                   </button>
+                  <button
+                    type="button"
+                    class="tab-card"
+                    data-tab="4"
+                    aria-pressed="false"
+                  >
+                    <span class="tab-preview"
+                      ><img
+                        src="./assets/calendar.svg"
+                        alt=""
+                        width="320"
+                        height="200"
+                      /><span class="current-badge" data-current="4" hidden
+                        >当前页面</span
+                      ></span
+                    ><span class="tab-meta"
+                      ><span class="favicon f-calendar" aria-hidden="true"><svg class="icon" aria-hidden="true" focusable="false"><use href="./assets/icons/lucide.svg#clock"></use></svg></span
+                      ><span
+                        ><span class="tab-title">本周日程</span
+                        ><span class="tab-url">calendar.example</span></span
+                      ></span
+                    >
+                  </button>
+                  <button
+                    type="button"
+                    class="tab-card"
+                    data-tab="5"
+                    aria-pressed="false"
+                  >
+                    <span class="tab-preview"
+                      ><img
+                        src="./assets/guide.svg"
+                        alt=""
+                        width="320"
+                        height="200"
+                      /><span class="current-badge" data-current="5" hidden
+                        >当前页面</span
+                      ></span
+                    ><span class="tab-meta"
+                      ><span class="favicon f-guide" aria-hidden="true"><svg class="icon" aria-hidden="true" focusable="false"><use href="./assets/icons/lucide.svg#library"></use></svg></span
+                      ><span
+                        ><span class="tab-title">城市漫游指南</span
+                        ><span class="tab-url">fieldguide.example</span></span
+                      ></span
+                    >
+                  </button>
                 </div>
                 <div class="demo-success" id="demo-success" hidden>
                   <svg class="icon" aria-hidden="true" focusable="false"><use href="./assets/icons/lucide.svg#check"></use></svg> 切换完成
@@ -212,16 +264,19 @@
               </div>
             </div>
             <div class="demo-footer">
-              <div class="shortcut-display" aria-hidden="true">
-                <kbd data-key="ArrowLeft"><svg class="icon" aria-hidden="true" focusable="false"><use href="./assets/icons/lucide.svg#arrow-left"></use></svg></kbd><kbd data-key="ArrowRight"><svg class="icon" aria-hidden="true" focusable="false"><use href="./assets/icons/lucide.svg#arrow-right"></use></svg></kbd><kbd data-key="Enter">Enter</kbd>
+              <div class="shortcut-display">
+                <button type="button" data-key="Alt" aria-label="按住或松开演示中的 Alt" aria-pressed="false" aria-controls="switcher">Alt</button>
+                <button type="button" data-key="Shift" aria-label="用 Shift 反向选择" aria-pressed="false">Shift</button>
+                <button type="button" data-key="KeyQ" aria-label="用 Q 循环选择标签页" aria-controls="switcher">Q</button>
+                <button type="button" data-key="Enter" aria-label="用 Enter 切换标签页">Enter</button>
               </div>
               <p class="demo-instruction" id="demo-help">
-                <span class="desktop-instruction">点击演示，用方向键选择，Enter 切换。</span>
-                <span class="touch-instruction">点选卡片，体验切换。</span>
+                <span class="desktop-instruction">点击试用。Q 会模拟按住 Alt 并循环选择，Shift+Q 反向选择。按 Enter 或点击卡片切换，Esc 取消。</span>
+                <span class="touch-instruction">轻点 Q 循环选择，先点 Shift 再点 Q 可反向选择。点 Alt 松开，或滑动卡片栏并轻点卡片切换。</span>
               </p>
             </div>
           </div>
-          <p class="demo-disclaimer">仅此演示使用方向键，不读取真实标签页。</p>
+          <p class="demo-disclaimer">如果 Alt+Q 未被拦截，也可直接使用。演示不会读取你的真实标签页。</p>
           <p id="demo-status" class="sr-only" role="status" aria-live="polite"></p>
           <noscript
             ><p class="no-script">启用 JavaScript 后可以试用这个演示。</p></noscript

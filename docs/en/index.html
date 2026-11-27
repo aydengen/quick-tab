@@ -89,6 +89,12 @@
                 <div class="browser-tab" data-browser-tab="3">
                   <span class="favicon f-music"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons/lucide.svg#music"></use></svg></span><span>Deep focus</span>
                 </div>
+                <div class="browser-tab" data-browser-tab="4">
+                  <span class="favicon f-calendar"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons/lucide.svg#clock"></use></svg></span><span>Weekly calendar</span>
+                </div>
+                <div class="browser-tab" data-browser-tab="5">
+                  <span class="favicon f-guide"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons/lucide.svg#library"></use></svg></span><span>City field guide</span>
+                </div>
                 <svg class="icon new-tab" aria-hidden="true" focusable="false"><use href="../assets/icons/lucide.svg#plus"></use></svg>
               </div>
               <div class="browser-address" aria-hidden="true">
@@ -205,6 +211,52 @@
                       ></span
                     >
                   </button>
+                  <button
+                    type="button"
+                    class="tab-card"
+                    data-tab="4"
+                    aria-pressed="false"
+                  >
+                    <span class="tab-preview"
+                      ><img
+                        src="../assets/calendar.svg"
+                        alt=""
+                        width="320"
+                        height="200"
+                      /><span class="current-badge" data-current="4" hidden
+                        >Current</span
+                      ></span
+                    ><span class="tab-meta"
+                      ><span class="favicon f-calendar" aria-hidden="true"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons/lucide.svg#clock"></use></svg></span
+                      ><span
+                        ><span class="tab-title">Weekly calendar</span
+                        ><span class="tab-url">calendar.example</span></span
+                      ></span
+                    >
+                  </button>
+                  <button
+                    type="button"
+                    class="tab-card"
+                    data-tab="5"
+                    aria-pressed="false"
+                  >
+                    <span class="tab-preview"
+                      ><img
+                        src="../assets/guide.svg"
+                        alt=""
+                        width="320"
+                        height="200"
+                      /><span class="current-badge" data-current="5" hidden
+                        >Current</span
+                      ></span
+                    ><span class="tab-meta"
+                      ><span class="favicon f-guide" aria-hidden="true"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons/lucide.svg#library"></use></svg></span
+                      ><span
+                        ><span class="tab-title">City field guide</span
+                        ><span class="tab-url">fieldguide.example</span></span
+                      ></span
+                    >
+                  </button>
                 </div>
                 <div class="demo-success" id="demo-success" hidden>
                   <svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons/lucide.svg#check"></use></svg> Switched
@@ -212,16 +264,19 @@
               </div>
             </div>
             <div class="demo-footer">
-              <div class="shortcut-display" aria-hidden="true">
-                <kbd data-key="ArrowLeft"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons/lucide.svg#arrow-left"></use></svg></kbd><kbd data-key="ArrowRight"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons/lucide.svg#arrow-right"></use></svg></kbd><kbd data-key="Enter">Enter</kbd>
+              <div class="shortcut-display">
+                <button type="button" data-key="Alt" aria-label="Hold or release demo Alt" aria-pressed="false" aria-controls="switcher">Alt</button>
+                <button type="button" data-key="Shift" aria-label="Reverse direction with Shift" aria-pressed="false">Shift</button>
+                <button type="button" data-key="KeyQ" aria-label="Cycle tabs with Q" aria-controls="switcher">Q</button>
+                <button type="button" data-key="Enter" aria-label="Switch tabs with Enter">Enter</button>
               </div>
               <p class="demo-instruction" id="demo-help">
-                <span class="desktop-instruction">Click the demo. Arrow keys to choose, Enter to switch.</span>
-                <span class="touch-instruction">Tap a card to try switching.</span>
+                <span class="desktop-instruction">Click to try. Q holds Alt for you and cycles tabs. Shift+Q goes back. Enter or click a card to switch; Esc cancels.</span>
+                <span class="touch-instruction">Tap Q to cycle, or Shift then Q to go back. Release Alt by tapping it, or swipe the row and tap a card.</span>
               </p>
             </div>
           </div>
-          <p class="demo-disclaimer">Arrow keys are for this demo only. Your tabs aren’t accessed.</p>
+          <p class="demo-disclaimer">Alt+Q also works if it reaches this page. The demo never accesses your real tabs.</p>
           <p id="demo-status" class="sr-only" role="status" aria-live="polite"></p>
           <noscript
             ><p class="no-script">Turn on JavaScript to try the demo.</p></noscript
