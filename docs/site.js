@@ -42,7 +42,6 @@
   let current = 0;
   let selected = 0;
   let gesture = null;
-  let reverse = false;
   let successTimer;
 
   function select(index) {
@@ -123,7 +122,6 @@
   }
 
   function resetKeys() {
-    reverse = false;
     Object.keys(keycaps).forEach((key) => press(key, false));
   }
 
@@ -133,14 +131,13 @@
 
   stage.addEventListener("keydown", (event) => {
     if (event.ctrlKey || event.metaKey) return;
-    if (event.key === "Alt" || event.key === "Shift") {
-      press(event.key, true);
+    if (event.key === "Alt") {
+      press("Alt", true);
     } else if (isQKey(event)) {
       event.preventDefault();
       if (event.repeat) return;
       press("KeyQ", true);
-      press("Shift", reverse || event.shiftKey);
-      cycle(reverse || event.shiftKey, event.altKey);
+      cycle(event.shiftKey, event.altKey);
     } else if (event.key === "Escape" && gesture) {
       event.preventDefault();
       hide(false);
@@ -154,8 +151,6 @@
     if (event.key === "Alt" && !event.altKey) {
       if (gesture === "physical") confirm(selected);
       else press("Alt", Boolean(gesture));
-    } else if (event.key === "Shift") {
-      press("Shift", reverse || event.shiftKey);
     } else if (isQKey(event)) {
       press("KeyQ", false);
     }
@@ -178,12 +173,7 @@
 
   const keyActions = {
     Alt: () => gesture ? confirm(selected) : show(current, false),
-    Shift: (event) => {
-      reverse = !reverse;
-      press("Shift", reverse || event.shiftKey);
-    },
-    KeyQ: (event) => cycle(reverse || event.shiftKey),
-    Enter: () => { if (gesture) confirm(selected); },
+    KeyQ: (event) => cycle(event.shiftKey),
   };
   Object.entries(keycaps).forEach(([key, button]) => {
     button.addEventListener("click", (event) => {
