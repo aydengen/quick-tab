@@ -34,6 +34,7 @@
   const cards = [...document.querySelectorAll("[data-tab]")];
   const status = document.querySelector("#demo-status");
   const page = document.querySelector("#active-page");
+  const stage = document.querySelector("#demo-stage");
   const shade = document.querySelector("#demo-shade");
   const success = document.querySelector("#demo-success");
   const keycaps = {
@@ -79,6 +80,9 @@
   }
 
   function hide(confirmed) {
+    // Keep keyboard focus near the demo while its cards are briefly hidden.
+    const returnFocus = cards.includes(document.activeElement) ? document.activeElement : null;
+    if (returnFocus) stage.focus({ preventScroll: true });
     open = false;
     switcher.hidden = true;
     shade.hidden = true;
@@ -88,6 +92,10 @@
     successTimer = setTimeout(() => {
       success.hidden = true;
       show();
+      // Do not steal focus if the user has moved elsewhere in the meantime.
+      if (returnFocus && document.activeElement === stage) {
+        returnFocus.focus({ preventScroll: true });
+      }
     }, 1400);
   }
 
