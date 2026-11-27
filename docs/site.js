@@ -5,14 +5,12 @@
   const en = document.documentElement.lang.startsWith("en");
   const text = en
     ? {
-        titles: ["Friday side project", "Moodboard", "aydengen / quick-tab", "Deep focus"],
         alt: (title) => `Simulated tab: ${title}`,
         selected: (title) => `Selected “${title}”. Enter to switch. Esc to cancel.`,
         switched: (title) => `Switched to “${title}”`,
         cancelled: "Cancelled",
       }
     : {
-        titles: ["周五，做点喜欢的事", "下一点灵感", "aydengen / quick-tab", "Deep focus"],
         alt: (title) => `模拟标签页：${title}`,
         selected: (title) => `已选择「${title}」，Enter 切换，Esc 取消。`,
         switched: (title) => `已切换到「${title}」`,
@@ -23,13 +21,16 @@
     "design.example / inspiration",
     "github.com / aydengen / quick-tab",
     "music.example / deep-focus",
+    "calendar.example / this-week",
+    "fieldguide.example / city-walks",
   ];
-  // Image paths come from the markup so the page works from any directory.
-  const tabs = [...document.querySelectorAll("[data-tab] .tab-preview img")].map(
-    (img, i) => ({ title: text.titles[i], address: addresses[i], image: img.getAttribute("src") })
-  );
   const switcher = document.querySelector("#switcher");
-  const cards = [...document.querySelectorAll("[data-tab]")];
+  const cards = [...switcher.querySelectorAll("[data-tab]")];
+  const tabs = cards.map((card, i) => ({
+    title: card.querySelector(".tab-title").textContent,
+    address: addresses[i],
+    image: card.querySelector(".tab-preview img").getAttribute("src"),
+  }));
   const status = document.querySelector("#demo-status");
   const page = document.querySelector("#active-page");
   const stage = document.querySelector("#demo-stage");
@@ -50,6 +51,14 @@
       card.classList.toggle("is-selected", i === selected);
       card.setAttribute("aria-pressed", String(i === selected));
     });
+    const card = cards[selected];
+    const left = card.offsetLeft;
+    const right = left + card.offsetWidth;
+    if (left < switcher.scrollLeft) {
+      switcher.scrollLeft = left;
+    } else if (right > switcher.scrollLeft + switcher.clientWidth) {
+      switcher.scrollLeft = right - switcher.clientWidth;
+    }
     status.textContent = text.selected(tabs[selected].title);
   }
 
