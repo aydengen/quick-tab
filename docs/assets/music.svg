@@ -4,6 +4,32 @@
   height="600"
   viewBox="0 0 960 600"
 >
+  <!-- Lucide 0.468.0; ISC license: icons/LICENSE.txt -->
+  <defs>
+<symbol id="music" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M9 18V5l12-2v13" />
+  <circle cx="6" cy="18" r="3" />
+  <circle cx="18" cy="16" r="3" />
+</symbol>
+<symbol id="house" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+</symbol>
+<symbol id="search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="11" cy="11" r="8" />
+  <path d="m21 21-4.3-4.3" />
+</symbol>
+<symbol id="library" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="m16 6 4 14" />
+  <path d="M12 6v14" />
+  <path d="M8 8v12" />
+  <path d="M4 4v16" />
+</symbol>
+<symbol id="clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="10" />
+  <polyline points="12 6 12 12 16 14" />
+</symbol>
+  </defs>
   <defs>
     <linearGradient id="bg" x2=".3" y2="1">
       <stop stop-color="#496958" />
@@ -17,12 +43,14 @@
   <rect width="960" height="600" fill="#17211d" />
   <rect x="165" width="795" height="600" fill="url(#bg)" />
   <g font-family="sans-serif" fill="#9baa9d" font-size="11">
-    <text x="24" y="48" fill="#e1e8dd" font-size="20" font-weight="700">
-      ♫ sound
-    </text>
-    <text x="25" y="100">⌂　Home</text>
-    <text x="25" y="134">⌕　Search</text>
-    <text x="25" y="168">▤　Your library</text>
+    <use href="#music" x="24.0" y="31.0" width="20" height="20" style="color:#e1e8dd" />
+<text x="24" y="48" fill="#e1e8dd" font-size="20" font-weight="700">　 sound</text>
+    <use href="#house" x="25.0" y="90.7" width="11" height="11" style="color:#9baa9d" />
+<text x="25" y="100">　 Home</text>
+    <use href="#search" x="25.0" y="124.7" width="11" height="11" style="color:#9baa9d" />
+<text x="25" y="134">　 Search</text>
+    <use href="#library" x="25.0" y="158.7" width="11" height="11" style="color:#9baa9d" />
+<text x="25" y="168">　 Your library</text>
     <text x="25" y="233" font-size="9">YOUR PLAYLISTS</text>
     <text x="25" y="272" fill="#e5eddf">Deep focus</text>
     <text x="25" y="305">A slow morning</text>
@@ -98,7 +126,8 @@
     <text x="216" y="367">#</text>
     <text x="250" y="367">TITLE</text>
     <text x="603" y="367">ALBUM</text>
-    <text x="882" y="367">◷</text>
+    <use href="#clock" x="882.0" y="357.6" width="11" height="11" style="color:#9baa9d" />
+<text x="882" y="367">　</text>
   </g>
   <path d="M205 381H917" stroke="#8ca180" stroke-opacity=".2" />
   <g font-family="sans-serif" font-size="11" fill="#d3dfcd">
@@ -106,7 +135,8 @@
     <text x="250" y="414">First light</text>
     <text x="603" y="414" fill="#96aa8e">Somewhere quiet</text>
     <text x="881" y="414">4:32</text>
-    <text x="217" y="457" fill="#bbd59e">♫</text>
+    <use href="#music" x="217.0" y="447.6" width="11" height="11" style="color:#bbd59e" />
+<text x="217" y="457" fill="#bbd59e">　</text>
     <text x="250" y="457" fill="#bbd59e">A place to begin</text>
     <text x="603" y="457" fill="#96aa8e">Small hours</text>
     <text x="881" y="457">3:57</text>
