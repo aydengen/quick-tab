@@ -86,9 +86,8 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
 .site-header a:active, .site-footer a:active, .faq-heading a:active { color: var(--ink); opacity: 0.75; }
 .header-github { font-size: 13px; }
 .header-github .icon { margin-left: 5px; }
-.hero-layout { display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.7fr); gap: 48px; align-items: center; padding-block: 48px 56px; }
-.hero { min-width: 0; }
-.hero-copy { display: block; }
+.hero-layout { padding-block: 40px 48px; }
+.hero { padding-bottom: 32px; text-align: center; }
 .hero h1 {
   font-size: clamp(44px, 4vw, 56px);
   line-height: 1.1;
@@ -97,11 +96,12 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
   margin: 0;
   text-wrap: balance;
 }
-.hero-intro { margin-top: 28px; }
-.hero-description { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); }
+.hero h1 br { display: none; }
+.hero-intro { margin-top: 16px; }
+.hero-description { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 12px; margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); }
 .hero-description kbd { padding: 7px 11px; border: 1px solid var(--line-strong); border-radius: 4px; box-shadow: 0 2px 0 var(--line); font: 500 14px/1.4 var(--font); color: var(--ink); white-space: nowrap; }
-.experience { min-width: 0; }
-.hero-actions { display: flex; align-items: center; gap: 16px; margin-top: 24px; }
+.experience { max-width: 1040px; margin-inline: auto; }
+.hero-actions { display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 16px; }
 .button {
   display: inline-flex;
   min-height: 48px;
@@ -293,6 +293,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
 .demo-success .icon { color: var(--blue); margin-right: 7px; }
 .demo-footer { min-height: 64px; display: flex; align-items: center; gap: 16px; padding-block: 8px; }
 .shortcut-display { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.shortcut-display > span { color: var(--muted); font-size: 12px; }
 .shortcut-display button {
   min-width: 29px;
   height: 25px;
@@ -363,17 +364,8 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
 .legal p, .legal li { font-size: 14px; line-height: 1.9; color: var(--muted); }
 .legal ul { padding-left: 22px; }
 .legal a { text-decoration: underline; text-underline-offset: 3px; }
-@media (max-width: 1100px) {
-  .hero-layout { display: block; padding-block: 40px 0; }
-  .hero { padding-bottom: 32px; }
-  .hero-copy { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(240px, 1fr); align-items: end; gap: 32px; }
-  .hero h1 { font-size: clamp(40px, 5.2vw, 56px); }
-  .hero-intro { margin-top: 0; }
-  .hero-description { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
-}
 @media (max-width: 1000px) {
   .wrap { width: calc(100% - 64px); }
-  .hero-copy { grid-template-columns: minmax(0, 1.6fr) minmax(240px, 1fr); gap: 32px; }
   .hero h1 { font-size: clamp(40px, 5.2vw, 52px); }
   .demo-canvas { padding: 25px 25px 0; }
   .features { gap: 32px; }
@@ -391,13 +383,13 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
   .brand img { width: 26px; height: 26px; }
   .header-github { font-size: 12px; }
   .hero-layout { padding-top: 32px; }
-  .hero { padding-block: 0 28px; }
-  .hero-copy { display: block; }
+  .hero { padding-bottom: 28px; text-align: left; }
   .hero h1 { font-size: clamp(38px, 6.2vw, 48px); line-height: 1.12; }
+  .hero h1 br { display: revert; }
   .hero-intro { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px 16px; margin-top: 24px; }
   .hero-description { flex-direction: column; align-items: flex-start; gap: 8px; font-size: 14px; line-height: 1.5; }
   .hero-description kbd { padding: 6px 8px; font-size: 13px; }
-  .hero-actions { gap: 16px; margin-top: 0; }
+  .hero-actions { margin-top: 0; }
   .hero-actions .button { gap: 12px; padding-inline: 14px; font-size: 13px; }
   .mobile-note { grid-column: 1 / -1; margin: 0; }
   .demo-canvas { padding: 17px 17px 0; }
