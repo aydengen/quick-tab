@@ -97,7 +97,7 @@ body {
 }
 
 .quicktab-option input:focus-visible,
-.quicktab-guide:focus-visible {
+.quicktab-links a:focus-visible {
   outline: 3px solid var(--blue);
   outline-offset: 4px;
 }
@@ -119,13 +119,20 @@ body {
   white-space: nowrap;
 }
 
+.quicktab-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-top: 16px;
+}
+
 .quicktab-guide {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
   min-height: 44px;
-  margin-top: 16px;
   padding: 12px 16px;
   border-radius: var(--radius);
   background: var(--ink);
@@ -143,6 +150,25 @@ body {
 
 .quicktab-guide:active {
   background: #000;
+}
+
+.quicktab-github {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 44px;
+  color: var(--ink);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.quicktab-github:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.quicktab-github:active {
+  opacity: 0.75;
 }
 
 @media (forced-colors: active) {
