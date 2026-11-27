@@ -10,6 +10,7 @@
   const QUICK_TAP_WINDOW_MS = 1000;
   // 面板到窗口边缘的最小距离
   const PANEL_MARGIN = 16;
+  const MIN_PANEL_SCALE = 0.85;
 
   let host = null;
   let root = null;
@@ -228,7 +229,7 @@
 
     // 默认选中上一个访问的标签
     const cards = getCards();
-    if (cards.length) cards[initialSelectionIndex(cards.length)].focus({ preventScroll: true });
+    if (cards.length) focusCard(cards[initialSelectionIndex(cards.length)]);
   }
 
   function layoutPanel() {
@@ -236,12 +237,20 @@
     const grid = panel?.querySelector('.quicktab-grid');
     if (!grid) return;
     grid.style.setProperty('--quicktab-columns', String(getCards().length || 1));
-    const scale = Math.min(
+    const availableWidth = window.innerWidth - 2 * PANEL_MARGIN;
+    const availableHeight = window.innerHeight - 2 * PANEL_MARGIN;
+    const naturalWidth = grid.scrollWidth + panel.offsetWidth - grid.offsetWidth;
+    const naturalHeight = grid.scrollHeight + panel.offsetHeight - grid.clientHeight;
+    const scale = Math.max(MIN_PANEL_SCALE, Math.min(
       1,
-      (window.innerWidth - 2 * PANEL_MARGIN) / panel.offsetWidth,
-      (window.innerHeight - 2 * PANEL_MARGIN) / panel.offsetHeight
-    );
+      availableWidth / naturalWidth,
+      availableHeight / naturalHeight
+    ));
     panel.style.setProperty('--qt-scale', String(scale));
+    panel.style.maxWidth = `${availableWidth / scale}px`;
+    panel.style.maxHeight = `${availableHeight / scale}px`;
+    const focusedCard = root.activeElement;
+    if (focusedCard?.parentElement === grid) revealCard(focusedCard);
   }
 
   function createTabCard(tab) {
@@ -350,13 +359,27 @@
     else pendingShortcutOffset += direction;
   }
 
+  function revealCard(card) {
+    const grid = card.parentElement;
+    const viewport = grid.getBoundingClientRect();
+    const bounds = card.getBoundingClientRect();
+    const scale = viewport.width / grid.offsetWidth;
+    if (bounds.left < viewport.left) grid.scrollLeft -= Math.ceil((viewport.left - bounds.left) / scale);
+    else if (bounds.right > viewport.right) grid.scrollLeft += Math.ceil((bounds.right - viewport.right) / scale);
+  }
+
+  function focusCard(card) {
+    card.focus({ preventScroll: true });
+    revealCard(card);
+  }
+
   function cycleSelection(direction) {
     const cards = getCards();
     if (cards.length === 0) return;
 
     const currentIndex = cards.indexOf(root.activeElement);
     const nextIndex = wrapSelectionIndex(currentIndex + direction, cards.length);
-    cards[nextIndex].focus({ preventScroll: true });
+    focusCard(cards[nextIndex]);
   }
 
   function hidePanel() {
