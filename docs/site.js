@@ -49,7 +49,6 @@
   const install = document.querySelector("#demo-install");
   const backdrop = document.querySelector(".demo-guide-backdrop");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const guideKey = "quicktab-demo-guide-seen";
   const shade = document.querySelector("#demo-shade");
   const success = document.querySelector("#demo-success");
   const altKey = stage.querySelector('[data-key="Alt"]');
@@ -57,26 +56,13 @@
   let current = 0;
   let selected = 0;
   let gesture = null;
+  let qSteps = 0;
   let switchedTabs = false;
   let successTimer;
-  let guideAvailable = new URLSearchParams(location.search).get("guide") === "1" || !hasSeenGuide();
+  let guideAvailable = new URLSearchParams(location.search).get("guide") === "1";
   let guideStep;
   let guideTimer;
   let openingPointer = false;
-
-  function hasSeenGuide() {
-    try {
-      return localStorage.getItem(guideKey) === "1";
-    } catch {
-      return false;
-    }
-  }
-
-  function rememberGuide() {
-    try {
-      localStorage.setItem(guideKey, "1");
-    } catch {}
-  }
 
   function showGuideStep(step, message) {
     guideStep = step;
@@ -131,13 +117,13 @@
     backdrop.hidden = true;
     guide.hidden = true;
     help.hidden = false;
-    showInstallPrompt();
+    if (switchedTabs) showInstallPrompt(text.switched(tabs[current].title));
   }
 
-  function showInstallPrompt() {
-    if (!switchedTabs || !install.hidden) return;
+  function showInstallPrompt(message = "") {
+    if (!install.hidden) return;
     install.hidden = false;
-    status.textContent = `${text.switched(tabs[current].title)} ${text.installReady}`;
+    status.textContent = message ? `${message} ${text.installReady}` : text.installReady;
   }
 
   function exitGuide() {
@@ -153,7 +139,7 @@
     Promise.allSettled(animations.map((animation) => animation.finished)).then(clearGuide);
   }
 
-  function select(index) {
+  function select(index, announce = true) {
     selected = (index + tabs.length) % tabs.length;
     cards.forEach((card, i) => {
       card.classList.toggle("is-selected", i === selected);
@@ -167,7 +153,7 @@
     } else if (right > switcher.scrollLeft + switcher.clientWidth) {
       switcher.scrollLeft = right - switcher.clientWidth;
     }
-    status.textContent = text.selected(tabs[selected].title);
+    if (announce) status.textContent = text.selected(tabs[selected].title);
   }
 
   function updateBrowser() {
@@ -182,17 +168,18 @@
     document.querySelector("#demo-address").textContent = tabs[current].address;
   }
 
-  function show(index, physicalAlt) {
+  function show(index, physicalAlt, announce = true) {
     gesture = physicalAlt ? "physical" : "virtual";
     clearTimeout(successTimer);
     switcher.hidden = false;
     shade.hidden = false;
     success.hidden = true;
-    select(index);
+    select(index, announce);
   }
 
   function cycle(backward, physicalAlt = false) {
     if (guideStep === "done" || guideStep === "closing") return;
+    qKey.classList.remove("is-pressed");
     const step = backward ? -1 : 1;
     if (!gesture) {
       if (!guideStep && !startGuide()) revealDemo();
@@ -202,17 +189,28 @@
         showGuideStep("confirm", text.guideConfirm);
         scaleSpotlight();
       }
-      return;
+    } else {
+      if (!stage.contains(document.activeElement)) {
+        revealDemo();
+        stage.focus({ preventScroll: true });
+      }
+      if (physicalAlt) gesture = "physical";
+      select(selected + step);
+      if (cards.includes(document.activeElement)) {
+        cards[selected].focus({ preventScroll: true });
+      }
     }
-    if (physicalAlt) gesture = "physical";
-    select(selected + step);
-    if (cards.includes(document.activeElement)) {
-      cards[selected].focus({ preventScroll: true });
+    if (!guideStep) {
+      qSteps = Math.max(0, qSteps + step);
+      if (!backward && qSteps >= tabs.length && selected === 2) {
+        showInstallPrompt(text.selected(tabs[selected].title));
+      }
     }
   }
 
   function hide(confirmed) {
     gesture = null;
+    qSteps = 0;
     if (cards.includes(document.activeElement)) stage.focus({ preventScroll: true });
     switcher.hidden = true;
     shade.hidden = true;
@@ -225,17 +223,17 @@
   }
 
   function confirm(index) {
-    if (index !== current) switchedTabs = true;
+    const switched = index !== current;
+    if (switched) switchedTabs = true;
     current = index;
     updateBrowser();
     hide(true);
     if (guideStep === "confirm") {
-      rememberGuide();
       showGuideStep("done", text.guideDone);
       scaleSpotlight();
       guideTimer = setTimeout(exitGuide, 950);
     } else if (!guideStep) {
-      showInstallPrompt();
+      showInstallPrompt(switched ? text.switched(tabs[current].title) : undefined);
     }
   }
 
@@ -260,12 +258,14 @@
     } else if (isQKey(event)) {
       event.preventDefault();
       if (event.repeat) return;
-      qKey.classList.add("is-pressed");
       cycle(event.shiftKey, event.altKey);
+      if (gesture) qKey.classList.add("is-pressed");
     } else if (event.key === "Escape" && gesture) {
       event.preventDefault();
       hide(false);
-    } else if (event.key === "Enter" && gesture && target !== skip && !install.contains(target)) {
+    } else if (event.key === "Enter" && gesture &&
+        (target === document.body || stage.contains(target)) &&
+        !target.closest?.("a, button:not([data-tab]), summary")) {
       event.preventDefault();
       confirm(selected);
     }
@@ -289,9 +289,8 @@
   window.addEventListener("resize", () => {
     if (guideStep && guideStep !== "closing") scaleSpotlight();
   });
-  document.addEventListener("pointerdown", (event) => {
+  document.addEventListener("click", (event) => {
     if (stage.contains(event.target)) return;
-    openingPointer = false;
     leaveDemo();
   });
   stage.addEventListener("pointerdown", () => { openingPointer = guideAvailable; });
@@ -309,19 +308,24 @@
 
   cards.forEach((card, index) => {
     card.addEventListener("click", () => confirm(index));
-    card.addEventListener("focus", () => select(index));
+    card.addEventListener("focus", () => {
+      if (index !== selected) qSteps = 0;
+      select(index);
+    });
   });
 
   altKey.addEventListener("click", () => {
     if (gesture) confirm(selected);
   });
   qKey.addEventListener("click", (event) => cycle(event.shiftKey));
-  skip.addEventListener("click", () => {
-    rememberGuide();
-    exitGuide();
-  });
+  skip.addEventListener("click", exitGuide);
 
   updateBrowser();
-  switcher.hidden = true;
-  shade.hidden = true;
+  if (guideAvailable) {
+    switcher.hidden = true;
+    shade.hidden = true;
+  } else {
+    show(current, false, false);
+    qKey.classList.add("is-pressed");
+  }
 })();
