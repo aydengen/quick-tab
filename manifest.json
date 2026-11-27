@@ -22,7 +22,6 @@
     "tabs",
     "storage",
     "scripting",
-    "activeTab",
     "favicon"
   ],
   "host_permissions": [

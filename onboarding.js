@@ -28,6 +28,12 @@ async function refreshControls() {
     document.getElementById('release-alt').hidden = !releaseAlt;
     document.getElementById('confirm-enter').hidden = releaseAlt;
   } else {
+    const { tabPreviewConsent } = await chrome.storage.local.get('tabPreviewConsent');
+    const allowed = tabPreviewConsent === true;
+    document.getElementById('preview-choices').hidden = allowed;
+    document.getElementById('preview-status').hidden = !allowed;
+    document.getElementById('allow-previews').disabled = false;
+    document.getElementById('practice-actions').hidden = !allowed;
     document.getElementById('start').disabled = !shortcut;
     document.getElementById('resume-practice').disabled = !shortcut;
   }
@@ -50,6 +56,21 @@ refreshControls();
 if (!practicePage) {
   const steps = ['welcome', 'resume', 'done'];
   const tab = chrome.tabs.getCurrent();
+
+  document.getElementById('allow-previews').addEventListener('click', async (event) => {
+    const button = event.currentTarget;
+    button.disabled = true;
+    errorNotice.hidden = true;
+    try {
+      await chrome.storage.local.set({ tabPreviewConsent: true });
+      await refreshControls();
+      document.getElementById('preview-status').focus();
+    } catch {
+      errorNotice.hidden = false;
+      button.disabled = false;
+    }
+  });
+  document.getElementById('decline-previews').addEventListener('click', () => request('closeOnboarding'));
 
   function showStep(step) {
     steps.forEach((id) => {

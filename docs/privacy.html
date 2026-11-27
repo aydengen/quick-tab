@@ -25,27 +25,29 @@
     </header>
     <main id="main" class="legal wrap">
       <h1>隐私政策</h1>
-      <p class="legal-updated">最后更新：2026-11-26</p>
-        <p>QuickTab 是一个 Chrome 标签页切换扩展。它不收集、不出售、不传输任何用户数据。</p>
+      <p class="legal-updated">最后更新：2026-11-27</p>
+        <p>QuickTab 是一个 Chrome 标签页切换扩展。它仅在你的设备上处理用户数据，不会向外传输、出售或共享这些数据。</p>
         <h2>扩展在你的电脑上处理哪些数据</h2>
         <ul>
-        <li>最近使用的标签页的标题、网址和网站图标：用来在切换面板中列出这些标签页。</li>
-        <li>当前可见标签页的缩略图：通过 <code>chrome.tabs.captureVisibleTab</code> 截取，显示在切换面板的卡片上。</li>
+        <li>你选择允许本地预览后，QuickTab 会记录最近使用的标签页标题、网址和网站图标，用来在切换面板中列出这些标签页。</li>
+        <li>在你浏览时，QuickTab 会自动截取当前可见网页并缩小为缩略图，仅用于切换面板预览。授权前不记录最近标签页，也不截图。</li>
         <li>扩展设置（例如 Sticky 模式）。</li>
         </ul>
+        <p>没有本地预览授权提示的旧版本会在你浏览时开始记录最近标签页并生成缩略图。这些信息也仅保存在你的设备上。</p>
         <h2>数据存在哪里</h2>
         <ul>
-        <li>标签页列表和缩略图保存在 <code>chrome.storage.session</code> 中，只在本机内存里，关闭浏览器后自动清空。</li>
+        <li>标签页列表和缩略图保存在 <code>chrome.storage.session</code> 中，只在本机内存里，退出 Chrome 时自动清空。关闭标签页或其移出最近列表时，QuickTab 会移除对应缩略图。</li>
         <li>设置保存在 <code>chrome.storage.local</code> 中，只在本机。</li>
         <li>无痕窗口和普通窗口的标签页互不显示。</li>
         </ul>
         <h2>数据不会离开你的电脑</h2>
         <p>QuickTab 没有服务器，不使用分析或追踪工具，不加载远程代码，也不与任何第三方共享数据。切换面板运行在封闭的 Shadow DOM 中，网页脚本读不到你其他标签页的信息。</p>
+        <p>QuickTab 对通过 Google API 获取的信息的使用遵守 <a href="https://developer.chrome.com/docs/webstore/program-policies/limited-use">Chrome 网上应用店用户数据政策，包括「有限使用」要求</a>。</p>
         <h2>权限用途</h2>
         <ul>
         <li><code>tabs</code>：读取标签页的标题、网址和图标，并切换到你选择的标签页。</li>
         <li><code>storage</code>：在本地保存最近标签列表、缩略图和设置。</li>
-        <li><code>activeTab</code>、<code>scripting</code>：在安装或更新前就已打开的页面上，按下快捷键时注入面板脚本。</li>
+        <li><code>scripting</code>：在安装或更新前就已打开的页面上，按下快捷键时注入面板脚本。</li>
         <li><code>favicon</code>：从 Chrome 的图标缓存读取网站图标。</li>
         <li>访问所有网站（<code>&lt;all_urls&gt;</code>）：在网页上显示切换面板，并截取当前可见标签页作为缩略图。</li>
         </ul>
