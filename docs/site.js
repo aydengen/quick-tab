@@ -12,7 +12,7 @@
         guideCycle: "Press Q to switch tabs",
         guideConfirm: "Enter or click a card to switch",
         guideDone: "You switched tabs!",
-        installReady: "You can now choose Add to Chrome.",
+        installReady: "Demo complete. You can now choose Add to Chrome.",
       }
     : {
         alt: (title) => `模拟标签页：${title}`,
@@ -22,7 +22,7 @@
         guideCycle: "按 Q 切换标签",
         guideConfirm: "回车或点击卡片切换",
         guideDone: "成功切换标签页！",
-        installReady: "现在可以选择「添加到 Chrome」。",
+        installReady: "演示完成。现在可以选择「添加到 Chrome」。",
       };
   const addresses = [
     "notes.example / my-space",
@@ -43,13 +43,13 @@
   const page = document.querySelector("#active-page");
   const stage = document.querySelector("#demo-stage");
   const help = document.querySelector("#demo-help");
+  const autoplayHint = help.querySelector(".autoplay-instruction");
   const guide = stage.querySelector(".demo-guide");
   const guideCopy = document.querySelector("#demo-guide-copy");
   const skip = guide.querySelector("button");
   const install = document.querySelector("#demo-install");
   const backdrop = document.querySelector(".demo-guide-backdrop");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const guideKey = "quicktab-demo-guide-seen";
   const shade = document.querySelector("#demo-shade");
   const success = document.querySelector("#demo-success");
   const altKey = stage.querySelector('[data-key="Alt"]');
@@ -59,24 +59,12 @@
   let gesture = null;
   let switchedTabs = false;
   let successTimer;
-  let guideAvailable = new URLSearchParams(location.search).get("guide") === "1" || !hasSeenGuide();
+  let guideAvailable = new URLSearchParams(location.search).get("guide") === "1";
   let guideStep;
   let guideTimer;
   let openingPointer = false;
-
-  function hasSeenGuide() {
-    try {
-      return localStorage.getItem(guideKey) === "1";
-    } catch {
-      return false;
-    }
-  }
-
-  function rememberGuide() {
-    try {
-      localStorage.setItem(guideKey, "1");
-    } catch {}
-  }
+  let autoplayActive = false;
+  let autoplayTimer;
 
   function showGuideStep(step, message) {
     guideStep = step;
@@ -153,7 +141,7 @@
     Promise.allSettled(animations.map((animation) => animation.finished)).then(clearGuide);
   }
 
-  function select(index) {
+  function select(index, announce = true) {
     selected = (index + tabs.length) % tabs.length;
     cards.forEach((card, i) => {
       card.classList.toggle("is-selected", i === selected);
@@ -167,7 +155,7 @@
     } else if (right > switcher.scrollLeft + switcher.clientWidth) {
       switcher.scrollLeft = right - switcher.clientWidth;
     }
-    status.textContent = text.selected(tabs[selected].title);
+    if (announce) status.textContent = text.selected(tabs[selected].title);
   }
 
   function updateBrowser() {
@@ -182,17 +170,50 @@
     document.querySelector("#demo-address").textContent = tabs[current].address;
   }
 
-  function show(index, physicalAlt) {
+  function show(index, physicalAlt, announce = true) {
     gesture = physicalAlt ? "physical" : "virtual";
     clearTimeout(successTimer);
     switcher.hidden = false;
     shade.hidden = false;
     success.hidden = true;
-    select(index);
+    select(index, announce);
+  }
+
+  function advanceAutoplay(remaining, delay) {
+    autoplayTimer = setTimeout(() => {
+      if (remaining === 0) {
+        confirm(selected);
+        return;
+      }
+      select(selected + 1, false);
+      advanceAutoplay(remaining - 1, remaining === 1 ? 500 : 320);
+    }, delay);
+  }
+
+  function startAutoplayWhenVisible() {
+    if (!autoplayActive || autoplayTimer !== undefined || document.hidden) return;
+    const finishTab = 2;
+    const stepsToFinish = (finishTab - selected + tabs.length) % tabs.length;
+    advanceAutoplay(tabs.length + stepsToFinish, 700);
+  }
+
+  function stopAutoplay() {
+    if (!autoplayActive) return false;
+    autoplayActive = false;
+    clearTimeout(autoplayTimer);
+    autoplayTimer = undefined;
+    autoplayHint.hidden = true;
+    delete help.dataset.autoplay;
+    qKey.classList.remove("is-pressed");
+    return true;
   }
 
   function cycle(backward, physicalAlt = false) {
     if (guideStep === "done" || guideStep === "closing") return;
+    if (stopAutoplay() && !stage.contains(document.activeElement)) {
+      revealDemo();
+      stage.focus({ preventScroll: true });
+    }
     const step = backward ? -1 : 1;
     if (!gesture) {
       if (!guideStep && !startGuide()) revealDemo();
@@ -212,6 +233,7 @@
   }
 
   function hide(confirmed) {
+    stopAutoplay();
     gesture = null;
     if (cards.includes(document.activeElement)) stage.focus({ preventScroll: true });
     switcher.hidden = true;
@@ -230,7 +252,6 @@
     updateBrowser();
     hide(true);
     if (guideStep === "confirm") {
-      rememberGuide();
       showGuideStep("done", text.guideDone);
       scaleSpotlight();
       guideTimer = setTimeout(exitGuide, 950);
@@ -260,12 +281,12 @@
     } else if (isQKey(event)) {
       event.preventDefault();
       if (event.repeat) return;
-      qKey.classList.add("is-pressed");
       cycle(event.shiftKey, event.altKey);
+      if (gesture) qKey.classList.add("is-pressed");
     } else if (event.key === "Escape" && gesture) {
       event.preventDefault();
       hide(false);
-    } else if (event.key === "Enter" && gesture && target !== skip && !install.contains(target)) {
+    } else if (event.key === "Enter" && gesture && !target.closest?.("a, button:not([data-tab]), summary")) {
       event.preventDefault();
       confirm(selected);
     }
@@ -286,6 +307,13 @@
   }
 
   window.addEventListener("blur", leaveDemo);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden && autoplayTimer !== undefined) leaveDemo();
+    else startAutoplayWhenVisible();
+  });
+  reducedMotion.addEventListener("change", (event) => {
+    if (event.matches) stopAutoplay();
+  });
   window.addEventListener("resize", () => {
     if (guideStep && guideStep !== "closing") scaleSpotlight();
   });
@@ -294,7 +322,10 @@
     openingPointer = false;
     leaveDemo();
   });
-  stage.addEventListener("pointerdown", () => { openingPointer = guideAvailable; });
+  stage.addEventListener("pointerdown", () => {
+    stopAutoplay();
+    openingPointer = guideAvailable;
+  });
   document.addEventListener("pointerup", () => { openingPointer = false; });
   document.addEventListener("pointercancel", () => { openingPointer = false; });
   stage.addEventListener("focusin", () => {
@@ -309,19 +340,29 @@
 
   cards.forEach((card, index) => {
     card.addEventListener("click", () => confirm(index));
-    card.addEventListener("focus", () => select(index));
+    card.addEventListener("focus", () => {
+      stopAutoplay();
+      select(index);
+    });
   });
 
   altKey.addEventListener("click", () => {
     if (gesture) confirm(selected);
   });
   qKey.addEventListener("click", (event) => cycle(event.shiftKey));
-  skip.addEventListener("click", () => {
-    rememberGuide();
-    exitGuide();
-  });
+  skip.addEventListener("click", exitGuide);
 
   updateBrowser();
-  switcher.hidden = true;
-  shade.hidden = true;
+  if (guideAvailable) {
+    switcher.hidden = true;
+    shade.hidden = true;
+    return;
+  }
+  show(current + 1, false, false);
+  if (reducedMotion.matches) return;
+  autoplayActive = true;
+  autoplayHint.hidden = false;
+  help.dataset.autoplay = "";
+  qKey.classList.add("is-pressed");
+  startAutoplayWhenVisible();
 })();
