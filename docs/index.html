@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f7f8fa" />
+    <meta name="theme-color" content="#f7f7f2" />
     <meta
       name="description"
       content="QuickTab 是一个轻量、开源的 Chrome 标签页切换扩展。按住 Alt + Q，找到最近的页面，松手即达。"
@@ -34,7 +34,7 @@
           width="34"
           height="34"
           alt=""
-        />QuickTab<span class="brand-dot">.</span></a
+        />QuickTab</a
       >
       <nav aria-label="主导航">
         <a href="#experience">体验一下</a>
@@ -54,34 +54,14 @@
     <main id="main">
       <section class="hero wrap" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <h1 id="hero-title">
-            切换标签，<br />不切断<span class="accent"
-              >思路<span class="underline" aria-hidden="true"></span
-            ></span>
-          </h1>
-        </div>
-        <div class="hero-aside">
-          <p>刚才的页面，一键回来。</p>
-          <a
-            class="button button-primary"
-            href="https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimheklaj"
-            target="_blank"
-            rel="noopener noreferrer"
-            ><svg
-              viewBox="0 0 24 24"
-              width="20"
-              height="20"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.7"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="12" r="9.5" />
-              <circle cx="12" cy="12" r="4" />
-              <path d="M12 8h8.6M8.5 14 4.2 6.6M15.5 14l-4.3 7.4" /></svg
-            >免费添加到 Chrome <span aria-hidden="true">↗</span></a
-          >
-          <p class="hero-note">免费开源 <span>·</span> 无需注册</p>
+          <p class="eyebrow">给浏览器，一个顺手的快捷键。</p>
+          <h1 id="hero-title">切换标签，<br class="mobile-break" />不切断思路。</h1>
+          <p class="hero-description">Alt + Q，回到刚才的页面。</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimheklaj" target="_blank" rel="noopener noreferrer">免费添加到 Chrome <span aria-hidden="true">↗</span></a>
+            <p class="hero-note">开源，无需注册，数据留在本地。</p>
+          </div>
+          <p class="mobile-note">手机上可以试用演示，请在电脑 Chrome 安装。</p>
         </div>
       </section>
 
@@ -90,6 +70,7 @@
         class="experience wrap"
         aria-labelledby="experience-title"
       >
+        <h2 id="experience-title" class="sr-only">试试 QuickTab 切换面板</h2>
         <div class="demo-canvas">
           <div class="browser">
             <div class="browser-bar" aria-hidden="true">
@@ -125,11 +106,10 @@
                 width="960"
                 height="600"
               />
-              <div class="demo-shade" id="demo-shade" hidden></div>
+              <div class="demo-shade" id="demo-shade"></div>
               <div
                 class="switcher"
                 id="switcher"
-                hidden
                 role="group"
                 aria-label="模拟标签切换器，点击卡片切换页面"
               >
@@ -231,12 +211,18 @@
               </div>
             </div>
           </div>
-          <div class="shortcut-display" aria-hidden="true">
-            <kbd data-key="alt">alt <span>⌥</span></kbd
-            ><span class="key-plus">+</span><kbd data-key="q">Q</kbd
-            ><span class="shortcut-caption">按住 Alt，再按 Q</span>
+          <div class="demo-footer">
+            <div class="shortcut-display" aria-hidden="true">
+              <kbd data-key="alt">Alt <span>⌥</span></kbd><span class="key-plus">+</span><kbd data-key="q">Q</kbd>
+            </div>
+            <p class="demo-instruction">
+              <span class="desktop-instruction">按住 Alt，再按 Q。也可以点选卡片。</span>
+              <span class="touch-instruction">点选卡片，体验切换。</span>
+            </p>
+            <span class="demo-label">互动演示</span>
           </div>
         </div>
+        <p class="demo-disclaimer">这里只切换示例页面，不读取你的真实标签页。</p>
         <p id="demo-status" class="sr-only" role="status" aria-live="polite"></p>
         <noscript
           ><p class="no-script">启用 JavaScript 后可以试用这个演示。</p></noscript
@@ -245,73 +231,39 @@
 
       <section class="features wrap" aria-label="为什么选择 QuickTab">
         <article>
-          <span class="feature-icon" aria-hidden="true">↔</span>
           <h3>刚才的页面，一按就回</h3>
           <p>按最近使用排序，轻按 Alt+Q 回到上一页。</p>
         </article>
         <article>
-          <span class="feature-icon" aria-hidden="true">▧</span>
           <h3>看一眼，就知道是哪页</h3>
           <p>看缩略图认页面，不用猜标题。</p>
-          
         </article>
         <article>
-          <span class="feature-icon" aria-hidden="true">⌁</span>
-          <h3>轻装上阵，数据留在本地</h3>
+          <h3>你的标签，只留在本地</h3>
           <p>不用注册，不做追踪，数据只在本机。</p>
         </article>
-      </section>
-
-      <section class="showcase" aria-labelledby="showcase-title">
-        <div class="wrap">
-          <h2 id="showcase-title">先看到页面，再决定去哪</h2>
-          <p>最近用过的标签页排成缩略图，标题再长也不用读。</p>
-          <img
-            src="./assets/showcase.png"
-            width="1800"
-            height="1080"
-            alt="QuickTab 面板：最近 8 个标签页的缩略图排成两行"
-            loading="lazy"
-          />
-        </div>
       </section>
 
       <section id="how-it-works" class="how-section">
         <div class="wrap">
           <div class="section-heading">
             <div>
-              <h2>不用学，试一次就会</h2>
+              <h2>三步，之后就成了习惯。</h2>
             </div>
           </div>
           <div class="steps">
             <article class="step">
-              <span class="step-number">01 /</span>
-              <div class="step-visual install-visual" aria-hidden="true">
-                <img
-                  src="./assets/icon.png"
-                  width="58"
-                  height="58"
-                  alt=""
-                /><span>+ 添加扩展程序</span>
-              </div>
+              <span class="step-number">01</span>
               <h3>先把 QuickTab 装好</h3>
               <p>在 Chrome 应用商店添加，无需登录。</p>
             </article>
             <article class="step">
-              <span class="step-number">02 /</span>
-              <div class="step-visual keys-visual" aria-hidden="true">
-                <kbd>Alt <small>⌥</small></kbd
-                ><span>+</span><kbd>Q</kbd>
-              </div>
+              <span class="step-number">02</span>
               <h3>按住 Alt，再按 Q</h3>
               <p>最近的标签排成卡片，继续按 Q 选择。</p>
             </article>
             <article class="step">
-              <span class="step-number">03 /</span>
-              <div class="step-visual release-visual" aria-hidden="true">
-                <span class="release-key">↵</span
-                ><span class="release-check">✓</span>
-              </div>
+              <span class="step-number">03</span>
               <h3>松开 Alt，就到了</h3>
               <p>松开即切换，按 Esc 取消。</p>
             </article>
@@ -389,7 +341,7 @@
 
       <section class="closing wrap" aria-labelledby="closing-title">
         <div>
-          <h2 id="closing-title">少一次寻找，<br />多一分专注。</h2>
+          <h2 id="closing-title">下一次切换，<br />试试 QuickTab。</h2>
         </div>
         <div>
           <a
@@ -410,7 +362,7 @@
           width="26"
           height="26"
           alt=""
-        />QuickTab<span class="brand-dot">.</span></a
+        />QuickTab</a
       >
       <div>
         <a

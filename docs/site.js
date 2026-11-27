@@ -8,6 +8,7 @@
         titles: ["Friday side project", "Moodboard", "aydengen / quick-tab", "Deep focus"],
         alt: (title) => `Simulated tab: ${title}`,
         opened: "Switcher open. Keep pressing Q, then release Alt.",
+        preview: "Demo ready. Click a card, or hold Alt and press Q.",
         switched: (title) => `Switched to “${title}”`,
         cancelled: "Cancelled",
       }
@@ -15,6 +16,7 @@
         titles: ["周五，做点喜欢的事", "下一点灵感", "aydengen / quick-tab", "Deep focus"],
         alt: (title) => `模拟标签页：${title}`,
         opened: "面板已打开，继续按 Q 选择，松开 Alt 切换",
+        preview: "演示已就绪。点选卡片，或按住 Alt 再按 Q。",
         switched: (title) => `已切换到「${title}」`,
         cancelled: "已取消",
       };
@@ -38,8 +40,6 @@
     alt: document.querySelector('[data-key="alt"]'),
     q: document.querySelector('[data-key="q"]'),
   };
-  // Without a keyboard, keep the switcher visible so the cards can be tapped.
-  const touchOnly = matchMedia("(hover: none)").matches;
   let current = 0;
   let selected = 1;
   let open = false;
@@ -75,7 +75,7 @@
     shade.hidden = false;
     success.hidden = true;
     select(current + 1);
-    status.textContent = text.opened;
+    status.textContent = keyboard ? text.opened : text.preview;
   }
 
   function hide(confirmed) {
@@ -87,7 +87,7 @@
     clearTimeout(successTimer);
     successTimer = setTimeout(() => {
       success.hidden = true;
-      if (touchOnly) show();
+      show();
     }, 1400);
   }
 
@@ -112,8 +112,7 @@
       event.preventDefault();
       press("q", true);
       if (event.repeat) return;
-      if (!open) return show(true);
-      fromKeyboard = true;
+      if (!open || !fromKeyboard) return show(true);
       select(selected + (event.shiftKey ? -1 : 1));
       return;
     }
@@ -136,7 +135,7 @@
     if (event.keyCode === 81) press("q", false);
     if (event.key !== "Alt") return;
     press("alt", false);
-    if (open) {
+    if (open && fromKeyboard) {
       event.preventDefault();
       confirm(selected);
     }
@@ -145,7 +144,7 @@
   window.addEventListener("blur", () => {
     press("alt", false);
     press("q", false);
-    if (open && !touchOnly) hide(false);
+    if (open && fromKeyboard) hide(false);
   });
 
   cards.forEach((card, index) => {
@@ -155,5 +154,6 @@
   });
 
   updateBrowser();
-  if (touchOnly) show();
+  // Start with the product visible on every device, not an unrelated example page.
+  show();
 })();

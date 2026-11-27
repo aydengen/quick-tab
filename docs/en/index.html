@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f7f8fa" />
+    <meta name="theme-color" content="#f7f7f2" />
     <meta
       name="description"
       content="QuickTab is a small, open-source tab switcher for Chrome. Hold Alt + Q, pick a recent tab, let go."
@@ -34,7 +34,7 @@
           width="34"
           height="34"
           alt=""
-        />QuickTab<span class="brand-dot">.</span></a
+        />QuickTab</a
       >
       <nav aria-label="Main navigation">
         <a href="#experience">Try it</a>
@@ -54,34 +54,14 @@
     <main id="main">
       <section class="hero wrap" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <h1 id="hero-title">
-            Switch tabs,<br />keep your <span class="accent"
-              >focus<span class="underline" aria-hidden="true"></span
-            ></span>
-          </h1>
-        </div>
-        <div class="hero-aside">
-          <p>Get back to the page you just left.</p>
-          <a
-            class="button button-primary"
-            href="https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimheklaj"
-            target="_blank"
-            rel="noopener noreferrer"
-            ><svg
-              viewBox="0 0 24 24"
-              width="20"
-              height="20"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.7"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="12" r="9.5" />
-              <circle cx="12" cy="12" r="4" />
-              <path d="M12 8h8.6M8.5 14 4.2 6.6M15.5 14l-4.3 7.4" /></svg
-            >Add to Chrome, free <span aria-hidden="true">↗</span></a
-          >
-          <p class="hero-note">Free and open source <span>·</span> No sign-up</p>
+          <p class="eyebrow">A small shortcut for your browser.</p>
+          <h1 id="hero-title">Switch tabs.<br class="mobile-break" /> Keep your focus.</h1>
+          <p class="hero-description">Alt + Q. Back to the page you just left.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimheklaj" target="_blank" rel="noopener noreferrer">Add to Chrome, free <span aria-hidden="true">↗</span></a>
+            <p class="hero-note">Open source. No account. All local.</p>
+          </div>
+          <p class="mobile-note">Try the demo here. Install on desktop Chrome.</p>
         </div>
       </section>
 
@@ -90,6 +70,7 @@
         class="experience wrap"
         aria-labelledby="experience-title"
       >
+        <h2 id="experience-title" class="sr-only">Try the QuickTab switcher</h2>
         <div class="demo-canvas">
           <div class="browser">
             <div class="browser-bar" aria-hidden="true">
@@ -125,11 +106,10 @@
                 width="960"
                 height="600"
               />
-              <div class="demo-shade" id="demo-shade" hidden></div>
+              <div class="demo-shade" id="demo-shade"></div>
               <div
                 class="switcher"
                 id="switcher"
-                hidden
                 role="group"
                 aria-label="Simulated tab switcher. Click a card to switch."
               >
@@ -231,12 +211,18 @@
               </div>
             </div>
           </div>
-          <div class="shortcut-display" aria-hidden="true">
-            <kbd data-key="alt">alt <span>⌥</span></kbd
-            ><span class="key-plus">+</span><kbd data-key="q">Q</kbd
-            ><span class="shortcut-caption">Hold Alt, press Q</span>
+          <div class="demo-footer">
+            <div class="shortcut-display" aria-hidden="true">
+              <kbd data-key="alt">Alt <span>⌥</span></kbd><span class="key-plus">+</span><kbd data-key="q">Q</kbd>
+            </div>
+            <p class="demo-instruction">
+              <span class="desktop-instruction">Hold Alt, press Q. Or click a card.</span>
+              <span class="touch-instruction">Tap a card to try switching.</span>
+            </p>
+            <span class="demo-label">Interactive demo</span>
           </div>
         </div>
+        <p class="demo-disclaimer">A preview, not your real tabs. Nothing is read from your browser.</p>
         <p id="demo-status" class="sr-only" role="status" aria-live="polite"></p>
         <noscript
           ><p class="no-script">Turn on JavaScript to try the demo.</p></noscript
@@ -245,73 +231,39 @@
 
       <section class="features wrap" aria-label="Why QuickTab">
         <article>
-          <span class="feature-icon" aria-hidden="true">↔</span>
           <h3>Back to the last page in one tap</h3>
           <p>Ordered by recent use. Tap Alt+Q to go back one tab.</p>
         </article>
         <article>
-          <span class="feature-icon" aria-hidden="true">▧</span>
           <h3>Recognize pages by sight</h3>
           <p>Spot pages by thumbnail, not by truncated titles.</p>
-          
         </article>
         <article>
-          <span class="feature-icon" aria-hidden="true">⌁</span>
-          <h3>Small, and your data stays local</h3>
+          <h3>Your tabs stay yours</h3>
           <p>No account, no tracking. Your data stays on your device.</p>
         </article>
-      </section>
-
-      <section class="showcase" aria-labelledby="showcase-title">
-        <div class="wrap">
-          <h2 id="showcase-title">See the page before you switch</h2>
-          <p>Recent tabs appear as live thumbnails, so you never read a cut-off title again.</p>
-          <img
-            src="../assets/showcase.png"
-            width="1800"
-            height="1080"
-            alt="QuickTab panel showing thumbnails of 8 recent tabs in two rows"
-            loading="lazy"
-          />
-        </div>
       </section>
 
       <section id="how-it-works" class="how-section">
         <div class="wrap">
           <div class="section-heading">
             <div>
-              <h2>Nothing to learn. Try it once.</h2>
+              <h2>Three steps. Then it’s second nature.</h2>
             </div>
           </div>
           <div class="steps">
             <article class="step">
-              <span class="step-number">01 /</span>
-              <div class="step-visual install-visual" aria-hidden="true">
-                <img
-                  src="../assets/icon.png"
-                  width="58"
-                  height="58"
-                  alt=""
-                /><span>+ Add extension</span>
-              </div>
+              <span class="step-number">01</span>
               <h3>Install QuickTab</h3>
               <p>Add it from the Chrome Web Store. No sign-in.</p>
             </article>
             <article class="step">
-              <span class="step-number">02 /</span>
-              <div class="step-visual keys-visual" aria-hidden="true">
-                <kbd>Alt <small>⌥</small></kbd
-                ><span>+</span><kbd>Q</kbd>
-              </div>
+              <span class="step-number">02</span>
               <h3>Hold Alt, press Q</h3>
               <p>Recent tabs appear as cards. Press Q again to move on.</p>
             </article>
             <article class="step">
-              <span class="step-number">03 /</span>
-              <div class="step-visual release-visual" aria-hidden="true">
-                <span class="release-key">↵</span
-                ><span class="release-check">✓</span>
-              </div>
+              <span class="step-number">03</span>
               <h3>Let go of Alt</h3>
               <p>Release to switch, or press Esc to cancel.</p>
             </article>
@@ -404,7 +356,7 @@
           width="26"
           height="26"
           alt=""
-        />QuickTab<span class="brand-dot">.</span></a
+        />QuickTab</a
       >
       <div>
         <a
