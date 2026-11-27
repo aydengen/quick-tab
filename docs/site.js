@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  // Focus-scoped simulation: no global shortcuts and no access to real tabs.
+  // Page-scoped simulation: no access to real tabs.
   const en = document.documentElement.lang.startsWith("en");
   const text = en
     ? {
@@ -9,9 +9,8 @@
         selected: (title) => `Selected “${title}”. Enter to switch. Esc to cancel.`,
         switched: (title) => `Switched to “${title}”`,
         cancelled: "Cancelled",
-        guideAlt: "Press or tap Alt to get started.",
-        guideCycle: "Release Alt, then press Q on its own. You can also tap Q.",
-        guideConfirm: "Keep cycling with Q, or choose a card or tap Alt to switch.",
+        guideCycle: "Press Q to switch tabs",
+        guideConfirm: "Enter or click a card to switch",
         guideDone: "You switched tabs!",
       }
     : {
@@ -19,9 +18,8 @@
         selected: (title) => `已选择「${title}」，Enter 切换，Esc 取消。`,
         switched: (title) => `已切换到「${title}」`,
         cancelled: "已取消",
-        guideAlt: "按下或点击 Alt，开始体验。",
-        guideCycle: "松开 Alt，单独按 Q 或点 Q 循环选择。",
-        guideConfirm: "继续按 Q 循环选择，或点击卡片或 Alt 切换。",
+        guideCycle: "按 Q 切换标签",
+        guideConfirm: "回车或点击卡片切换",
         guideDone: "成功切换标签页！",
       };
   const addresses = [
@@ -42,7 +40,6 @@
   const status = document.querySelector("#demo-status");
   const page = document.querySelector("#active-page");
   const stage = document.querySelector("#demo-stage");
-  const spacer = document.querySelector(".demo-guide-spacer");
   const help = document.querySelector("#demo-help");
   const guide = stage.querySelector(".demo-guide");
   const guideCopy = document.querySelector("#demo-guide-copy");
@@ -52,9 +49,8 @@
   const guideKey = "quicktab-demo-guide-seen";
   const shade = document.querySelector("#demo-shade");
   const success = document.querySelector("#demo-success");
-  const keycaps = Object.fromEntries(
-    [...stage.querySelectorAll("[data-key]")].map((button) => [button.dataset.key, button])
-  );
+  const altKey = stage.querySelector('[data-key="Alt"]');
+  const qKey = stage.querySelector('[data-key="KeyQ"]');
   let current = 0;
   let selected = 0;
   let gesture = null;
@@ -90,36 +86,34 @@
     guide.hidden = false;
     help.hidden = true;
     stage.setAttribute("aria-describedby", guideCopy.id);
-    showGuideStep("alt", text.guideAlt);
-    return true;
-  }
-
-  function placeSpotlight() {
-    stage.style.setProperty("--guide-width", `${spacer.clientWidth}px`);
-    const width = stage.offsetWidth;
-    const height = stage.offsetHeight;
-    spacer.style.height = `${height}px`;
-    const scale = Math.min(reducedMotion.matches ? 1 : 1.12, (innerWidth - 24) / width, (innerHeight - 24) / height);
-    stage.style.transform = `translate(${(innerWidth - width * scale) / 2}px, ${(innerHeight - height * scale) / 2}px) scale(${scale})`;
-  }
-
-  function enterSpotlight() {
     showGuideStep("cycle", text.guideCycle);
-    press("Alt", true);
-    const { left, top, height, width } = stage.getBoundingClientRect();
-    spacer.style.height = `${height}px`;
-    spacer.hidden = false;
-    stage.style.setProperty("--guide-width", `${width}px`);
-    stage.style.transform = `translate(${left}px, ${top}px)`;
     stage.classList.add("is-spotlight");
     stage.setAttribute("role", "dialog");
     stage.setAttribute("aria-modal", "true");
-    document.documentElement.classList.add("demo-guide-open");
+    revealDemo();
     backdrop.hidden = false;
     stage.getBoundingClientRect();
     backdrop.classList.add("is-visible");
-    placeSpotlight();
-    stage.focus({ preventScroll: true });
+    scaleSpotlight();
+    return true;
+  }
+
+  function revealDemo() {
+    const { top, bottom, height } = stage.getBoundingClientRect();
+    const viewportHeight = document.documentElement.clientHeight;
+    if (top < 0 || bottom > viewportHeight) {
+      stage.scrollIntoView({ block: height > viewportHeight ? "end" : "nearest", inline: "nearest", behavior: "instant" });
+    }
+  }
+
+  function scaleSpotlight() {
+    const { x, y, width, height } = stage.getBoundingClientRect();
+    const centerX = x + width / 2;
+    const centerY = y + height / 2;
+    const availableWidth = 2 * Math.min(centerX, document.documentElement.clientWidth - centerX) - 16;
+    const availableHeight = 2 * Math.min(centerY, document.documentElement.clientHeight - centerY);
+    const fit = Math.min(1.12, availableWidth / stage.offsetWidth, availableHeight / stage.offsetHeight);
+    stage.style.setProperty("--guide-scale", reducedMotion.matches ? 1 : Math.max(1, fit));
   }
 
   function clearGuide() {
@@ -127,14 +121,9 @@
     delete stage.dataset.guideStep;
     if (document.activeElement === skip) stage.focus({ preventScroll: true });
     stage.classList.remove("is-spotlight");
-    stage.style.removeProperty("transform");
-    stage.style.removeProperty("--guide-width");
     stage.removeAttribute("aria-modal");
     stage.setAttribute("role", "group");
     stage.setAttribute("aria-describedby", help.id);
-    spacer.hidden = true;
-    spacer.style.removeProperty("height");
-    document.documentElement.classList.remove("demo-guide-open");
     backdrop.hidden = true;
     guide.hidden = true;
     help.hidden = false;
@@ -144,14 +133,9 @@
     if (!guideStep || guideStep === "closing") return;
     clearTimeout(guideTimer);
     if (gesture) hide(false);
-    else resetKeys();
-    if (guideStep === "alt") {
-      clearGuide();
-      return;
-    }
+    else qKey.classList.remove("is-pressed");
     guideStep = "closing";
-    const { left, top } = spacer.getBoundingClientRect();
-    stage.style.transform = `translate(${left}px, ${top}px)`;
+    stage.style.removeProperty("--guide-scale");
     backdrop.classList.remove("is-visible");
     stage.getBoundingClientRect();
     const animations = [...stage.getAnimations(), ...backdrop.getAnimations()];
@@ -193,23 +177,20 @@
     switcher.hidden = false;
     shade.hidden = false;
     success.hidden = true;
-    press("Alt", true);
     select(index);
   }
 
   function cycle(backward, physicalAlt = false) {
     if (guideStep === "done" || guideStep === "closing") return;
-    if (guideStep === "alt") {
-      if (physicalAlt) enterSpotlight();
-      else exitGuide();
-    }
-    if (guideStep === "cycle") {
-      showGuideStep("confirm", text.guideConfirm);
-      placeSpotlight();
-    }
     const step = backward ? -1 : 1;
     if (!gesture) {
+      if (!guideStep && !startGuide()) revealDemo();
+      if (!stage.contains(document.activeElement)) stage.focus({ preventScroll: true });
       show(current + step, physicalAlt);
+      if (guideStep === "cycle") {
+        showGuideStep("confirm", text.guideConfirm);
+        scaleSpotlight();
+      }
       return;
     }
     if (physicalAlt) gesture = "physical";
@@ -224,7 +205,7 @@
     if (cards.includes(document.activeElement)) stage.focus({ preventScroll: true });
     switcher.hidden = true;
     shade.hidden = true;
-    resetKeys();
+    qKey.classList.remove("is-pressed");
     success.hidden = !confirmed;
     status.textContent = confirmed ? text.switched(tabs[current].title) : text.cancelled;
     if (confirmed) {
@@ -239,44 +220,33 @@
     if (guideStep === "confirm") {
       rememberGuide();
       showGuideStep("done", text.guideDone);
-      placeSpotlight();
+      scaleSpotlight();
       guideTimer = setTimeout(exitGuide, 950);
     }
-  }
-
-  function press(key, down) {
-    const button = keycaps[key];
-    button.classList.toggle("is-pressed", down);
-    if (button.hasAttribute("aria-pressed")) button.setAttribute("aria-pressed", String(down));
-  }
-
-  function resetKeys() {
-    Object.keys(keycaps).forEach((key) => press(key, false));
   }
 
   function isQKey(event) {
     return event.key === "q" || event.key === "Q" || (event.altKey && event.code === "KeyQ");
   }
 
-  stage.addEventListener("keydown", (event) => {
-    if (event.ctrlKey || event.metaKey) return;
+  document.addEventListener("keydown", (event) => {
+    const target = event.target;
+    if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.isComposing ||
+        (target instanceof HTMLElement && (target.isContentEditable || target.matches("input, textarea, select")))) return;
     if (event.key === "Escape" && guideStep) {
       event.preventDefault();
       exitGuide();
-    } else if (event.key === "Tab" && stage.classList.contains("is-spotlight")) {
+    } else if (event.key === "Tab" && guideStep && stage.contains(target)) {
       const buttons = [...stage.querySelectorAll("button")].filter((button) => button.getClientRects().length);
       const last = buttons.at(-1);
       if ((event.shiftKey && document.activeElement === stage) || (!event.shiftKey && document.activeElement === last)) {
         event.preventDefault();
         (event.shiftKey ? last : stage).focus();
       }
-    } else if (event.key === "Alt") {
-      if (guideStep === "alt") enterSpotlight();
-      press("Alt", true);
     } else if (isQKey(event)) {
       event.preventDefault();
       if (event.repeat) return;
-      press("KeyQ", true);
+      qKey.classList.add("is-pressed");
       cycle(event.shiftKey, event.altKey);
     } else if (event.key === "Escape" && gesture) {
       event.preventDefault();
@@ -287,43 +257,37 @@
     }
   });
 
-  stage.addEventListener("keyup", (event) => {
+  document.addEventListener("keyup", (event) => {
     if (event.key === "Alt" && !event.altKey) {
       if (gesture === "physical") confirm(selected);
-      else press("Alt", Boolean(gesture) || guideStep === "cycle");
     } else if (isQKey(event)) {
-      press("KeyQ", false);
+      qKey.classList.remove("is-pressed");
     }
   });
 
   function leaveDemo() {
     if (guideStep) exitGuide();
     else if (gesture) hide(false);
-    else resetKeys();
+    else qKey.classList.remove("is-pressed");
   }
 
   window.addEventListener("blur", leaveDemo);
   window.addEventListener("resize", () => {
-    if (stage.classList.contains("is-spotlight") && guideStep !== "closing") placeSpotlight();
+    if (guideStep && guideStep !== "closing") scaleSpotlight();
   });
   document.addEventListener("pointerdown", (event) => {
     if (stage.contains(event.target)) return;
     openingPointer = false;
-    if (guideStep) exitGuide();
+    leaveDemo();
   });
   stage.addEventListener("pointerdown", () => { openingPointer = guideAvailable; });
-  stage.addEventListener("pointercancel", () => { openingPointer = false; });
+  document.addEventListener("pointerup", () => { openingPointer = false; });
+  document.addEventListener("pointercancel", () => { openingPointer = false; });
   stage.addEventListener("focusin", () => {
-    if (startGuide() && !openingPointer) guide.scrollIntoView({ block: "nearest", behavior: "instant" });
+    if (!openingPointer) startGuide();
   });
-  stage.addEventListener("click", (event) => {
-    if (!openingPointer && !startGuide()) return;
-    openingPointer = false;
-    startGuide();
-    event.preventDefault();
-    event.stopPropagation();
-    stage.focus({ preventScroll: true });
-    guide.scrollIntoView({ block: "nearest", behavior: "instant" });
+  stage.addEventListener("click", () => {
+    if (startGuide()) stage.focus({ preventScroll: true });
   }, true);
   stage.addEventListener("focusout", (event) => {
     if (!stage.contains(event.relatedTarget)) leaveDemo();
@@ -334,20 +298,10 @@
     card.addEventListener("focus", () => select(index));
   });
 
-  const keyActions = {
-    Alt: () => {
-      if (guideStep === "alt") enterSpotlight();
-      else if (gesture) confirm(selected);
-      else if (!guideStep) show(current, false);
-    },
-    KeyQ: (event) => cycle(event.shiftKey),
-  };
-  Object.entries(keycaps).forEach(([key, button]) => {
-    button.addEventListener("click", (event) => {
-      if (event.detail) stage.focus({ preventScroll: true });
-      keyActions[key](event);
-    });
+  altKey.addEventListener("click", () => {
+    if (gesture) confirm(selected);
   });
+  qKey.addEventListener("click", (event) => cycle(event.shiftKey));
   skip.addEventListener("click", () => {
     rememberGuide();
     exitGuide();

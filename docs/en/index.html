@@ -72,7 +72,6 @@
           aria-labelledby="experience-title"
         >
           <h2 id="experience-title" class="sr-only">Try the QuickTab switcher</h2>
-          <div class="demo-guide-spacer" hidden></div>
           <div class="demo-guide-backdrop" hidden></div>
           <div class="demo-canvas" id="demo-stage" tabindex="0" aria-describedby="demo-help" role="group" aria-label="Interactive QuickTab demo">
             <div class="browser">
@@ -267,13 +266,13 @@
             </div>
             <div class="demo-footer">
               <div class="shortcut-display">
-                <button type="button" data-key="Alt" aria-label="Hold or release demo Alt" aria-pressed="false" aria-controls="switcher">Alt</button>
+                <button type="button" class="is-pressed" data-key="Alt" aria-label="Release demo Alt to switch tabs" aria-pressed="true" aria-controls="switcher">Alt</button>
                 <span aria-hidden="true">+</span>
                 <button type="button" data-key="KeyQ" aria-label="Cycle tabs with Q" aria-controls="switcher">Q</button>
               </div>
               <p class="demo-instruction" id="demo-help">
-                <span class="desktop-instruction">Click to try. Hold Alt and press Q, or just press Q here. Click Alt to release and switch.</span>
-                <span class="touch-instruction">Tap Alt to hold it, then tap Q to cycle. Tap Alt again to switch.</span>
+                <span class="desktop-instruction">Press Q to switch tabs.</span>
+                <span class="touch-instruction">Tap Q to cycle, then tap a tab to switch.</span>
               </p>
               <div class="demo-guide" hidden>
                 <p id="demo-guide-copy" role="status"></p>
@@ -282,7 +281,7 @@
             </div>
             <p id="demo-status" class="sr-only" role="status" aria-live="polite"></p>
           </div>
-          <p class="demo-disclaimer">Alt+Q also works if it reaches this page. The demo never accesses your real tabs.</p>
+          <p class="demo-disclaimer">The demo never accesses your real tabs.</p>
           <noscript
             ><p class="no-script">Turn on JavaScript to try the demo.</p></noscript
           >
