@@ -281,7 +281,7 @@
     } else if (event.key === "Escape" && gesture) {
       event.preventDefault();
       hide(false);
-    } else if (event.key === "Enter" && gesture) {
+    } else if (event.key === "Enter" && gesture && event.target !== skip) {
       event.preventDefault();
       confirm(selected);
     }
