@@ -84,6 +84,11 @@ async function getTabList() {
   return readTabList();
 }
 
+async function hasTabPreviewConsent() {
+  const { tabPreviewConsent } = await chrome.storage.local.get('tabPreviewConsent');
+  return tabPreviewConsent === true;
+}
+
 // ========== 标签列表管理 ==========
 
 async function recordTabActivation(tabId) {
@@ -169,12 +174,12 @@ chrome.runtime.onInstalled.addListener(({ reason }) => {
 });
 
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
-  await recordTabActivation(activeInfo.tabId);
+  if (await hasTabPreviewConsent()) await recordTabActivation(activeInfo.tabId);
 });
 
 // 切换窗口时 onActivated 不会触发，需单独记录
 chrome.windows.onFocusChanged.addListener(async (windowId) => {
-  if (windowId === chrome.windows.WINDOW_ID_NONE) return;
+  if (windowId === chrome.windows.WINDOW_ID_NONE || !(await hasTabPreviewConsent())) return;
   try {
     const [tab] = await chrome.tabs.query({ active: true, windowId });
     if (tab) await recordTabActivation(tab.id);
@@ -184,16 +189,18 @@ chrome.windows.onFocusChanged.addListener(async (windowId) => {
 });
 
 chrome.tabs.onRemoved.addListener(async (tabId) => {
+  if (!(await hasTabPreviewConsent())) return;
   deleteThumb(tabId);
   await removeTab(tabId);
 });
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  await updateTabInfo(tabId, changeInfo, tab);
+  if (await hasTabPreviewConsent()) await updateTabInfo(tabId, changeInfo, tab);
 });
 
 // 预渲染等场景下标签 ID 会被替换
 chrome.tabs.onReplaced.addListener(async (addedTabId, removedTabId) => {
+  if (!(await hasTabPreviewConsent())) return;
   deleteThumb(removedTabId);
   let tab;
   try {
@@ -407,8 +414,13 @@ async function getOnboardingControls() {
   return { shortcut, releaseAlt: shortcutUsesAlt(shortcut) && !stickyMode };
 }
 
-// content.js 通过 manifest 注入；安装/更新前已打开的页面没有它，
-// 借助快捷键授予的 activeTab 权限补注入
+async function showOnboarding(windowId) {
+  const [guide] = await chrome.tabs.query({ windowId, url: ONBOARDING_URL });
+  if (guide) await chrome.tabs.update(guide.id, { active: true });
+  else await chrome.tabs.create({ windowId, url: ONBOARDING_URL });
+}
+
+// content.js 通过 manifest 注入；安装/更新前已打开的页面没有它，按快捷键时补注入
 async function openPanel(tab) {
   const practice = isPracticeTab(tab);
   if (!practice && !isInjectableUrl(tab.url)) return false;
@@ -468,6 +480,11 @@ chrome.commands.onCommand.addListener(async (command, commandTab) => {
       (await chrome.tabs.query({ active: true, lastFocusedWindow: true }))[0];
     if (!tab) return;
 
+    if (!(await hasTabPreviewConsent())) {
+      if (tab.url !== ONBOARDING_URL) await showOnboarding(tab.windowId);
+      return;
+    }
+
     if (!(await openPanel(tab))) {
       await switchToPreviousTab(tab);
     }
@@ -498,6 +515,8 @@ async function withPreviews(entries) {
 }
 
 async function buildPanelData(senderTab, includeCss, capture) {
+  if (!(await hasTabPreviewConsent())) return { tabs: [] };
+
   if (isPracticeTab(senderTab)) {
     const guide = await getPracticeGuide(senderTab);
     const tabs = [{ id: senderTab.id, title: 'Practice tab', current: true }];
@@ -529,6 +548,8 @@ async function buildPanelData(senderTab, includeCss, capture) {
 }
 
 async function switchFromPanel(senderTab, tabId) {
+  if (!(await hasTabPreviewConsent())) return;
+
   if (!isPracticeTab(senderTab)) {
     await activateTab(tabId);
     return;
@@ -549,7 +570,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       result = chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
     }
     if (sender.url === ONBOARDING_URL) {
-      if (message.action === 'startPractice') result = openPractice(sender.tab);
+      if (message.action === 'startPractice') {
+        result = hasTabPreviewConsent().then((allowed) => {
+          if (!allowed) throw new Error('Tab previews are not enabled.');
+          return openPractice(sender.tab);
+        });
+      }
       if (message.action === 'skipPractice') result = closePractice(sender.tab);
       if (message.action === 'closeOnboarding') result = chrome.tabs.remove(sender.tab.id);
     }

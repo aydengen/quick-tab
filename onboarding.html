@@ -19,12 +19,22 @@
     <section id="welcome" aria-labelledby="welcome-title">
       <h1 id="welcome-title">Meet your tab switcher.</h1>
       <p>Jump between your recent tabs without hunting through the tab bar.</p>
+      <section class="settings-note" aria-labelledby="preview-privacy-title">
+        <h2 id="preview-privacy-title">Tab previews stay on this device</h2>
+        <p>QuickTab remembers recent tab titles, URLs, and icons and automatically takes screenshots of visible web tabs as you browse. This data is used only to show recent tabs and their thumbnails in the switcher.</p>
+        <p>The list and thumbnails stay in Chrome’s session storage on this device and clear when you quit Chrome. Nothing is sent or shared. <a href="https://aydengen.github.io/quick-tab/en/privacy.html" target="_blank" rel="noopener">Privacy policy</a></p>
+        <div id="preview-choices" class="actions">
+          <button type="button" id="allow-previews" disabled>Allow local tab previews</button>
+          <button type="button" id="decline-previews" class="text-button">Not now</button>
+        </div>
+        <p id="preview-status" role="status" tabindex="-1" hidden>Local tab previews are enabled.</p>
+      </section>
       <div class="shortcut-box">
         <span>Your shortcut</span>
         <kbd data-shortcut>Checking…</kbd>
       </div>
       <p data-unbound hidden>No shortcut is assigned. It may already be in use. Assign one in <button type="button" class="text-button" data-settings>Chrome shortcut settings</button>, then return here.</p>
-      <div class="actions">
+      <div id="practice-actions" class="actions" hidden>
         <button type="button" id="start" disabled>Try it now</button>
         <button type="button" class="text-button" data-skip>Skip practice</button>
       </div>

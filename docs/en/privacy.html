@@ -25,27 +25,29 @@
     </header>
     <main id="main" class="legal wrap">
       <h1>Privacy Policy</h1>
-      <p class="legal-updated">Last updated: 2026-11-26</p>
-        <p>QuickTab is a tab switcher extension for Chrome. It does not collect, sell, or transmit any user data.</p>
+      <p class="legal-updated">Last updated: 2026-11-27</p>
+        <p>QuickTab is a tab switcher extension for Chrome. It handles user data only on your device and does not transmit, sell, or share it.</p>
         <h2>What the extension handles on your computer</h2>
         <ul>
-        <li>Titles, URLs, and icons of recently used tabs, to list them in the switcher.</li>
-        <li>A thumbnail of the visible tab, captured with <code>chrome.tabs.captureVisibleTab</code>, to show on the switcher cards.</li>
+        <li>After you allow local previews, QuickTab remembers titles, URLs, and icons of recently used tabs to list them in the switcher.</li>
+        <li>As you browse, QuickTab automatically captures visible web tabs and reduces the screenshots to thumbnails solely for switcher previews. It does not track recent tabs or take screenshots before you allow local previews.</li>
         <li>Your extension settings (for example, Sticky mode).</li>
         </ul>
+        <p>Older versions without the local previews prompt start tracking recent tabs and making thumbnails as you browse. They store the same information only on your device.</p>
         <h2>Where it is stored</h2>
         <ul>
-        <li>The recent-tab list and thumbnails are kept in <code>chrome.storage.session</code>, in memory on your computer only, and are cleared when you close the browser.</li>
+        <li>The recent-tab list and thumbnails are kept in <code>chrome.storage.session</code>, in memory on your computer only, and clear when you quit Chrome. QuickTab removes a thumbnail when its tab closes or drops off the recent list.</li>
         <li>Settings are kept in <code>chrome.storage.local</code>, on your computer only.</li>
         <li>Incognito and regular windows never show each other&#x27;s tabs.</li>
         </ul>
         <h2>Nothing leaves your computer</h2>
         <p>QuickTab has no server, uses no analytics or tracking, loads no remote code, and shares no data with third parties. The switcher panel runs in a closed Shadow DOM, so web pages cannot read information about your other tabs.</p>
+        <p>QuickTab’s use of information received from Google APIs adheres to the <a href="https://developer.chrome.com/docs/webstore/program-policies/limited-use">Chrome Web Store User Data Policy, including the Limited Use requirements</a>.</p>
         <h2>Why each permission is needed</h2>
         <ul>
         <li><code>tabs</code>: read tab titles, URLs, and icons, and switch to the tab you choose.</li>
         <li><code>storage</code>: keep the recent-tab list, thumbnails, and settings locally.</li>
-        <li><code>activeTab</code>, <code>scripting</code>: inject the panel script when you press the shortcut on a page that was open before the extension was installed or updated.</li>
+        <li><code>scripting</code>: inject the panel script when you press the shortcut on a page that was open before the extension was installed or updated.</li>
         <li><code>favicon</code>: read site icons from Chrome&#x27;s favicon cache.</li>
         <li>Access to all sites (<code>&lt;all_urls&gt;</code>): show the switcher panel on web pages and capture the visible tab as a thumbnail.</li>
         </ul>

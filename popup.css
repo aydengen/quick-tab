@@ -119,6 +119,23 @@ body {
   white-space: nowrap;
 }
 
+.quicktab-privacy {
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--wash);
+}
+
+.quicktab-privacy h2 {
+  margin: 0 0 4px;
+  font-size: 13px;
+}
+
+.quicktab-privacy p + p {
+  margin-top: 6px;
+}
+
 .quicktab-links {
   display: flex;
   flex-wrap: wrap;

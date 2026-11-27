@@ -120,6 +120,15 @@ kbd {
   font-size: 0.9rem;
 }
 
+.settings-note h2 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.settings-note a {
+  color: var(--link);
+}
+
 strong {
   color: var(--text);
 }
