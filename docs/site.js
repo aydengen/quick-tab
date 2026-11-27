@@ -12,7 +12,7 @@
         guideCycle: "Press Q to switch tabs",
         guideConfirm: "Enter or click a card to switch",
         guideDone: "You switched tabs!",
-        installReady: "Demo complete. You can now choose Add to Chrome.",
+        installReady: "You can now choose Add to Chrome.",
       }
     : {
         alt: (title) => `模拟标签页：${title}`,
@@ -22,7 +22,7 @@
         guideCycle: "按 Q 切换标签",
         guideConfirm: "回车或点击卡片切换",
         guideDone: "成功切换标签页！",
-        installReady: "演示完成。现在可以选择「添加到 Chrome」。",
+        installReady: "现在可以选择「添加到 Chrome」。",
       };
   const addresses = [
     "notes.example / my-space",
@@ -43,7 +43,6 @@
   const page = document.querySelector("#active-page");
   const stage = document.querySelector("#demo-stage");
   const help = document.querySelector("#demo-help");
-  const autoplayHint = help.querySelector(".autoplay-instruction");
   const guide = stage.querySelector(".demo-guide");
   const guideCopy = document.querySelector("#demo-guide-copy");
   const skip = guide.querySelector("button");
@@ -63,8 +62,6 @@
   let guideStep;
   let guideTimer;
   let openingPointer = false;
-  let autoplayActive = false;
-  let autoplayTimer;
 
   function showGuideStep(step, message) {
     guideStep = step;
@@ -119,13 +116,13 @@
     backdrop.hidden = true;
     guide.hidden = true;
     help.hidden = false;
-    showInstallPrompt();
+    if (switchedTabs) showInstallPrompt(text.switched(tabs[current].title));
   }
 
-  function showInstallPrompt() {
-    if (!switchedTabs || !install.hidden) return;
+  function showInstallPrompt(message) {
+    if (!install.hidden) return;
     install.hidden = false;
-    status.textContent = `${text.switched(tabs[current].title)} ${text.installReady}`;
+    status.textContent = `${message} ${text.installReady}`;
   }
 
   function exitGuide() {
@@ -179,37 +176,9 @@
     select(index, announce);
   }
 
-  function advanceAutoplay(remaining, delay) {
-    autoplayTimer = setTimeout(() => {
-      if (remaining === 0) {
-        confirm(selected);
-        return;
-      }
-      select(selected + 1, false);
-      advanceAutoplay(remaining - 1, remaining === 1 ? 500 : 320);
-    }, delay);
-  }
-
-  function startAutoplayWhenVisible() {
-    if (!autoplayActive || autoplayTimer !== undefined || document.hidden) return;
-    const finishTab = 2;
-    const stepsToFinish = (finishTab - selected + tabs.length) % tabs.length;
-    advanceAutoplay(tabs.length + stepsToFinish, 700);
-  }
-
-  function stopAutoplay() {
-    if (!autoplayActive) return;
-    autoplayActive = false;
-    clearTimeout(autoplayTimer);
-    autoplayTimer = undefined;
-    autoplayHint.hidden = true;
-    delete help.dataset.autoplay;
-    qKey.classList.remove("is-pressed");
-  }
-
   function cycle(backward, physicalAlt = false) {
     if (guideStep === "done" || guideStep === "closing") return;
-    stopAutoplay();
+    qKey.classList.remove("is-pressed");
     const step = backward ? -1 : 1;
     if (!gesture) {
       if (!guideStep && !startGuide()) revealDemo();
@@ -219,21 +188,23 @@
         showGuideStep("confirm", text.guideConfirm);
         scaleSpotlight();
       }
-      return;
+    } else {
+      if (!stage.contains(document.activeElement)) {
+        revealDemo();
+        stage.focus({ preventScroll: true });
+      }
+      if (physicalAlt) gesture = "physical";
+      select(selected + step);
+      if (cards.includes(document.activeElement)) {
+        cards[selected].focus({ preventScroll: true });
+      }
     }
-    if (!stage.contains(document.activeElement)) {
-      revealDemo();
-      stage.focus({ preventScroll: true });
-    }
-    if (physicalAlt) gesture = "physical";
-    select(selected + step);
-    if (cards.includes(document.activeElement)) {
-      cards[selected].focus({ preventScroll: true });
+    if (!guideStep && (selected === 1 || selected === 2)) {
+      showInstallPrompt(text.selected(tabs[selected].title));
     }
   }
 
   function hide(confirmed) {
-    stopAutoplay();
     gesture = null;
     if (cards.includes(document.activeElement)) stage.focus({ preventScroll: true });
     switcher.hidden = true;
@@ -255,8 +226,6 @@
       showGuideStep("done", text.guideDone);
       scaleSpotlight();
       guideTimer = setTimeout(exitGuide, 950);
-    } else if (!guideStep) {
-      showInstallPrompt();
     }
   }
 
@@ -307,13 +276,6 @@
   }
 
   window.addEventListener("blur", leaveDemo);
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden && autoplayTimer !== undefined) leaveDemo();
-    else startAutoplayWhenVisible();
-  });
-  reducedMotion.addEventListener("change", (event) => {
-    if (event.matches) stopAutoplay();
-  });
   window.addEventListener("resize", () => {
     if (guideStep && guideStep !== "closing") scaleSpotlight();
   });
@@ -321,9 +283,7 @@
     if (stage.contains(event.target)) return;
     leaveDemo();
   });
-  stage.addEventListener("pointerdown", () => {
-    openingPointer = guideAvailable;
-  });
+  stage.addEventListener("pointerdown", () => { openingPointer = guideAvailable; });
   document.addEventListener("pointerup", () => { openingPointer = false; });
   document.addEventListener("pointercancel", () => { openingPointer = false; });
   stage.addEventListener("focusin", () => {
@@ -338,10 +298,7 @@
 
   cards.forEach((card, index) => {
     card.addEventListener("click", () => confirm(index));
-    card.addEventListener("focus", () => {
-      stopAutoplay();
-      select(index);
-    });
+    card.addEventListener("focus", () => select(index));
   });
 
   altKey.addEventListener("click", () => {
@@ -354,13 +311,8 @@
   if (guideAvailable) {
     switcher.hidden = true;
     shade.hidden = true;
-    return;
+  } else {
+    show(current, false, false);
+    qKey.classList.add("is-pressed");
   }
-  show(current + 1, false, false);
-  if (reducedMotion.matches) return;
-  autoplayActive = true;
-  autoplayHint.hidden = false;
-  help.dataset.autoplay = "";
-  qKey.classList.add("is-pressed");
-  startAutoplayWhenVisible();
 })();
