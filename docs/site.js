@@ -12,6 +12,7 @@
         guideCycle: "Press Q to switch tabs",
         guideConfirm: "Enter or click a card to switch",
         guideDone: "You switched tabs!",
+        installReady: "You can now choose Add to Chrome.",
       }
     : {
         alt: (title) => `模拟标签页：${title}`,
@@ -21,6 +22,7 @@
         guideCycle: "按 Q 切换标签",
         guideConfirm: "回车或点击卡片切换",
         guideDone: "成功切换标签页！",
+        installReady: "现在可以选择「添加到 Chrome」。",
       };
   const addresses = [
     "notes.example / my-space",
@@ -44,6 +46,7 @@
   const guide = stage.querySelector(".demo-guide");
   const guideCopy = document.querySelector("#demo-guide-copy");
   const skip = guide.querySelector("button");
+  const install = document.querySelector("#demo-install");
   const backdrop = document.querySelector(".demo-guide-backdrop");
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const guideKey = "quicktab-demo-guide-seen";
@@ -54,6 +57,7 @@
   let current = 0;
   let selected = 0;
   let gesture = null;
+  let switchedTabs = false;
   let successTimer;
   let guideAvailable = new URLSearchParams(location.search).get("guide") === "1" || !hasSeenGuide();
   let guideStep;
@@ -127,6 +131,13 @@
     backdrop.hidden = true;
     guide.hidden = true;
     help.hidden = false;
+    showInstallPrompt();
+  }
+
+  function showInstallPrompt() {
+    if (!switchedTabs || !install.hidden) return;
+    install.hidden = false;
+    status.textContent = `${text.switched(tabs[current].title)} ${text.installReady}`;
   }
 
   function exitGuide() {
@@ -214,6 +225,7 @@
   }
 
   function confirm(index) {
+    if (index !== current) switchedTabs = true;
     current = index;
     updateBrowser();
     hide(true);
@@ -222,6 +234,8 @@
       showGuideStep("done", text.guideDone);
       scaleSpotlight();
       guideTimer = setTimeout(exitGuide, 950);
+    } else if (!guideStep) {
+      showInstallPrompt();
     }
   }
 
@@ -251,7 +265,7 @@
     } else if (event.key === "Escape" && gesture) {
       event.preventDefault();
       hide(false);
-    } else if (event.key === "Enter" && gesture && event.target !== skip) {
+    } else if (event.key === "Enter" && gesture && target !== skip && !install.contains(target)) {
       event.preventDefault();
       confirm(selected);
     }
