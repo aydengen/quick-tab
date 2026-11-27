@@ -212,16 +212,19 @@
               </div>
             </div>
             <div class="demo-footer">
-              <div class="shortcut-display" aria-hidden="true">
-                <kbd data-key="ArrowLeft"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons/lucide.svg#arrow-left"></use></svg></kbd><kbd data-key="ArrowRight"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons/lucide.svg#arrow-right"></use></svg></kbd><kbd data-key="Enter">Enter</kbd>
+              <div class="shortcut-display">
+                <button type="button" data-key="Alt" aria-label="Hold or release demo Alt" aria-pressed="false" aria-controls="switcher">Alt</button>
+                <button type="button" data-key="Shift" aria-label="Reverse direction with Shift" aria-pressed="false">Shift</button>
+                <button type="button" data-key="KeyQ" aria-label="Cycle tabs with Q" aria-controls="switcher">Q</button>
+                <button type="button" data-key="Enter" aria-label="Switch tabs with Enter">Enter</button>
               </div>
               <p class="demo-instruction" id="demo-help">
-                <span class="desktop-instruction">Click the demo. Arrow keys to choose, Enter to switch.</span>
-                <span class="touch-instruction">Tap a card to try switching.</span>
+                <span class="desktop-instruction">Click to try. Q holds Alt for you and cycles tabs. Shift+Q goes back. Enter or click a card to switch; Esc cancels.</span>
+                <span class="touch-instruction">Tap Q to cycle, or Shift then Q to go back. Tap Alt again or pick a card to switch.</span>
               </p>
             </div>
           </div>
-          <p class="demo-disclaimer">Arrow keys are for this demo only. Your tabs aren’t accessed.</p>
+          <p class="demo-disclaimer">Alt+Q also works if it reaches this page. The demo never accesses your real tabs.</p>
           <p id="demo-status" class="sr-only" role="status" aria-live="polite"></p>
           <noscript
             ><p class="no-script">Turn on JavaScript to try the demo.</p></noscript

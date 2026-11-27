@@ -7,18 +7,14 @@
     ? {
         titles: ["Friday side project", "Moodboard", "aydengen / quick-tab", "Deep focus"],
         alt: (title) => `Simulated tab: ${title}`,
-        opened: "Use the arrow keys to choose a tab. Enter to switch. Esc to cancel.",
         selected: (title) => `Selected “${title}”. Enter to switch. Esc to cancel.`,
-        preview: "Demo ready. Click a card, or focus the demo and use the arrow keys, then Enter.",
         switched: (title) => `Switched to “${title}”`,
         cancelled: "Cancelled",
       }
     : {
         titles: ["周五，做点喜欢的事", "下一点灵感", "aydengen / quick-tab", "Deep focus"],
         alt: (title) => `模拟标签页：${title}`,
-        opened: "用方向键选择标签，Enter 切换，Esc 取消。",
         selected: (title) => `已选择「${title}」，Enter 切换，Esc 取消。`,
-        preview: "演示已就绪。点选卡片，或聚焦演示后用方向键选择、Enter 切换。",
         switched: (title) => `已切换到「${title}」`,
         cancelled: "已取消",
       };
@@ -39,16 +35,13 @@
   const stage = document.querySelector("#demo-stage");
   const shade = document.querySelector("#demo-shade");
   const success = document.querySelector("#demo-success");
-  const keycaps = {
-    ArrowLeft: document.querySelector('[data-key="ArrowLeft"]'),
-    ArrowRight: document.querySelector('[data-key="ArrowRight"]'),
-    Enter: document.querySelector('[data-key="Enter"]'),
-  };
+  const keycaps = Object.fromEntries(
+    [...stage.querySelectorAll("[data-key]")].map((button) => [button.dataset.key, button])
+  );
   let current = 0;
-  let selected = 1;
-  let open = false;
-  // Escape/blur only dismiss an actively keyboard-controlled demo.
-  let fromKeyboard = false;
+  let selected = 0;
+  let gesture = null;
+  let reverse = false;
   let successTimer;
 
   function select(index) {
@@ -72,36 +65,40 @@
     document.querySelector("#demo-address").textContent = tabs[current].address;
   }
 
-  function show(keyboard = false) {
-    open = true;
-    fromKeyboard = keyboard;
+  function show(index, physicalAlt) {
+    gesture = physicalAlt ? "physical" : "virtual";
     clearTimeout(successTimer);
     switcher.hidden = false;
     shade.hidden = false;
     success.hidden = true;
-    select(current + 1);
-    status.textContent = keyboard ? text.opened : text.preview;
+    press("Alt", true);
+    select(index);
+  }
+
+  function cycle(backward, physicalAlt = false) {
+    const step = backward ? -1 : 1;
+    if (!gesture) {
+      show(current + step, physicalAlt);
+      return;
+    }
+    if (physicalAlt) gesture = "physical";
+    select(selected + step);
+    if (cards.includes(document.activeElement)) {
+      cards[selected].focus({ preventScroll: true });
+    }
   }
 
   function hide(confirmed) {
-    // Keep keyboard focus near the demo while its cards are briefly hidden.
-    const restoreCardFocus = cards.includes(document.activeElement);
-    if (restoreCardFocus) stage.focus({ preventScroll: true });
-    open = false;
+    gesture = null;
+    if (cards.includes(document.activeElement)) stage.focus({ preventScroll: true });
     switcher.hidden = true;
     shade.hidden = true;
+    resetKeys();
     success.hidden = !confirmed;
     status.textContent = confirmed ? text.switched(tabs[current].title) : text.cancelled;
-    clearTimeout(successTimer);
-    successTimer = setTimeout(() => {
-      success.hidden = true;
-      show();
-      // Do not steal focus if the user has moved elsewhere in the meantime.
-      if (restoreCardFocus && document.activeElement === stage) {
-        // Follow the fresh selection rather than reselecting the dismissed card.
-        cards[selected].focus({ preventScroll: true });
-      }
-    }, 1400);
+    if (confirmed) {
+      successTimer = setTimeout(() => { success.hidden = true; }, 1400);
+    }
   }
 
   function confirm(index) {
@@ -111,46 +108,49 @@
   }
 
   function press(key, down) {
-    keycaps[key]?.classList.toggle("is-pressed", down);
+    const button = keycaps[key];
+    button.classList.toggle("is-pressed", down);
+    if (button.hasAttribute("aria-pressed")) button.setAttribute("aria-pressed", String(down));
+  }
+
+  function resetKeys() {
+    reverse = false;
+    Object.keys(keycaps).forEach((key) => press(key, false));
   }
 
   stage.addEventListener("keydown", (event) => {
-    // Leave browser, extension and OS shortcuts alone, even inside the demo.
-    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
-    const navigation = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key);
-    if (!navigation && event.key !== "Enter" && event.key !== "Escape") return;
-    if (event.key === "Escape" && !open) return;
-    if (!open) {
+    if (event.ctrlKey || event.metaKey) return;
+    if (event.key === "Alt" || event.key === "Shift") {
+      press(event.key, true);
+    } else if (event.code === "KeyQ") {
+      event.preventDefault();
       if (event.repeat) return;
-      show(true);
+      press("KeyQ", true);
+      press("Shift", reverse || event.shiftKey);
+      cycle(reverse || event.shiftKey, event.altKey);
+    } else if (event.key === "Escape" && gesture) {
+      event.preventDefault();
+      hide(false);
+    } else if (event.key === "Enter" && gesture && !event.target.closest("[data-key]")) {
+      event.preventDefault();
+      confirm(selected);
     }
-    fromKeyboard = true;
-    press(event.key, true);
-    const columns = getComputedStyle(switcher).gridTemplateColumns.split(" ").length;
-    const moves = {
-      ArrowLeft: -1,
-      ArrowRight: 1,
-      ArrowUp: selected >= columns ? -columns : 0,
-      ArrowDown: selected + columns < tabs.length ? columns : 0,
-    };
-    if (event.key in moves) {
-      select(selected + moves[event.key]);
-      // Keep native Space activation and Enter pointed at the same card.
-      cards[selected].focus({ preventScroll: true });
-    }
-    else if (event.key === "Enter") confirm(selected);
-    else if (event.key === "Escape") hide(false);
-    else return;
-    event.preventDefault();
   });
 
   stage.addEventListener("keyup", (event) => {
-    press(event.key, false);
+    if (event.key === "Alt" && !event.altKey) {
+      if (gesture === "physical") confirm(selected);
+      else press("Alt", Boolean(gesture));
+    } else if (event.key === "Shift") {
+      press("Shift", reverse || event.shiftKey);
+    } else if (event.code === "KeyQ") {
+      press("KeyQ", false);
+    }
   });
 
   function leaveDemo() {
-    Object.keys(keycaps).forEach((key) => press(key, false));
-    if (open && fromKeyboard) hide(false);
+    if (gesture) hide(false);
+    else resetKeys();
   }
 
   window.addEventListener("blur", leaveDemo);
@@ -163,7 +163,23 @@
     card.addEventListener("focus", () => select(index));
   });
 
+  const keyActions = {
+    Alt: () => gesture ? confirm(selected) : show(current, false),
+    Shift: (event) => {
+      reverse = !reverse;
+      press("Shift", reverse || event.shiftKey);
+    },
+    KeyQ: (event) => cycle(reverse || event.shiftKey),
+    Enter: () => { if (gesture) confirm(selected); },
+  };
+  Object.entries(keycaps).forEach(([key, button]) => {
+    button.addEventListener("click", (event) => {
+      if (event.detail) stage.focus({ preventScroll: true });
+      keyActions[key](event);
+    });
+  });
+
   updateBrowser();
-  // Start with the product visible on every device, not an unrelated example page.
-  show();
+  switcher.hidden = true;
+  shade.hidden = true;
 })();

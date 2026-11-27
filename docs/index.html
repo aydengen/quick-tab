@@ -212,16 +212,19 @@
               </div>
             </div>
             <div class="demo-footer">
-              <div class="shortcut-display" aria-hidden="true">
-                <kbd data-key="ArrowLeft"><svg class="icon" aria-hidden="true" focusable="false"><use href="./assets/icons/lucide.svg#arrow-left"></use></svg></kbd><kbd data-key="ArrowRight"><svg class="icon" aria-hidden="true" focusable="false"><use href="./assets/icons/lucide.svg#arrow-right"></use></svg></kbd><kbd data-key="Enter">Enter</kbd>
+              <div class="shortcut-display">
+                <button type="button" data-key="Alt" aria-label="按住或松开演示中的 Alt" aria-pressed="false" aria-controls="switcher">Alt</button>
+                <button type="button" data-key="Shift" aria-label="用 Shift 反向选择" aria-pressed="false">Shift</button>
+                <button type="button" data-key="KeyQ" aria-label="用 Q 循环选择标签页" aria-controls="switcher">Q</button>
+                <button type="button" data-key="Enter" aria-label="用 Enter 切换标签页">Enter</button>
               </div>
               <p class="demo-instruction" id="demo-help">
-                <span class="desktop-instruction">点击演示，用方向键选择，Enter 切换。</span>
-                <span class="touch-instruction">点选卡片，体验切换。</span>
+                <span class="desktop-instruction">点击试用。Q 会模拟按住 Alt 并循环选择，Shift+Q 反向选择。按 Enter 或点击卡片切换，Esc 取消。</span>
+                <span class="touch-instruction">轻点 Q 循环选择，先点 Shift 再点 Q 可反向选择。点 Alt 松开，或点卡片切换。</span>
               </p>
             </div>
           </div>
-          <p class="demo-disclaimer">仅此演示使用方向键，不读取真实标签页。</p>
+          <p class="demo-disclaimer">如果 Alt+Q 未被拦截，也可直接使用。演示不会读取你的真实标签页。</p>
           <p id="demo-status" class="sr-only" role="status" aria-live="polite"></p>
           <noscript
             ><p class="no-script">启用 JavaScript 后可以试用这个演示。</p></noscript
