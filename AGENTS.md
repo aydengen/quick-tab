@@ -60,7 +60,7 @@ background.js (Service Worker)
 ├── 管理最近标签列表（存 20 个，面板显示 10 个，MAX_TABS 常量）
 ├── 使用 chrome.storage.session 存储（会话级，浏览器关闭自动清空），内存缓存避免重复读写
 ├── 监听标签激活、窗口焦点、关闭、更新、替换事件
-├── 页面没有 content.js（安装/更新前已打开）时用 activeTab + scripting 补注入
+├── 页面没有 content.js（安装/更新前已打开）时用 scripting 补注入
 ├── 无法注入的页面直接切回上一个标签
 ├── 缩略图：标签停留 THUMB_SETTLE_MS 后 captureVisibleTab，裁成 480×300 WebP 存入 session（thumb:<tabId>）；打开面板时先补截当前标签
 ├── 图标：通过 _favicon 读取并转 data URL（不受页面 CSP 影响）
@@ -98,8 +98,9 @@ Alt+Q → chrome.commands → background 发消息到 content（旧页面未注�
 
 - **不可注入页面**: `chrome://`, `edge://`, `about:`, Chrome Web Store 页面
 - **存储类型**: `chrome.storage.session`（非持久化，隐私优先）
+- **本地预览授权**: 用户在引导页明确允许后，才开始记录最近标签页并截取缩略图；未授权时按快捷键会打开引导页。
 - **最大标签数**: 面板显示 10 个
-- **权限**: `tabs`、`storage`、`activeTab`、`scripting`、`favicon`（读 `_favicon` 图标缓存），host `<all_urls>`（`captureVisibleTab` 截缩略图必需；content script 本就匹配所有网站，安装提示不变）
+- **权限**: `tabs`、`storage`、`scripting`、`favicon`（读 `_favicon` 图标缓存），host `<all_urls>`（`captureVisibleTab` 截缩略图必需；content script 本就匹配所有网站，安装提示不变）
 - **快捷键**: 通过 `chrome.commands` API 处理，用户可在 `chrome://extensions/shortcuts` 自定义，连续按快捷键可循环切换
 
 ## File Structure
