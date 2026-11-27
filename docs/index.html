@@ -3,16 +3,16 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f7f8fa" />
+    <meta name="theme-color" content="#f7f7f2" />
     <meta
       name="description"
-      content="QuickTab 是一个轻量、开源的 Chrome 标签页切换扩展。按住 Alt + Q，找到最近的页面，松手即达。"
+      content="QuickTab：用 Alt + Q 切换最近使用的 Chrome 标签页。"
     />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="QuickTab — 切换标签，不切断思路" />
     <meta
       property="og:description"
-      content="让 Chrome 标签切换像切换应用一样自然。一个快捷键，回到刚才的页面。免费、开源、无需注册。"
+      content="QuickTab：用 Alt + Q 切换最近使用的 Chrome 标签页。"
     />
     <meta property="og:image" content="https://aydengen.github.io/quick-tab/assets/og-zh.png" />
     <meta property="og:url" content="https://aydengen.github.io/quick-tab/" />
@@ -34,7 +34,7 @@
           width="34"
           height="34"
           alt=""
-        />QuickTab<span class="brand-dot">.</span></a
+        />QuickTab</a
       >
       <nav aria-label="主导航">
         <a href="#experience">体验一下</a>
@@ -54,34 +54,12 @@
     <main id="main">
       <section class="hero wrap" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <h1 id="hero-title">
-            切换标签，<br />不切断<span class="accent"
-              >思路<span class="underline" aria-hidden="true"></span
-            ></span>
-          </h1>
-        </div>
-        <div class="hero-aside">
-          <p>刚才的页面，一键回来。</p>
-          <a
-            class="button button-primary"
-            href="https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimheklaj"
-            target="_blank"
-            rel="noopener noreferrer"
-            ><svg
-              viewBox="0 0 24 24"
-              width="20"
-              height="20"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.7"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="12" r="9.5" />
-              <circle cx="12" cy="12" r="4" />
-              <path d="M12 8h8.6M8.5 14 4.2 6.6M15.5 14l-4.3 7.4" /></svg
-            >免费添加到 Chrome <span aria-hidden="true">↗</span></a
-          >
-          <p class="hero-note">免费开源 <span>·</span> 无需注册</p>
+          <h1 id="hero-title">切换标签，<br class="mobile-break" />不切断思路。</h1>
+          <p class="hero-description">Alt + Q，切回上个标签。</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimheklaj" target="_blank" rel="noopener noreferrer">添加到 Chrome <span aria-hidden="true">↗</span></a>
+          </div>
+          <p class="mobile-note">请在电脑 Chrome 安装。</p>
         </div>
       </section>
 
@@ -90,6 +68,7 @@
         class="experience wrap"
         aria-labelledby="experience-title"
       >
+        <h2 id="experience-title" class="sr-only">试试 QuickTab 切换面板</h2>
         <div class="demo-canvas">
           <div class="browser">
             <div class="browser-bar" aria-hidden="true">
@@ -116,7 +95,7 @@
                 <span id="demo-address">notes.example / my-space</span></span
               ><span>⋮</span>
             </div>
-            <div class="browser-viewport" id="demo-stage">
+            <div class="browser-viewport" id="demo-stage" tabindex="-1" role="group" aria-label="模拟浏览器页面">
               <img
                 class="active-page"
                 id="active-page"
@@ -125,11 +104,10 @@
                 width="960"
                 height="600"
               />
-              <div class="demo-shade" id="demo-shade" hidden></div>
+              <div class="demo-shade" id="demo-shade"></div>
               <div
                 class="switcher"
                 id="switcher"
-                hidden
                 role="group"
                 aria-label="模拟标签切换器，点击卡片切换页面"
               >
@@ -231,12 +209,17 @@
               </div>
             </div>
           </div>
-          <div class="shortcut-display" aria-hidden="true">
-            <kbd data-key="alt">alt <span>⌥</span></kbd
-            ><span class="key-plus">+</span><kbd data-key="q">Q</kbd
-            ><span class="shortcut-caption">按住 Alt，再按 Q</span>
+          <div class="demo-footer">
+            <div class="shortcut-display" aria-hidden="true">
+              <kbd data-key="alt">Alt <span>⌥</span></kbd><span class="key-plus">+</span><kbd data-key="q">Q</kbd>
+            </div>
+            <p class="demo-instruction">
+              <span class="desktop-instruction">按住 Alt，再按 Q。也可以点选卡片。</span>
+              <span class="touch-instruction">点选卡片，体验切换。</span>
+            </p>
           </div>
         </div>
+        <p class="demo-disclaimer">模拟演示，不读取真实标签页。</p>
         <p id="demo-status" class="sr-only" role="status" aria-live="polite"></p>
         <noscript
           ><p class="no-script">启用 JavaScript 后可以试用这个演示。</p></noscript
@@ -245,78 +228,44 @@
 
       <section class="features wrap" aria-label="为什么选择 QuickTab">
         <article>
-          <span class="feature-icon" aria-hidden="true">↔</span>
-          <h3>刚才的页面，一按就回</h3>
-          <p>按最近使用排序，轻按 Alt+Q 回到上一页。</p>
+          <h3>快捷切换</h3>
+          <p>最近使用的标签优先。</p>
         </article>
         <article>
-          <span class="feature-icon" aria-hidden="true">▧</span>
-          <h3>看一眼，就知道是哪页</h3>
-          <p>看缩略图认页面，不用猜标题。</p>
-          
+          <h3>页面预览</h3>
+          <p>不用逐个打开标签。</p>
         </article>
         <article>
-          <span class="feature-icon" aria-hidden="true">⌁</span>
-          <h3>轻装上阵，数据留在本地</h3>
-          <p>不用注册，不做追踪，数据只在本机。</p>
+          <h3>仅在本地</h3>
+          <p>不上传标签和缩略图。</p>
         </article>
-      </section>
-
-      <section class="showcase" aria-labelledby="showcase-title">
-        <div class="wrap">
-          <h2 id="showcase-title">先看到页面，再决定去哪</h2>
-          <p>最近用过的标签页排成缩略图，标题再长也不用读。</p>
-          <img
-            src="./assets/showcase.png"
-            width="1800"
-            height="1080"
-            alt="QuickTab 面板：最近 8 个标签页的缩略图排成两行"
-            loading="lazy"
-          />
-        </div>
       </section>
 
       <section id="how-it-works" class="how-section">
         <div class="wrap">
           <div class="section-heading">
             <div>
-              <h2>不用学，试一次就会</h2>
+              <h2>如何使用</h2>
             </div>
           </div>
           <div class="steps">
             <article class="step">
-              <span class="step-number">01 /</span>
-              <div class="step-visual install-visual" aria-hidden="true">
-                <img
-                  src="./assets/icon.png"
-                  width="58"
-                  height="58"
-                  alt=""
-                /><span>+ 添加扩展程序</span>
-              </div>
-              <h3>先把 QuickTab 装好</h3>
-              <p>在 Chrome 应用商店添加，无需登录。</p>
+              <span class="step-number">01</span>
+              <h3>安装</h3>
+              <p>从 Chrome 应用商店添加。</p>
             </article>
             <article class="step">
-              <span class="step-number">02 /</span>
-              <div class="step-visual keys-visual" aria-hidden="true">
-                <kbd>Alt <small>⌥</small></kbd
-                ><span>+</span><kbd>Q</kbd>
-              </div>
-              <h3>按住 Alt，再按 Q</h3>
-              <p>最近的标签排成卡片，继续按 Q 选择。</p>
+              <span class="step-number">02</span>
+              <h3>选择标签</h3>
+              <p>按住 Alt，按 Q 选择。</p>
             </article>
             <article class="step">
-              <span class="step-number">03 /</span>
-              <div class="step-visual release-visual" aria-hidden="true">
-                <span class="release-key">↵</span
-                ><span class="release-check">✓</span>
-              </div>
-              <h3>松开 Alt，就到了</h3>
-              <p>松开即切换，按 Esc 取消。</p>
+              <span class="step-number">03</span>
+              <h3>松开切换</h3>
+              <p>松开 Alt 确认，Esc 取消。</p>
             </article>
           </div>
-          <p class="tip">不想一直按住 Alt？在设置里打开 Sticky 模式，用 Enter 确认。</p>
+          <p class="tip">设置中开启 Sticky 模式，用 Enter 确认。</p>
         </div>
       </section>
 
@@ -327,48 +276,46 @@
             href="https://github.com/aydengen/quick-tab/issues"
             target="_blank"
             rel="noopener noreferrer"
-            >还有问题？来 GitHub 聊聊 <span aria-hidden="true">↗</span></a
+            >反馈问题 <span aria-hidden="true">↗</span></a
           >
         </div>
         <div class="faq-list">
           <details>
             <summary>
-              快捷键没有反应，怎么办？<span aria-hidden="true">+</span>
+              快捷键无效？<span aria-hidden="true">+</span>
             </summary>
             <div>
               <p>
-                先在一个普通网页（如 GitHub）试试。如果仍然没有反应，打开
-                <code>chrome://extensions/shortcuts</code>，找到
-                QuickTab，为它设置一个没有被其他扩展或系统占用的快捷键。
+                先刷新普通网页再试；仍无响应，请在
+                <code>chrome://extensions/shortcuts</code>
+                为 QuickTab 设置未被占用的快捷键。
               </p>
               <p>
-                Mac 上 Alt 对应
-                Option（⌥）键。安装后，已打开的页面如果没有响应，可以刷新后再试。
+                Mac 的 Alt 即 Option（⌥）。
               </p>
             </div>
           </details>
           <details>
             <summary>
-              为什么有些页面不能显示面板？<span aria-hidden="true">+</span>
+              哪些页面不显示面板？<span aria-hidden="true">+</span>
             </summary>
             <div>
               <p>
-                Chrome 不允许扩展在新标签页、<code>chrome://</code>、Chrome
-                应用商店和部分 PDF
-                页面显示面板。在这些页面上按快捷键，会直接切回上一个标签。
+                新标签页、<code>chrome://</code>、Chrome 应用商店及部分 PDF
+                不显示面板，快捷键会直接切回上一标签。
               </p>
             </div>
           </details>
           <details>
             <summary>
-              为什么需要读取标签页和网站权限？<span aria-hidden="true">+</span>
+              为什么需要这些权限？<span aria-hidden="true">+</span>
             </summary>
             <div>
               <p>
-                读取标签页，是为了显示标题、网站图标并切换页面。网站权限用于截取当前可见页面，作为标签缩略图。没有服务器接收这些数据，源代码也完全公开。
+                标签页权限用于显示标题、图标和切换标签；网站权限用于生成页面缩略图。数据不上传。
               </p>
               <p>
-                最近标签记录和缩略图使用浏览器本地会话存储，关闭浏览器后清空；快捷键与偏好设置会保留。
+                标签记录和缩略图随 Chrome 关闭而清空，快捷键和设置保留。
               </p>
             </div>
           </details>
@@ -378,29 +325,13 @@
             </summary>
             <div>
               <p>
-                完全免费，使用 MIT 开源协议。QuickTab 为桌面版 Chrome 开发，支持
-                Mac、Windows 和 Linux；其他 Chromium
-                浏览器可能兼容，但尚未逐一验证。手机浏览器无法安装这个扩展。
+                免费，MIT 开源。支持 Mac、Windows、Linux 上的桌面 Chrome，不支持手机；其他 Chromium 浏览器未验证。
               </p>
             </div>
           </details>
         </div>
       </section>
 
-      <section class="closing wrap" aria-labelledby="closing-title">
-        <div>
-          <h2 id="closing-title">少一次寻找，<br />多一分专注。</h2>
-        </div>
-        <div>
-          <a
-            class="button button-primary"
-            href="https://chromewebstore.google.com/detail/quicktab/pmagocpnoedekbpchligfnhkimheklaj"
-            target="_blank"
-            rel="noopener noreferrer"
-            >免费添加到 Chrome <span aria-hidden="true">↗</span></a
-          >
-        </div>
-      </section>
     </main>
 
     <footer class="site-footer wrap">
@@ -410,7 +341,7 @@
           width="26"
           height="26"
           alt=""
-        />QuickTab<span class="brand-dot">.</span></a
+        />QuickTab</a
       >
       <div>
         <a
