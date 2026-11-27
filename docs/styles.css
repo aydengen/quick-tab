@@ -86,18 +86,21 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
 .site-header a:active, .site-footer a:active, .faq-heading a:active { color: var(--ink); opacity: 0.75; }
 .header-github { font-size: 13px; }
 .header-github .icon { margin-left: 5px; }
-.hero { padding-block: 56px 40px; }
-.hero-copy { display: grid; grid-template-columns: minmax(0, 1.8fr) minmax(260px, 1fr); align-items: end; gap: 48px; }
+.hero-layout { display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.7fr); gap: 48px; align-items: center; padding-block: 48px 56px; }
+.hero { min-width: 0; }
+.hero-copy { display: block; }
 .hero h1 {
-  font-size: clamp(44px, 4.6vw, 64px);
+  font-size: clamp(44px, 4vw, 56px);
   line-height: 1.1;
   font-weight: 500;
   letter-spacing: -0.055em;
   margin: 0;
   text-wrap: balance;
 }
-.hero-intro { padding-bottom: 4px; }
-.hero-description { margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); }
+.hero-intro { margin-top: 28px; }
+.hero-description { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); }
+.hero-description kbd { padding: 7px 11px; border: 1px solid var(--line-strong); border-radius: 4px; box-shadow: 0 2px 0 var(--line); font: 500 14px/1.4 var(--font); color: var(--ink); white-space: nowrap; }
+.experience { min-width: 0; }
 .hero-actions { display: flex; align-items: center; gap: 16px; margin-top: 24px; }
 .button {
   display: inline-flex;
@@ -117,7 +120,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
 .button-primary:active { background: #000; }
 .button .icon { width: 16px; height: 16px; }
 .mobile-note { display: none; margin: 12px 0 0; font-size: 12px; color: var(--muted); line-height: 1.6; }
-.demo-canvas { padding: 28px 32px 0; border-radius: var(--radius); background: var(--wash); overflow: hidden; }
+.demo-canvas { padding: 16px 16px 0; border-radius: var(--radius); background: var(--wash); overflow: hidden; }
 /* The browser is product media, not marketing chrome. Keep its own palette. */
 .browser {
   --ink: #252722;
@@ -297,15 +300,17 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
 .demo-instruction { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
 .touch-instruction { display: none; }
 .demo-disclaimer, .no-script { margin: 12px 0 0; font-size: 12px; line-height: 1.6; color: var(--muted); }
-.features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 64px; padding-block: 48px 64px; }
-.features h3 { font-size: 16px; font-weight: 500; line-height: 1.5; margin: 0 0 8px; }
-.features p { font-size: 16px; line-height: 1.6; color: var(--muted); margin: 0; max-width: 320px; }
+.features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; padding-block: 28px 40px; border-top: 1px solid var(--line); }
+.features article { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 4px 16px; align-content: start; }
+.features article > .icon { grid-row: span 2; width: 20px; height: 20px; margin-top: 2px; }
+.features h3 { font-size: 16px; font-weight: 500; line-height: 1.5; margin: 0; }
+.features p { font-size: 14px; line-height: 1.6; color: var(--muted); margin: 0; max-width: 320px; }
 .how-section { padding-block: 72px; background: var(--wash); }
 .how-section > .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); column-gap: 64px; }
 .section-heading h2, .faq h2 { margin: 0; font-size: 28px; font-weight: 500; letter-spacing: -0.04em; line-height: 1.3; }
-.steps { display: grid; gap: 28px; }
-.step { display: grid; grid-template-columns: 28px 148px minmax(0, 1fr); gap: 20px; align-items: baseline; }
-.step-number { display: block; color: var(--subtle); font-size: 12px; font-variant-numeric: tabular-nums; }
+.steps { display: grid; border-bottom: 1px solid var(--line); }
+.step { display: grid; grid-template-columns: 36px 148px minmax(0, 1fr); gap: 20px; align-items: start; padding-block: 20px; border-top: 1px solid var(--line); }
+.step-number { display: block; color: var(--ink); font-size: 24px; line-height: 1.1; font-variant-numeric: tabular-nums; }
 .step h3 { font-size: 16px; line-height: 1.6; font-weight: 500; margin: 0; }
 .step p { font-size: 16px; line-height: 1.6; margin: 0; color: var(--muted); }
 .tip { grid-column: 2; font-size: 13px; line-height: 1.6; color: var(--muted); margin: 32px 0 0; }
@@ -345,6 +350,20 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
 .legal p, .legal li { font-size: 14px; line-height: 1.9; color: var(--muted); }
 .legal ul { padding-left: 22px; }
 .legal a { text-decoration: underline; text-underline-offset: 3px; }
+@media (min-width: 1101px) {
+  .hero-layout .browser-viewport { aspect-ratio: auto; height: 540px; }
+  .hero-layout .switcher { grid-template-columns: repeat(2, minmax(0, 1fr)); width: 92%; padding: 8px; gap: 4px; }
+  .hero-layout .tab-card { padding: 6px; }
+  .hero-layout .tab-meta { padding-top: 6px; }
+}
+@media (max-width: 1100px) {
+  .hero-layout { display: block; padding-block: 40px 0; }
+  .hero { padding-bottom: 32px; }
+  .hero-copy { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(240px, 1fr); align-items: end; gap: 32px; }
+  .hero h1 { font-size: clamp(40px, 5.2vw, 56px); }
+  .hero-intro { margin-top: 0; }
+  .hero-description { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+}
 @media (max-width: 1000px) {
   .wrap { width: calc(100% - 64px); }
   .hero-copy { grid-template-columns: minmax(0, 1.6fr) minmax(240px, 1fr); gap: 32px; }
@@ -357,7 +376,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
   .tab-url { font-size: 8px; }
   .features { gap: 32px; }
   .how-section > .wrap, .faq { column-gap: 32px; }
-  .step { grid-template-columns: 24px minmax(0, 1fr); column-gap: 16px; row-gap: 4px; }
+  .step { grid-template-columns: 36px minmax(0, 1fr); column-gap: 16px; row-gap: 4px; }
   .step-number { grid-row: span 2; }
   .step p { grid-column: 2; }
 }
@@ -369,12 +388,16 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
   .brand { font-size: 18px; }
   .brand img { width: 26px; height: 26px; }
   .header-github { font-size: 12px; }
-  .hero { padding-block: 40px 32px; }
-  .hero-copy { grid-template-columns: 1fr; gap: 24px; }
+  .hero-layout { padding-top: 32px; }
+  .hero { padding-block: 0 28px; }
+  .hero-copy { display: block; }
   .hero h1 { font-size: clamp(38px, 6.2vw, 48px); line-height: 1.12; }
-  .hero-intro { padding-bottom: 0; }
-  .hero-description { font-size: 16px; }
-  .hero-actions { gap: 16px; margin-top: 20px; }
+  .hero-intro { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px 16px; margin-top: 24px; }
+  .hero-description { flex-direction: column; align-items: flex-start; gap: 8px; font-size: 14px; line-height: 1.5; }
+  .hero-description kbd { padding: 6px 8px; font-size: 13px; }
+  .hero-actions { gap: 16px; margin-top: 0; }
+  .hero-actions .button { gap: 12px; padding-inline: 14px; font-size: 13px; }
+  .mobile-note { grid-column: 1 / -1; margin: 0; }
   .demo-canvas { padding: 17px 17px 0; }
   .browser-bar { height: 29px; padding-inline: 9px; }
   .browser-tab { font-size: 8px; padding-inline: 7px; }
@@ -393,7 +416,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
   .features p { font-size: 14px; }
   .how-section { padding-block: 48px; }
   .how-section > .wrap { grid-template-columns: 1fr; row-gap: 32px; }
-  .steps { gap: 24px; }
+  .step { padding-block: 16px; }
   .tip { grid-column: 1; margin-top: 0; }
   .section-heading h2, .faq h2 { font-size: 26px; }
   .faq { grid-template-columns: 1fr; gap: 24px; padding-block: 48px; }
@@ -409,11 +432,12 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
   .site-header nav { font-size: 12px; }
   .legal-page .site-header { display: grid; grid-template-columns: 1fr auto; gap: 0 16px; padding-block: 12px; }
   .legal-page .site-header nav { grid-column: 1 / -1; grid-row: 2; justify-content: space-between; margin-left: 0; }
-  .hero { padding-block: 28px 24px; }
-  .hero-copy { gap: 16px; }
+  .hero-layout { padding-top: 24px; }
+  .hero { padding-block: 0 24px; }
+  .hero-intro { margin-top: 20px; }
   .hero h1 { font-size: clamp(34px, 10.2vw, 44px); }
-  .hero-actions { flex-wrap: wrap; margin-top: 16px; }
-  .mobile-note { margin-top: 8px; }
+  .hero-actions { flex-wrap: wrap; margin-top: 0; }
+  .mobile-note { margin-top: 0; }
   .demo-canvas { padding: 10px 10px 0; border-radius: 5px; }
   .browser { border-radius: 6px; }
   .browser-tab { flex: 1; width: auto; }
@@ -432,9 +456,9 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
   .demo-instruction { font-size: 10px; }
   .shortcut-display { gap: 5px; }
   .shortcut-display kbd { min-width: 24px; height: 23px; padding-inline: 5px; font-size: 10px; gap: 5px; }
-  .demo-disclaimer { font-size: 11px; margin-top: 12px; }
+  .demo-disclaimer { font-size: 12px; margin-top: 12px; }
   .features { grid-template-columns: 1fr; gap: 24px; }
-  .features h3 { margin-bottom: 4px; }
+  .features h3 { margin-bottom: 0; }
   .features p { max-width: none; }
   .step h3, .step p { font-size: 15px; }
   .tip { font-size: 12px; }
@@ -446,6 +470,9 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
 @media (hover: none) and (pointer: coarse) {
   .desktop-instruction { display: none; }
   .touch-instruction { display: inline; }
+  .shortcut-display { display: none; }
+  .demo-footer { min-height: 44px; }
+  .demo-instruction { font-size: 12px; }
   .mobile-note { display: block; }
 }
 @media (prefers-reduced-motion: reduce) {
