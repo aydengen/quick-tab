@@ -10,6 +10,7 @@
         switched: (title) => `Switched to “${title}”`,
         cancelled: "Cancelled",
         guideCycle: "Press Q to switch tabs",
+        guideConfirm: "Enter or click a card to switch",
         guideDone: "You switched tabs!",
       }
     : {
@@ -18,6 +19,7 @@
         switched: (title) => `已切换到「${title}」`,
         cancelled: "已取消",
         guideCycle: "按 Q 切换标签",
+        guideConfirm: "回车或点击卡片切换",
         guideDone: "成功切换标签页！",
       };
   const addresses = [
@@ -185,6 +187,10 @@
       if (!guideStep && !startGuide()) revealDemo();
       if (!stage.contains(document.activeElement)) stage.focus({ preventScroll: true });
       show(current + step, physicalAlt);
+      if (guideStep === "cycle") {
+        showGuideStep("confirm", text.guideConfirm);
+        scaleSpotlight();
+      }
       return;
     }
     if (physicalAlt) gesture = "physical";
@@ -211,7 +217,7 @@
     current = index;
     updateBrowser();
     hide(true);
-    if (guideStep === "cycle") {
+    if (guideStep === "confirm") {
       rememberGuide();
       showGuideStep("done", text.guideDone);
       scaleSpotlight();
