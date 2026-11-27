@@ -23,6 +23,7 @@
   let stickyMode = false;
   let altShortcutOpen = true;
   let panelRequestId = 0;
+  let pendingShortcutOffset = 0;
   // 页面实际观察到的 Alt 状态：true / false / null（未知，如刚注入或失焦后）
   let altHeld = null;
   let lastAltUpAt = 0;
@@ -49,12 +50,13 @@
   function showPanel(altShortcut) {
     // 如果面板已打开，循环选择下一个（支持连续按 Alt+Q 切换）
     if (panelVisible) {
-      cycleSelection(1);
+      cycleShortcutSelection(1);
       return;
     }
 
     // 立即标记为可见，防止连续按键时重复调用
     panelVisible = true;
+    pendingShortcutOffset = 0;
     // 快捷键不含 Alt 时没有“松开确认”，面板保持打开
     altShortcutOpen = altShortcut;
     altKeyDown = altShortcut;
@@ -85,7 +87,7 @@
         }
 
         if (confirmPending) {
-          const target = tabs[1];
+          const target = tabs.length > 1 ? tabs[initialSelectionIndex(tabs.length)] : null;
           hidePanel();
           if (target) switchToTab(target.id);
           return;
@@ -227,7 +229,7 @@
 
     // 默认选中上一个访问的标签
     const cards = getCards();
-    (cards[1] || cards[0])?.focus({ preventScroll: true });
+    if (cards.length) cards[initialSelectionIndex(cards.length)].focus({ preventScroll: true });
   }
 
   // 卡片尺寸固定：一行放不下就逐步换成两行、三行，三行还放不下再整体等比缩小
@@ -352,12 +354,25 @@
     hidePanel();
   }
 
+  function wrapSelectionIndex(index, count) {
+    return ((index % count) + count) % count;
+  }
+
+  function initialSelectionIndex(count) {
+    return wrapSelectionIndex(1 + pendingShortcutOffset, count);
+  }
+
+  function cycleShortcutSelection(direction) {
+    if (root?.childElementCount) cycleSelection(direction);
+    else pendingShortcutOffset += direction;
+  }
+
   function cycleSelection(direction) {
     const cards = getCards();
     if (cards.length === 0) return;
 
     const currentIndex = cards.indexOf(root.activeElement);
-    const nextIndex = (currentIndex + direction + cards.length) % cards.length;
+    const nextIndex = wrapSelectionIndex(currentIndex + direction, cards.length);
     cards[nextIndex].focus({ preventScroll: true });
   }
 
@@ -424,7 +439,11 @@
       return;
     }
 
-    if (e.key === 'Tab') {
+    const isQ = /^[a-z]$/i.test(e.key) ? key === 'q' : e.code === 'KeyQ';
+    if (isQ && e.altKey && e.shiftKey && !e.ctrlKey && !e.metaKey) {
+      e.preventDefault();
+      cycleShortcutSelection(-1);
+    } else if (e.key === 'Tab') {
       e.preventDefault();
       cycleSelection(e.shiftKey ? -1 : 1);
     } else if (e.key === 'ArrowRight' || key === 'j') {
