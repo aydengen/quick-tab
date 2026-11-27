@@ -487,6 +487,85 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
   .shortcut-display button { min-width: 44px; height: 44px; }
   .mobile-note { display: block; }
 }
+
+[data-onboarding] .hero-layout { padding-top: 18px; }
+[data-onboarding] .hero { padding-bottom: 20px; }
+[data-onboarding] .hero h1 { font-size: clamp(32px, 4vw, 54px); }
+.onboard-chooser {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  column-gap: 6px;
+  margin-bottom: 12px;
+  color: #53565c;
+  font-size: 13px;
+}
+.onboard-chooser > span { padding-inline: 10px; }
+.onboard-chooser a { display: grid; align-content: center; min-height: 44px; padding: 0 12px; border-radius: 8px; }
+.onboard-chooser a:hover { text-decoration: underline; }
+.onboard-chooser a[aria-current] { font-weight: 650; color: #183581; background: #eef2fc; }
+.onboard-panel {
+  max-width: 880px;
+  margin: 0 auto 12px;
+  padding: 20px clamp(16px, 4vw, 40px);
+  background: #f5f7f9;
+  border: 1px solid #e0e5eb;
+  border-radius: 18px;
+  text-align: center;
+}
+.onboard-panel h2 { margin: 0; font-size: clamp(24px, 3vw, 34px); line-height: 1.15; letter-spacing: -0.035em; }
+.onboard-panel p { margin: 8px 0 0; font-size: 17px; line-height: 1.55; color: #343840; }
+.onboard-panel p.onboard-note { font-size: 14px; }
+.onboard-panel p.onboard-note + .onboard-note { margin-top: 2px; }
+.onboard-panel .onboard-success { color: #17603d; font-weight: 650; }
+.onboard-panel .onboard-success:empty { margin: 0; }
+.onboard-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 12px; margin-top: 14px; }
+.onboard-primary, .onboard-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 8px 18px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+.onboard-primary { background: #233e83; color: #fff; }
+.onboard-primary:hover { background: #19336e; }
+.onboard-secondary { background: #fff; border-color: #c9d1dd; color: #233762; }
+.onboard-secondary:hover { background: #edf2ff; border-color: #9cacc8; }
+.onboard-store-steps, .onboard-progress { padding: 0; list-style: none; }
+.onboard-store-steps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 12px auto 0; max-width: 620px; counter-reset: install-step; }
+.onboard-store-steps li { display: grid; align-content: center; gap: 2px; padding: 10px 12px; background: #fff; border: 1px solid #d8dfe9; border-radius: 10px; counter-increment: install-step; }
+.onboard-store-steps li span { font-size: 14px; color: #4e5668; }
+.onboard-store-steps li span::before { content: counter(install-step) ". "; }
+.onboard-store-steps li strong { font-size: 18px; line-height: 1.4; color: #1e386e; }
+.onboard-progress { display: flex; justify-content: center; gap: 4px 12px; flex-wrap: wrap; margin: 0 0 14px; }
+.onboard-progress li { display: flex; align-items: center; gap: 7px; padding: 4px 9px; font-size: 14px; color: #4e5668; }
+.onboard-progress li[aria-current] { border-radius: 999px; color: #19336e; background: #e3ebfc; font-weight: 700; }
+.onboard-progress li span { padding: 1px 5px; }
+.onboard-demo-bar { display: flex; justify-content: flex-end; margin-bottom: 6px; }
+.onboard-demo-bar .onboard-secondary { min-height: 44px; padding-inline: 12px; font-size: 14px; }
+[data-onboarding] .experience { max-width: 1040px; }
+[data-onboarding] .browser-viewport { max-height: 380px; }
+[data-onboarding] .demo-canvas.is-spotlight .demo-footer { min-height: 70px; }
+[data-onboarding] .demo-guide { flex-wrap: wrap; justify-content: start; }
+[data-onboarding] .demo-guide p { flex: 1; min-width: 13ch; font-size: 16px; font-weight: 600; }
+[data-onboarding] .demo-guide-skip { min-height: 44px; padding-inline: 8px; font-size: 14px; color: #343840; }
+[data-onboarding] .shortcut-display button { min-width: 44px; min-height: 44px; font-size: 16px; }
+[data-onboarding] .shortcut-display button[data-key="KeyQ"] { border-color: #8398d1; font-weight: 700; }
+@media (max-width: 480px) {
+  .onboard-chooser > span { width: 100%; }
+  .onboard-chooser a { padding-inline: 8px; }
+  .onboard-panel { border-radius: 14px; }
+  [data-onboarding] .demo-footer { flex-wrap: wrap; }
+  [data-onboarding] .demo-guide { flex-basis: 100%; }
+  [data-onboarding] .demo-guide p { flex-basis: 100%; }
+}
 @media (prefers-reduced-motion: reduce) {
   :root { scroll-behavior: auto; }
   *, *::before, *::after { transition: none !important; animation: none !important; }
