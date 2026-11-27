@@ -439,7 +439,8 @@
       return;
     }
 
-    if (e.code === 'KeyQ' && e.altKey && e.shiftKey && !e.ctrlKey && !e.metaKey) {
+    const isQ = /^[a-z]$/i.test(e.key) ? key === 'q' : e.code === 'KeyQ';
+    if (isQ && e.altKey && e.shiftKey && !e.ctrlKey && !e.metaKey) {
       e.preventDefault();
       cycleShortcutSelection(-1);
     } else if (e.key === 'Tab') {
