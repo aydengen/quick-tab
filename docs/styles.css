@@ -356,7 +356,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
   .browser-bar .favicon { width: 10px; height: 10px; }
   .traffic-lights { gap: 4px; padding-right: 4px; }
   .traffic-lights i { width: 6px; height: 6px; }
-  .browser-viewport { aspect-ratio: auto; height: 340px; }
+  .browser-viewport { aspect-ratio: auto; height: 360px; }
   .switcher { width: min(92%, 470px); grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 7px; gap: 3px; }
   .tab-preview { aspect-ratio: 1.85; }
   .tab-meta { padding-top: 6px; gap: 6px; }
@@ -395,8 +395,8 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
   .button { font-size: 12px; min-height: 42px; padding: 11px 17px; gap: 20px; }
   .demo-canvas { padding: 10px 10px 0; border-radius: 5px; }
   .browser { border-radius: 6px; }
-  .browser-tab { width: 43%; }
-  .browser-tab:nth-of-type(n+4) { display: none; }
+  .browser-tab { flex: 1; width: auto; }
+  .browser-tab:not(.is-active) { display: none; }
   .browser-address { display: none; }
   .browser-viewport { height: 302px; }
   .active-page { object-position: 25% top; }
