@@ -169,7 +169,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible {
   align-items: center;
 }
 .browser-viewport { position: relative; aspect-ratio: 3.35; overflow: hidden; background: #fff; }
-.browser-viewport:focus-visible { outline: 3px solid var(--blue); outline-offset: -3px; }
+.demo-canvas:focus-visible { outline: 3px solid var(--blue); outline-offset: -3px; }
 .active-page { width: 100%; height: 100%; object-fit: cover; object-position: top; }
 .demo-shade {
   position: absolute;
