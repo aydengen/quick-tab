@@ -1,22 +1,24 @@
 (() => {
   "use strict";
 
-  // Self-contained simulation that reacts to the real Alt+Q shortcut; it never reads real tabs.
+  // Focus-scoped simulation: no global shortcuts and no access to real tabs.
   const en = document.documentElement.lang.startsWith("en");
   const text = en
     ? {
         titles: ["Friday side project", "Moodboard", "aydengen / quick-tab", "Deep focus"],
         alt: (title) => `Simulated tab: ${title}`,
-        opened: "Switcher open. Keep pressing Q, then release Alt.",
-        preview: "Demo ready. Click a card, or hold Alt and press Q.",
+        opened: "Use the arrow keys to choose a tab. Enter to switch. Esc to cancel.",
+        selected: (title) => `Selected “${title}”. Enter to switch. Esc to cancel.`,
+        preview: "Demo ready. Click a card, or focus the demo and use the arrow keys, then Enter.",
         switched: (title) => `Switched to “${title}”`,
         cancelled: "Cancelled",
       }
     : {
         titles: ["周五，做点喜欢的事", "下一点灵感", "aydengen / quick-tab", "Deep focus"],
         alt: (title) => `模拟标签页：${title}`,
-        opened: "面板已打开，继续按 Q 选择，松开 Alt 切换",
-        preview: "演示已就绪。点选卡片，或按住 Alt 再按 Q。",
+        opened: "用方向键选择标签，Enter 切换，Esc 取消。",
+        selected: (title) => `已选择「${title}」，Enter 切换，Esc 取消。`,
+        preview: "演示已就绪。点选卡片，或聚焦演示后用方向键选择、Enter 切换。",
         switched: (title) => `已切换到「${title}」`,
         cancelled: "已取消",
       };
@@ -38,13 +40,14 @@
   const shade = document.querySelector("#demo-shade");
   const success = document.querySelector("#demo-success");
   const keycaps = {
-    alt: document.querySelector('[data-key="alt"]'),
-    q: document.querySelector('[data-key="q"]'),
+    ArrowLeft: document.querySelector('[data-key="ArrowLeft"]'),
+    ArrowRight: document.querySelector('[data-key="ArrowRight"]'),
+    Enter: document.querySelector('[data-key="Enter"]'),
   };
   let current = 0;
   let selected = 1;
   let open = false;
-  // Only a switcher opened with Alt+Q owns the arrow, Enter and Esc keys.
+  // Escape/blur only dismiss an actively keyboard-controlled demo.
   let fromKeyboard = false;
   let successTimer;
 
@@ -54,6 +57,7 @@
       card.classList.toggle("is-selected", i === selected);
       card.setAttribute("aria-pressed", String(i === selected));
     });
+    status.textContent = text.selected(tabs[selected].title);
   }
 
   function updateBrowser() {
@@ -81,8 +85,8 @@
 
   function hide(confirmed) {
     // Keep keyboard focus near the demo while its cards are briefly hidden.
-    const returnFocus = cards.includes(document.activeElement) ? document.activeElement : null;
-    if (returnFocus) stage.focus({ preventScroll: true });
+    const restoreCardFocus = cards.includes(document.activeElement);
+    if (restoreCardFocus) stage.focus({ preventScroll: true });
     open = false;
     switcher.hidden = true;
     shade.hidden = true;
@@ -93,8 +97,9 @@
       success.hidden = true;
       show();
       // Do not steal focus if the user has moved elsewhere in the meantime.
-      if (returnFocus && document.activeElement === stage) {
-        returnFocus.focus({ preventScroll: true });
+      if (restoreCardFocus && document.activeElement === stage) {
+        // Follow the fresh selection rather than reselecting the dismissed card.
+        cards[selected].focus({ preventScroll: true });
       }
     }, 1400);
   }
@@ -109,22 +114,18 @@
     keycaps[key]?.classList.toggle("is-pressed", down);
   }
 
-  window.addEventListener("keydown", (event) => {
-    if (event.key === "Alt") {
-      press("alt", true);
-      if (open) event.preventDefault();
-      return;
-    }
-    // keyCode follows the layout (AZERTY's Q too), unlike event.key, which is "œ" for Option+Q.
-    if (event.altKey && event.keyCode === 81 && !event.ctrlKey && !event.metaKey) {
-      event.preventDefault();
-      press("q", true);
+  stage.addEventListener("keydown", (event) => {
+    // Leave browser, extension and OS shortcuts alone, even inside the demo.
+    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+    const navigation = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key);
+    if (!navigation && event.key !== "Enter" && event.key !== "Escape") return;
+    if (event.key === "Escape" && !open) return;
+    if (!open) {
       if (event.repeat) return;
-      if (!open || !fromKeyboard) return show(true);
-      select(selected + (event.shiftKey ? -1 : 1));
-      return;
+      show(true);
     }
-    if (!open || !fromKeyboard) return;
+    fromKeyboard = true;
+    press(event.key, true);
     const columns = getComputedStyle(switcher).gridTemplateColumns.split(" ").length;
     const moves = {
       ArrowLeft: -1,
@@ -132,32 +133,33 @@
       ArrowUp: selected >= columns ? -columns : 0,
       ArrowDown: selected + columns < tabs.length ? columns : 0,
     };
-    if (event.key in moves) select(selected + moves[event.key]);
+    if (event.key in moves) {
+      select(selected + moves[event.key]);
+      // Keep native Space activation and Enter pointed at the same card.
+      cards[selected].focus({ preventScroll: true });
+    }
     else if (event.key === "Enter") confirm(selected);
     else if (event.key === "Escape") hide(false);
     else return;
     event.preventDefault();
   });
 
-  window.addEventListener("keyup", (event) => {
-    if (event.keyCode === 81) press("q", false);
-    if (event.key !== "Alt") return;
-    press("alt", false);
-    if (open && fromKeyboard) {
-      event.preventDefault();
-      confirm(selected);
-    }
+  stage.addEventListener("keyup", (event) => {
+    press(event.key, false);
   });
 
-  window.addEventListener("blur", () => {
-    press("alt", false);
-    press("q", false);
+  function leaveDemo() {
+    Object.keys(keycaps).forEach((key) => press(key, false));
     if (open && fromKeyboard) hide(false);
+  }
+
+  window.addEventListener("blur", leaveDemo);
+  stage.addEventListener("focusout", (event) => {
+    if (!stage.contains(event.relatedTarget)) leaveDemo();
   });
 
   cards.forEach((card, index) => {
     card.addEventListener("click", () => confirm(index));
-    card.addEventListener("mouseenter", () => select(index));
     card.addEventListener("focus", () => select(index));
   });
 

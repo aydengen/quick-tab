@@ -4,14 +4,71 @@
   height="600"
   viewBox="0 0 960 600"
 >
+  <!-- Lucide 0.468.0; ISC license: icons/LICENSE.txt -->
+  <defs>
+<symbol id="file-text" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+  <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+  <path d="M10 9H8" />
+  <path d="M16 13H8" />
+  <path d="M16 17H8" />
+</symbol>
+<symbol id="circle-dot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="10" />
+  <circle cx="12" cy="12" r="1" />
+</symbol>
+<symbol id="git-pull-request" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="18" cy="18" r="3" />
+  <circle cx="6" cy="6" r="3" />
+  <path d="M13 6h3a2 2 0 0 1 2 2v7" />
+  <line x1="6" x2="6" y1="9" y2="21" />
+</symbol>
+<symbol id="play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <polygon points="6 3 20 12 6 21 6 3" />
+</symbol>
+<symbol id="shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+</symbol>
+<symbol id="circle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="10" />
+</symbol>
+<symbol id="folder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
+</symbol>
+<symbol id="library" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="m16 6 4 14" />
+  <path d="M12 6v14" />
+  <path d="M8 8v12" />
+  <path d="M4 4v16" />
+</symbol>
+<symbol id="menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <line x1="4" x2="20" y1="12" y2="12" />
+  <line x1="4" x2="20" y1="6" y2="6" />
+  <line x1="4" x2="20" y1="18" y2="18" />
+</symbol>
+<symbol id="arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M5 12h14" />
+  <path d="m12 5 7 7-7 7" />
+</symbol>
+<symbol id="scale" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+  <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+  <path d="M7 21h10" />
+  <path d="M12 3v18" />
+  <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" />
+</symbol>
+  </defs>
   <rect width="960" height="600" fill="#fff" />
   <rect width="960" height="56" fill="#f5f7f9" />
   <circle cx="31" cy="28" r="14" fill="#262d37" />
   <g font-family="sans-serif" font-size="11" fill="#444c57">
     <text x="57" y="32" font-weight="600">aydengen　 /　 quick-tab</text>
-    <text x="31" y="85">
-      ⌘ Code　　 ◉ Issues　　 ⤴ Pull requests　　 ▷ Actions　　 ◇ Security
-    </text>
+    <use href="#file-text" x="31.0" y="75.7" width="11" height="11" style="color:#627185" />
+<use href="#circle-dot" x="72.8" y="75.7" width="11" height="11" style="color:#627185" />
+<use href="#git-pull-request" x="126.7" y="75.7" width="11" height="11" style="color:#627185" />
+<use href="#play" x="220.2" y="75.7" width="11" height="11" style="color:#627185" />
+<use href="#shield" x="280.2" y="75.7" width="11" height="11" style="color:#627185" />
+<text x="31" y="85">　 Code 　 Issues 　 Pull requests 　 Actions 　 Security</text>
   </g>
   <path d="M20 102H99" stroke="#e9986c" stroke-width="3" />
   <path d="M0 104H960" stroke="#e0e5ea" />
@@ -40,13 +97,20 @@
   <path d="M52 212H637" stroke="#d9e0e6" />
   <rect x="53" y="178" width="583" height="33" rx="4" fill="#f5f7f9" />
   <g font-family="sans-serif" font-size="10" fill="#627185">
-    <text x="68" y="199">●　aydengen　　Make switching feel natural.</text>
-    <text x="69" y="239">▧　icons</text>
-    <text x="69" y="269">▤　background.js</text>
-    <text x="69" y="299">▤　content.js</text>
-    <text x="69" y="329">▤　content.css</text>
-    <text x="69" y="359">▤　manifest.json</text>
-    <text x="69" y="389">▤　README.md</text>
+    <use href="#circle" x="68.0" y="189.7" width="11" height="11" style="color:#627185" />
+<text x="68" y="199">　 aydengen Make switching feel natural.</text>
+    <use href="#folder" x="69.0" y="229.7" width="11" height="11" style="color:#627185" />
+<text x="69" y="239">　 icons</text>
+    <use href="#library" x="69.0" y="259.6" width="11" height="11" style="color:#627185" />
+<text x="69" y="269">　 background.js</text>
+    <use href="#library" x="69.0" y="289.6" width="11" height="11" style="color:#627185" />
+<text x="69" y="299">　 content.js</text>
+    <use href="#library" x="69.0" y="319.6" width="11" height="11" style="color:#627185" />
+<text x="69" y="329">　 content.css</text>
+    <use href="#library" x="69.0" y="349.6" width="11" height="11" style="color:#627185" />
+<text x="69" y="359">　 manifest.json</text>
+    <use href="#library" x="69.0" y="379.6" width="11" height="11" style="color:#627185" />
+<text x="69" y="389">　 README.md</text>
     <text x="403" y="239">Update extension icons</text>
     <text x="403" y="269">Keep things lightweight</text>
     <text x="403" y="299">A shortcut to your last tab</text>
@@ -67,7 +131,8 @@
     stroke="#d9e0e6"
   />
   <g font-family="sans-serif">
-    <text x="72" y="449" font-size="9" fill="#697585">☷　README</text>
+    <use href="#menu" x="72.0" y="441.4" width="9" height="9" style="color:#697585" />
+<text x="72" y="449" font-size="9" fill="#697585">　 README</text>
     <text x="85" y="498" font-size="29" fill="#303a46" font-weight="700">
       QuickTab
     </text>
@@ -75,9 +140,8 @@
       Fast tab switching. One simple shortcut.
     </text>
     <rect x="85" y="552" width="345" height="25" rx="4" fill="#f3f5f8" />
-    <text x="98" y="569" font-size="10" fill="#60728a">
-      Alt + Q　→　Find your flow.
-    </text>
+    <use href="#arrow-right" x="134.5" y="560.5" width="10" height="10" style="color:#60728a" />
+<text x="98" y="569" font-size="10" fill="#60728a">Alt + Q 　 Find your flow.</text>
     <text x="675" y="195" font-size="14" fill="#303a46" font-weight="600">
       About
     </text>
@@ -87,8 +151,10 @@
     <text x="675" y="257" font-size="10" fill="#4080c6">
       chrome-extension　 productivity
     </text>
-    <text x="675" y="296" font-size="10" fill="#717e8c">☷　Readme</text>
-    <text x="675" y="323" font-size="10" fill="#717e8c">⚖　MIT license</text>
+    <use href="#menu" x="675.0" y="287.5" width="10" height="10" style="color:#717e8c" />
+<text x="675" y="296" font-size="10" fill="#717e8c">　 Readme</text>
+    <use href="#scale" x="675.0" y="314.5" width="10" height="10" style="color:#717e8c" />
+<text x="675" y="323" font-size="10" fill="#717e8c">　 MIT license</text>
     <text x="675" y="383" font-size="13" fill="#303a46" font-weight="600">
       Languages
     </text>

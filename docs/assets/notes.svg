@@ -4,6 +4,55 @@
   height="600"
   viewBox="0 0 960 600"
 >
+  <!-- Lucide 0.468.0; ISC license: icons/LICENSE.txt -->
+  <defs>
+<symbol id="notebook-pen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4" />
+  <path d="M2 6h4" />
+  <path d="M2 10h4" />
+  <path d="M2 14h4" />
+  <path d="M2 18h4" />
+  <path d="M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z" />
+</symbol>
+<symbol id="search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="11" cy="11" r="8" />
+  <path d="m21 21-4.3-4.3" />
+</symbol>
+<symbol id="house" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+</symbol>
+<symbol id="clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="10" />
+  <polyline points="12 6 12 12 16 14" />
+</symbol>
+<symbol id="menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <line x1="4" x2="20" y1="12" y2="12" />
+  <line x1="4" x2="20" y1="6" y2="6" />
+  <line x1="4" x2="20" y1="18" y2="18" />
+</symbol>
+<symbol id="plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M5 12h14" />
+  <path d="M12 5v14" />
+</symbol>
+<symbol id="coffee" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M10 2v2" />
+  <path d="M14 2v2" />
+  <path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1" />
+  <path d="M6 2v2" />
+</symbol>
+<symbol id="corner-down-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <polyline points="15 10 20 15 15 20" />
+  <path d="M4 4v7a4 4 0 0 0 4 4h12" />
+</symbol>
+<symbol id="square-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect width="18" height="18" x="3" y="3" rx="2" />
+  <path d="m9 12 2 2 4-4" />
+</symbol>
+<symbol id="square" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect width="18" height="18" x="3" y="3" rx="2" />
+</symbol>
+  </defs>
   <rect width="960" height="600" fill="#fff" />
   <rect width="180" height="600" fill="#f4f4f1" />
   <rect
@@ -15,9 +64,8 @@
     fill="#fff"
     stroke="#dededb"
   />
-  <text x="28" y="44" font-family="Georgia,serif" font-size="19" fill="#373832">
-    N
-  </text>
+  <use href="#notebook-pen" x="28.0" y="27.9" width="19" height="19" style="color:#373832" />
+<text x="28" y="44" font-family="Georgia,serif" font-size="19" fill="#373832">　</text>
   <text
     x="57"
     y="43"
@@ -29,17 +77,24 @@
     My space
   </text>
   <g fill="#8b8b83" font-family="sans-serif" font-size="11">
-    <text x="25" y="89">⌕　Search anything</text>
-    <text x="25" y="123">⌂　Home</text>
-    <text x="25" y="157">◷　Recently visited</text>
+    <use href="#search" x="25.0" y="79.7" width="11" height="11" style="color:#777d70" />
+<text x="25" y="89">　 Search anything</text>
+    <use href="#house" x="25.0" y="113.7" width="11" height="11" style="color:#777d70" />
+<text x="25" y="123">　 Home</text>
+    <use href="#clock" x="25.0" y="147.7" width="11" height="11" style="color:#777d70" />
+<text x="25" y="157">　 Recently visited</text>
     <text x="25" y="214" font-size="9">PRIVATE</text>
   </g>
   <rect x="12" y="232" width="156" height="30" rx="4" fill="#e7e7e2" />
   <g fill="#62625a" font-family="sans-serif" font-size="10">
-    <text x="25" y="251">☷　Friday notes</text>
-    <text x="25" y="285">☷　Reading list</text>
-    <text x="25" y="319">☷　Little things</text>
-    <text x="25" y="353">＋　Add a page</text>
+    <use href="#menu" x="25.0" y="241.7" width="11" height="11" style="color:#777d70" />
+<text x="25" y="251">　 Friday notes</text>
+    <use href="#menu" x="25.0" y="275.6" width="11" height="11" style="color:#777d70" />
+<text x="25" y="285">　 Reading list</text>
+    <use href="#menu" x="25.0" y="309.6" width="11" height="11" style="color:#777d70" />
+<text x="25" y="319">　 Little things</text>
+    <use href="#plus" x="25.0" y="343.6" width="11" height="11" style="color:#777d70" />
+<text x="25" y="353">　 Add a page</text>
   </g>
   <text x="220" y="36" font-family="sans-serif" font-size="9" fill="#8e8e87">
     My space　 /　 Friday notes
@@ -51,7 +106,8 @@
     fill="#c0cdb0"
   />
   <circle cx="786" cy="106" r="24" fill="#f5f3d5" />
-  <text x="269" y="219" font-size="35">☕</text>
+  <use href="#coffee" x="269.0" y="189.3" width="35" height="35" style="color:#777d70" />
+<text x="269" y="219" font-size="35">　</text>
   <g font-family="sans-serif">
     <text x="270" y="271" font-size="29" font-weight="700" fill="#363b31">
       Friday, a little slower.
@@ -60,16 +116,18 @@
       A few notes on making room for the things that matter.
     </text>
     <rect x="270" y="324" width="505" height="50" rx="4" fill="#f4f5ee" />
-    <text x="286" y="353" font-size="11" fill="#717961">
-      ↳　Less noise. More of what you love.
-    </text>
+    <use href="#corner-down-right" x="286.0" y="343.6" width="11" height="11" style="color:#717961" />
+<text x="286" y="353" font-size="11" fill="#717961">　 Less noise. More of what you love.</text>
     <text x="270" y="412" font-size="16" font-weight="600" fill="#434b39">
       A small plan for today
     </text>
     <g font-size="11" fill="#777d70">
-      <text x="272" y="444">☑　Make something useful</text>
-      <text x="272" y="472">☐　Leave a little room for curiosity</text>
-      <text x="272" y="500">☐　Go for a walk, without a destination</text>
+      <use href="#square-check" x="272.0" y="434.6" width="11" height="11" style="color:#777d70" />
+<text x="272" y="444">　 Make something useful</text>
+      <use href="#square" x="272.0" y="462.6" width="11" height="11" style="color:#777d70" />
+<text x="272" y="472">　 Leave a little room for curiosity</text>
+      <use href="#square" x="272.0" y="490.6" width="11" height="11" style="color:#777d70" />
+<text x="272" y="500">　 Go for a walk, without a destination</text>
     </g>
   </g>
   <rect x="270" y="532" width="505" height="1" fill="#e9ebe3" />
