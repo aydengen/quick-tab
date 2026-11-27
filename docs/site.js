@@ -91,9 +91,10 @@
     stage.classList.add("is-spotlight");
     stage.setAttribute("role", "dialog");
     stage.setAttribute("aria-modal", "true");
-    const { top, bottom } = stage.getBoundingClientRect();
-    if (top < 0 || bottom > document.documentElement.clientHeight) {
-      stage.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "instant" });
+    const { top, bottom, height } = stage.getBoundingClientRect();
+    const viewportHeight = document.documentElement.clientHeight;
+    if (top < 0 || bottom > viewportHeight) {
+      stage.scrollIntoView({ block: height > viewportHeight ? "start" : "nearest", inline: "nearest", behavior: "instant" });
     }
     backdrop.hidden = false;
     stage.getBoundingClientRect();
@@ -109,7 +110,7 @@
     const availableWidth = 2 * Math.min(centerX, document.documentElement.clientWidth - centerX) - 16;
     const availableHeight = 2 * Math.min(centerY, document.documentElement.clientHeight - centerY);
     const fit = Math.min(1.12, availableWidth / stage.offsetWidth, availableHeight / stage.offsetHeight);
-    stage.style.setProperty("--guide-scale", reducedMotion.matches || fit <= 0 ? 1 : fit);
+    stage.style.setProperty("--guide-scale", reducedMotion.matches ? 1 : Math.max(1, fit));
   }
 
   function clearGuide() {
