@@ -1,7 +1,8 @@
 // QuickTab - Background Service Worker
 // 管理最近标签列表和消息通信，必要时补注入面板脚本
 
-const MAX_TABS = 8;
+const DEFAULT_TAB_COUNT = 8;
+const TAB_COUNT_PRESETS = [6, DEFAULT_TAB_COUNT, 12];
 const MAX_STORED_TABS = 20;
 const STORAGE_KEY = 'lastTabs';
 const ONBOARDING_URL = chrome.runtime.getURL('onboarding.html');
@@ -525,21 +526,21 @@ async function buildPanelData(senderTab, includeCss, capture) {
   }
 
   if (senderTab && capture) await refreshCurrentThumb(senderTab).catch(() => {});
-  const [tabs, settings, css] = await Promise.all([
+  const [tabs, { showNonInjectableTabs, tabCount }, css] = await Promise.all([
     getTabList(),
-    chrome.storage.local.get('showNonInjectableTabs'),
+    chrome.storage.local.get(['showNonInjectableTabs', 'tabCount']),
     includeCss ? getPanelCss() : null
   ]);
-  const showAll = Boolean(settings.showNonInjectableTabs);
+  const limit = TAB_COUNT_PRESETS.includes(tabCount) ? tabCount : DEFAULT_TAB_COUNT;
   const incognito = Boolean(senderTab?.incognito);
 
   // 当前标签固定放第一位；不跨普通/无痕窗口泄露标签
   const list = senderTab ? [{ ...toEntry(senderTab), current: true }] : [];
   for (const entry of tabs) {
-    if (list.length >= MAX_TABS) break;
+    if (list.length >= limit) break;
     if (entry.id === senderTab?.id) continue;
     if (Boolean(entry.incognito) !== incognito) continue;
-    if (!showAll && !isInjectableUrl(entry.url)) continue;
+    if (!showNonInjectableTabs && !isInjectableUrl(entry.url)) continue;
     list.push(entry);
   }
 

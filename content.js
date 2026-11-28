@@ -11,6 +11,7 @@
   // 面板到窗口边缘的最小距离
   const PANEL_MARGIN = 16;
   const MIN_PANEL_SCALE = 0.85;
+  const MAX_SINGLE_ROW_TABS = 8;
 
   let host = null;
   let root = null;
@@ -197,6 +198,10 @@
     }
   }
 
+  function columnsFor(count) {
+    return count > MAX_SINGLE_ROW_TABS ? Math.ceil(count / 2) : Math.max(1, count);
+  }
+
   function renderPanel(tabs) {
     ensureHost();
 
@@ -209,6 +214,7 @@
 
     const grid = document.createElement('div');
     grid.className = 'quicktab-grid';
+    grid.style.setProperty('--quicktab-columns', String(columnsFor(tabs.length)));
     grid.setAttribute('role', 'listbox');
     grid.setAttribute('aria-label', 'Recent tabs');
 
@@ -236,7 +242,6 @@
     const panel = root?.querySelector('.quicktab-panel');
     const grid = panel?.querySelector('.quicktab-grid');
     if (!grid) return;
-    grid.style.setProperty('--quicktab-columns', String(getCards().length || 1));
     const availableWidth = window.innerWidth - 2 * PANEL_MARGIN;
     const availableHeight = window.innerHeight - 2 * PANEL_MARGIN;
     const naturalWidth = grid.scrollWidth + panel.offsetWidth - grid.offsetWidth;
@@ -380,11 +385,18 @@
     revealCard(card);
   }
 
-  function cycleSelection(direction) {
+  function cycleSelection(direction, vertical = false) {
     const cards = getCards();
     if (cards.length === 0) return;
 
     const currentIndex = cards.indexOf(root.activeElement);
+    const columns = columnsFor(cards.length);
+    if (vertical && currentIndex >= 0 && cards.length > columns) {
+      const rows = Math.ceil(cards.length / columns);
+      const row = wrapSelectionIndex(Math.floor(currentIndex / columns) + direction, rows);
+      focusCard(cards[Math.min(row * columns + currentIndex % columns, cards.length - 1)]);
+      return;
+    }
     const nextIndex = wrapSelectionIndex(currentIndex + direction, cards.length);
     focusCard(cards[nextIndex]);
   }
@@ -442,10 +454,13 @@
     } else if (e.key === 'Tab') {
       e.preventDefault();
       cycleSelection(e.shiftKey ? -1 : 1);
-    } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || key === 'j') {
+    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      cycleSelection(e.key === 'ArrowDown' ? 1 : -1, true);
+    } else if (e.key === 'ArrowRight' || key === 'j') {
       e.preventDefault();
       cycleSelection(1);
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || key === 'k') {
+    } else if (e.key === 'ArrowLeft' || key === 'k') {
       e.preventDefault();
       cycleSelection(-1);
     }

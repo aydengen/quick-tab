@@ -18,6 +18,18 @@
 
     <div class="quicktab-setting">
       <label class="quicktab-option">
+        <span>Tabs to show</span>
+        <select id="tabCount" aria-describedby="tabCountHint">
+          <option value="6">6</option>
+          <option value="8" selected>8</option>
+          <option value="12">12</option>
+        </select>
+      </label>
+      <p class="quicktab-hint" id="tabCountHint">Maximum recent tabs in the switcher, including the current tab.</p>
+    </div>
+
+    <div class="quicktab-setting">
+      <label class="quicktab-option">
         <span>Show non-switchable tabs</span>
         <input type="checkbox" role="switch" id="showNonInjectable" aria-describedby="showNonInjectableHint">
       </label>

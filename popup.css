@@ -96,7 +96,19 @@ body {
   background: var(--paper);
 }
 
+.quicktab-option select {
+  min-width: 54px;
+  padding: 3px 5px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--paper);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
 .quicktab-option input:focus-visible,
+.quicktab-option select:focus-visible,
 .quicktab-links a:focus-visible {
   outline: 3px solid var(--blue);
   outline-offset: 4px;
