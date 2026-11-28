@@ -13,7 +13,19 @@
         <span>Sticky panel mode</span>
         <input type="checkbox" role="switch" id="stickyMode" aria-describedby="stickyModeHint">
       </label>
-      <p class="quicktab-hint" id="stickyModeHint">Panel stays open without holding Alt. Use <kbd>j</kbd>/<kbd>k</kbd> or arrows to navigate, <kbd>Enter</kbd> to switch.</p>
+      <p class="quicktab-hint" id="stickyModeHint">Keep the panel open after releasing Alt. Move with <kbd>j</kbd>/<kbd>k</kbd> or arrows, then press <kbd>Enter</kbd> to switch.</p>
+    </div>
+
+    <div class="quicktab-setting">
+      <div class="quicktab-option">
+        <span id="tabCountLabel">Tabs to show</span>
+        <div class="quicktab-segments" role="radiogroup" aria-labelledby="tabCountLabel" aria-describedby="tabCountHint">
+          <label><input type="radio" name="tabCount" value="6"><span>6</span></label>
+          <label><input type="radio" name="tabCount" value="8" checked><span>8</span></label>
+          <label><input type="radio" name="tabCount" value="12"><span>12</span></label>
+        </div>
+      </div>
+      <p class="quicktab-hint" id="tabCountHint">Includes the current tab.</p>
     </div>
 
     <div class="quicktab-setting">
@@ -26,7 +38,7 @@
 
     <section class="quicktab-privacy" aria-labelledby="preview-privacy-title">
       <h2 id="preview-privacy-title">Tab previews stay on this device</h2>
-      <p class="quicktab-hint">When enabled, QuickTab remembers recent tab titles, URLs, and icons and automatically captures visible web tabs for switcher thumbnails. The list and thumbnails stay in Chrome’s session storage and clear when you quit Chrome. Nothing is sent or shared.</p>
+      <p class="quicktab-hint">When enabled, QuickTab saves recent tab titles, URLs, icons, and screenshots of visible web tabs until you quit Chrome. Nothing is sent or shared.</p>
       <p class="quicktab-hint" id="enable-previews-hint" hidden>To allow local previews, open the quick start guide.</p>
     </section>
 
